@@ -7,23 +7,22 @@ describe('Contrast', () => {
       const result = Contrast.values();
 
       expect(result).toHaveLength(4);
-      expect(result.map(l => l.value)).toEqual([-1, 0, 0.25, 0.5]);
 
-      expect(result[0]?.name).toBe('REDUCED');
-      expect(result[0]?.value).toBe(-1);
-      expect(result[0]?.label).toBe('Reduced');
+      const expectedValues = [
+        {name: 'REDUCED', value: -1, label: 'Reduced'},
+        {name: 'DEFAULT', value: 0, label: 'Default'},
+        {name: 'MEDIUM', value: 0.25, label: 'Medium'},
+        {name: 'HIGH', value: 0.5, label: 'High'},
+      ];
 
-      expect(result[1]?.name).toBe('DEFAULT');
-      expect(result[1]?.value).toBe(0);
-      expect(result[1]?.label).toBe('Default');
+      expectedValues.forEach((expected, index) => {
+        const level = result[index];
+        expect(level?.name).toBe(expected.name);
+        expect(level?.value).toBe(expected.value);
+        expect(level?.label).toBe(expected.label);
+      });
 
-      expect(result[2]?.name).toBe('MEDIUM');
-      expect(result[2]?.value).toBe(0.25);
-      expect(result[2]?.label).toBe('Medium');
-
-      expect(result[3]?.name).toBe('HIGH');
-      expect(result[3]?.value).toBe(0.5);
-      expect(result[3]?.label).toBe('High');
+      expect(result.map((l) => l.value)).toEqual(expectedValues.map((e) => e.value));
     });
   });
 
@@ -52,6 +51,16 @@ describe('Contrast', () => {
       expect(result).toBe(Contrast.REDUCED);
     });
 
+    it('should return default level for zero', () => {
+      const result = Contrast.closestContrastLevel(0);
+      expect(result).toBe(Contrast.DEFAULT);
+    });
+
+    it('should return high level for values greater than highest', () => {
+      const result = Contrast.closestContrastLevel(1.5);
+      expect(result).toBe(Contrast.HIGH);
+    });
+
     it('should handle exact matches', () => {
       expect(Contrast.closestContrastLevel(0).name).toBe('DEFAULT');
       expect(Contrast.closestContrastLevel(0.25).name).toBe('MEDIUM');
@@ -62,15 +71,6 @@ describe('Contrast', () => {
       expect(Contrast.closestContrastLevel(0.15).name).toBe('DEFAULT');
       expect(Contrast.closestContrastLevel(0.3).name).toBe('MEDIUM');
       expect(Contrast.closestContrastLevel(0.4).name).toBe('MEDIUM');
-    });
-  });
-
-  describe('Enum Structure', () => {
-    it('should have correct numeric values', () => {
-      expect(Contrast.valueOf('DEFAULT').value).toBe(0);
-      expect(Contrast.valueOf('MEDIUM').value).toBe(0.25);
-      expect(Contrast.valueOf('HIGH').value).toBe(0.5);
-      expect(Contrast.valueOf('REDUCED').value).toBe(-1);
     });
   });
 });

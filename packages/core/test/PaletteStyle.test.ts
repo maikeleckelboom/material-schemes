@@ -26,7 +26,6 @@ describe('PaletteStyle', () => {
   describe('values()', () => {
     test('returns all instances in order', () => {
       const values = PaletteStyle.values();
-      console.log(values);
       expect(values).toHaveLength(PALETTE_ENTRIES.length);
       values.forEach((instance, index) => {
         expect(instance.name).toBe(PALETTE_ENTRIES[index]);
