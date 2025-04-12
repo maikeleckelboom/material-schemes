@@ -8,11 +8,24 @@
     "url": "https://github.com/maikeleckelboom/material-schemes.git",
     "directory": "packages/cli"
   },
+  "scripts": {
+    "dev": "bun run src/index.ts"
+  },
   "dependencies": {
-    "@material-schemes/core": "workspace:*"
+    "@inquirer/prompts": "^7.4.1",
+    "@material-schemes/core": "workspace:*",
+    "@types/commander": "^2.12.5",
+    "@types/dedent": "^0.7.2",
+    "@types/prompts": "^2.4.9",
+    "colorjs.io": "^0.5.2",
+    "dedent": "^1.5.3",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "vitest": "^3.1.1"
   },
   "peerDependencies": {
     "typescript": "^5"
