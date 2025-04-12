@@ -12,20 +12,18 @@ export class ContrastThreshold {
     this.value = value;
   }
 
-  static values(): ContrastThreshold[] {
-    return Object.values(this).filter(
-      (v) => v instanceof ContrastThreshold
-    ) as ContrastThreshold[];
+  static getAll(): ContrastThreshold[] {
+    return Object.values(this).filter((v) => v instanceof ContrastThreshold);
   }
 
-  static valueOf(name: string): ContrastThreshold {
-    const found = this.values().find((v) => v.name === name);
+  static fromName(name: string): ContrastThreshold {
+    const found = this.getAll().find((v) => v.name === name);
     if (!found) throw new Error(`Invalid ContrastThreshold: ${name}`);
     return found;
   }
 
   static closest(targetValue: number): ContrastThreshold {
-    const thresholds = this.values();
+    const thresholds = this.getAll();
     let currentMax = -Infinity;
     let currentCandidate: ContrastThreshold | null = null;
 

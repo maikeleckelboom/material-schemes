@@ -29,8 +29,9 @@ describe('ContrastThreshold', () => {
     });
 
     it('should return WCAG_AA_NORMAL_TEXT for 4.5', () => {
-      const result = ContrastThreshold.valueOf('WCAG_AA_NORMAL_TEXT')
+      const result = ContrastThreshold.fromName('WCAG_AA_NORMAL_TEXT')
       expect(result.value).toBe(4.5);
     });
   });
+
 });

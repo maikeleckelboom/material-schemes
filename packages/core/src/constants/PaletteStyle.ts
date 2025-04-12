@@ -1,4 +1,5 @@
 import {
+  Hct,
   SchemeContent,
   SchemeExpressive,
   SchemeFidelity,
@@ -11,7 +12,7 @@ import {
 } from '@material/material-color-utilities';
 
 
-export type PaletteStyleScheme =
+export type SchemeOfPaletteStyle =
   | typeof SchemeMonochrome
   | typeof SchemeNeutral
   | typeof SchemeTonalSpot
@@ -34,7 +35,7 @@ const PALETTE_ENTRIES = [
   'FruitSalad',
 ] as const;
 
-const schemeMap: Record<PaletteStyleName, PaletteStyleScheme> = {
+const paletteStyleSchemes: Record<PaletteStyleName, SchemeOfPaletteStyle> = {
   Monochrome: SchemeMonochrome,
   Neutral: SchemeNeutral,
   TonalSpot: SchemeTonalSpot,
@@ -46,7 +47,7 @@ const schemeMap: Record<PaletteStyleName, PaletteStyleScheme> = {
   FruitSalad: SchemeFruitSalad,
 } as const;
 
-type PaletteStyleName = (typeof PALETTE_ENTRIES)[number];
+export type PaletteStyleName = (typeof PALETTE_ENTRIES)[number];
 
 /**
  * Represents different palette styling options based on Material Design variants.
@@ -68,69 +69,56 @@ type PaletteStyleName = (typeof PALETTE_ENTRIES)[number];
 export class PaletteStyle {
   /**
    * Purely achromatic theme using black, white, and gray tones
-   * @default new PaletteStyle('Monochrome', 0)
    */
   static readonly Monochrome = new PaletteStyle('Monochrome', 0);
 
   /**
    * Subtly chromatic theme with minimal color saturation
-   * @default new PaletteStyle('Neutral', 1)
    */
   static readonly Neutral = new PaletteStyle('Neutral', 1);
 
   /**
    * Calm theme with tonal variations and muted colors
-   * @default new PaletteStyle('TonalSpot', 2)
    */
   static readonly TonalSpot = new PaletteStyle('TonalSpot', 2);
 
   /**
    * High-contrast theme with maximum color saturation
-   * @default new PaletteStyle('Vibrant', 3)
    */
   static readonly Vibrant = new PaletteStyle('Vibrant', 3);
 
   /**
    * Artistic theme with hue shifts from source color
-   * @default new PaletteStyle('Expressive', 4)
    */
   static readonly Expressive = new PaletteStyle('Expressive', 4);
 
   /**
    * Color-accurate theme emphasizing container colors
-   * @default new PaletteStyle('Fidelity', 5)
    */
   static readonly Fidelity = new PaletteStyle('Fidelity', 5);
 
   /**
    * Content-focused theme with primary container emphasis
-   * @default new PaletteStyle('Content', 6)
    */
   static readonly Content = new PaletteStyle('Content', 6);
 
   /**
    * Playful theme with diverse hue distribution
-   * @default new PaletteStyle('Rainbow', 7)
    */
   static readonly Rainbow = new PaletteStyle('Rainbow', 7);
 
   /**
    * Bold theme with contrasting color combinations
-   * @default new PaletteStyle('FruitSalad', 8)
    */
   static readonly FruitSalad = new PaletteStyle('FruitSalad', 8);
 
   private constructor(
     public readonly name: PaletteStyleName,
-    public readonly variant: number,
+    public readonly variant: number
   ) {
   }
 
-  /**
-   * Retrieve all available palette styles in declaration order
-   * @returns Array of PaletteStyle instances
-   */
-  static values(): PaletteStyle[] {
+  static getAll(): PaletteStyle[] {
     return [
       this.Monochrome,
       this.Neutral,
@@ -145,16 +133,47 @@ export class PaletteStyle {
   }
 
   /**
-   * Get PaletteStyle by name
-   * @param name - Case-sensitive style name
-   * @returns Matching PaletteStyle instance
-   * @throws Error if no matching style found
+   * Retrieves all available palette styles in declaration order.
+   *
+   * @returns An array of all `PaletteStyle` instances.
    */
-  static valueOf(name: PaletteStyleName | string): PaletteStyle {
-    const style = this.values().find((s) => s.name === name);
-    if (!style) {
-      throw new Error(`PaletteStyle not found: ${name}`);
-    }
+  static fromName(name: string): PaletteStyle {
+    const style = this.getAll().find((s) => s.name === this.normalize(name));
+    if (!style) throw new Error(`Invalid PaletteStyle: ${name}`);
     return style;
+  }
+
+  /**
+   * Normalizes a given name to PascalCase.
+   *
+   * @param name - A string in PascalCase, kebab-case, snake_case, or camelCase.
+   * @returns The normalized string in PascalCase.
+   */
+  static normalize(name: string): string {
+    return name
+      .replace(/[^a-zA-Z0-9]/g, ' ') // Replace non-alphanumerics with spaces
+      .replace(/([a-z])([A-Z])/g, '$1 $2') // Split camelCase into words
+      .toLowerCase()
+      .split(' ')
+      .filter((word) => word.length > 0)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+  }
+
+  /**
+   * Creates a `DynamicScheme` based on the palette style.
+   *
+   * @param sourceColor - The source color in ARGB format.
+   * @param isDark - Indicates if the scheme is for a dark theme. Defaults to `false`.
+   * @param contrastLevel - The contrast level for the scheme.
+   * @returns An instance of the corresponding color scheme.
+   */
+  public createScheme(
+    sourceColor: number,
+    isDark: boolean = false,
+    contrastLevel: number = 0.0,
+  ) {
+    const SchemeConstructor = paletteStyleSchemes[this.name];
+    return new SchemeConstructor(Hct.fromInt(sourceColor), isDark, contrastLevel);
   }
 }

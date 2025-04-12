@@ -2,75 +2,74 @@ import {describe, expect, it} from 'vitest';
 import {Contrast} from '../src/constants/Contrast.ts';
 
 describe('Contrast', () => {
-  describe('values()', () => {
+  describe('getAll()', () => {
     it('should return all levels sorted by value', () => {
-      const result = Contrast.values();
+      const result = Contrast.getAll();
 
       expect(result).toHaveLength(4);
 
       const expectedValues = [
-        {name: 'REDUCED', value: -1, label: 'Reduced'},
-        {name: 'DEFAULT', value: 0, label: 'Default'},
-        {name: 'MEDIUM', value: 0.25, label: 'Medium'},
-        {name: 'HIGH', value: 0.5, label: 'High'},
+        {value: -1, name: 'Reduced'},
+        {value: 0, name: 'Default'},
+        {value: 0.25, name: 'Medium'},
+        {value: 0.5, name: 'High'},
       ];
 
       expectedValues.forEach((expected, index) => {
         const level = result[index];
         expect(level?.name).toBe(expected.name);
         expect(level?.value).toBe(expected.value);
-        expect(level?.label).toBe(expected.label);
       });
 
       expect(result.map((l) => l.value)).toEqual(expectedValues.map((e) => e.value));
     });
   });
 
-  describe('closestContrastLevel', () => {
+  describe('closest', () => {
     const testCases = [
-      {input: -1, expected: 'REDUCED'},
-      {input: -0.5, expected: 'REDUCED'},
-      {input: 0, expected: 'DEFAULT'},
-      {input: 0.1, expected: 'DEFAULT'},
-      {input: 0.25, expected: 'MEDIUM'},
-      {input: 0.3, expected: 'MEDIUM'},
-      {input: 0.5, expected: 'HIGH'},
-      {input: 0.6, expected: 'HIGH'},
-      {input: 1, expected: 'HIGH'},
+      {input: -1, expected: 'Reduced'},
+      {input: -0.5, expected: 'Reduced'},
+      {input: 0, expected: 'Default'},
+      {input: 0.1, expected: 'Default'},
+      {input: 0.25, expected: 'Medium'},
+      {input: 0.3, expected: 'Medium'},
+      {input: 0.5, expected: 'High'},
+      {input: 0.6, expected: 'High'},
+      {input: 1, expected: 'High'},
     ];
 
     testCases.forEach(({input, expected}) => {
       it(`should return ${expected} for input ${input}`, () => {
-        const result = Contrast.closestContrastLevel(input);
+        const result = Contrast.closest(input);
         expect(result.name).toBe(expected);
       });
     });
 
-    it('should return reduced level for negative values', () => {
-      const result = Contrast.closestContrastLevel(-0.1);
-      expect(result).toBe(Contrast.REDUCED);
+    it('should return reduced level for negative getAll', () => {
+      const result = Contrast.closest(-0.1);
+      expect(result).toBe(Contrast.Reduced);
     });
 
     it('should return default level for zero', () => {
-      const result = Contrast.closestContrastLevel(0);
-      expect(result).toBe(Contrast.DEFAULT);
+      const result = Contrast.closest(0);
+      expect(result).toBe(Contrast.Default);
     });
 
-    it('should return high level for values greater than highest', () => {
-      const result = Contrast.closestContrastLevel(1.5);
-      expect(result).toBe(Contrast.HIGH);
+    it('should return high level for getAll greater than highest', () => {
+      const result = Contrast.closest(1.5);
+      expect(result).toBe(Contrast.High);
     });
 
     it('should handle exact matches', () => {
-      expect(Contrast.closestContrastLevel(0).name).toBe('DEFAULT');
-      expect(Contrast.closestContrastLevel(0.25).name).toBe('MEDIUM');
-      expect(Contrast.closestContrastLevel(0.5).name).toBe('HIGH');
+      expect(Contrast.closest(0).name).toBe('Default');
+      expect(Contrast.closest(0.25).name).toBe('Medium');
+      expect(Contrast.closest(0.5).name).toBe('High');
     });
 
-    it('should handle values between levels', () => {
-      expect(Contrast.closestContrastLevel(0.15).name).toBe('DEFAULT');
-      expect(Contrast.closestContrastLevel(0.3).name).toBe('MEDIUM');
-      expect(Contrast.closestContrastLevel(0.4).name).toBe('MEDIUM');
+    it('should handle getAll between levels', () => {
+      expect(Contrast.closest(0.15).name).toBe('Default');
+      expect(Contrast.closest(0.3).name).toBe('Medium');
+      expect(Contrast.closest(0.4).name).toBe('Medium');
     });
   });
 });
