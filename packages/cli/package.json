@@ -1,0 +1,20 @@
+{
+  "name": "@material-schemes/cli",
+  "module": "src/index.ts",
+  "type": "module",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maikeleckelboom/material-schemes.git",
+    "directory": "packages/cli"
+  },
+  "dependencies": {
+    "@material-schemes/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

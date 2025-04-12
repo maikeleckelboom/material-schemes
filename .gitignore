@@ -1,0 +1,24 @@
+# Modules
+node_modules/
+**/node_modules/
+
+# Editor directories
+.vscode/
+.idea/
+
+# Lockfiles
+*.lock
+
+# Logs
+*.log
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/
+
+# Environment Files
+.env
+.env.local
+.env.*.local

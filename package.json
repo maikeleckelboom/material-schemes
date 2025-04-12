@@ -1,0 +1,8 @@
+{
+  "name": "material-schemes",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

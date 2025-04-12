@@ -1,0 +1,17 @@
+{
+  "name": "@material-schemes/core",
+  "module": "src/index.ts",
+  "type": "module",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maikeleckelboom/material-schemes.git",
+    "directory": "packages/core"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
