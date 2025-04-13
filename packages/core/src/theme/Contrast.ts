@@ -16,12 +16,6 @@ export class Contrast {
     return Object.values(this).filter((v) => v instanceof Contrast);
   }
 
-  public static fromName(name: string): Contrast {
-    const found = this.all().find((v) => v.name === name);
-    if (!found) throw new Error(`Invalid Contrast: ${name}`);
-    return found;
-  }
-
   public static closest(level: number): Contrast {
     if (level < 0) return this.Reduced;
 

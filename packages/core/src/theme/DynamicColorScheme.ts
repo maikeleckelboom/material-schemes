@@ -78,9 +78,9 @@ export type DynamicSchemeOptionsInput =
   | ({ sourceColor?: number; primary: number } & DynamicSchemeOptions);
 
 export class DynamicColorScheme extends M3DynamicScheme {
-  // Overload 1: Accepts sourceColor and options separately
+  // Overload 1: sourceColor and options separately
   constructor(sourceColor: Color, options?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>);
-  // Overload 2: Accepts a full configuration object
+  // Overload 2: full configuration object
   constructor(options: DynamicSchemeOptionsInput);
   constructor(arg1: Color | DynamicSchemeOptionsInput, arg2?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>) {
     const options: DynamicSchemeOptionsInput = typeof arg1 === 'number'

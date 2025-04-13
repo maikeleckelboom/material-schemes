@@ -1,6 +1,4 @@
-import {DynamicColorScheme} from "../src/theme/DynamicColorScheme.ts";
-import {PaletteStyle} from "../src/theme/PaletteStyle.ts";
-import {Contrast} from "../src/theme/Contrast.ts";
+import {Contrast, DynamicColorScheme, PaletteStyle} from "../src";
 import {describe, expect, it, test} from "vitest";
 
 describe('DynamicColorScheme', () => {
@@ -10,7 +8,7 @@ describe('DynamicColorScheme', () => {
 
     expect(scheme.sourceColorArgb).toBe(sourceColor);
     expect(scheme.isDark).toBe(false);
-    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.variant);
+    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.value);
     expect(scheme.contrastLevel).toBe(Contrast.Default.value);
   });
 
@@ -19,7 +17,7 @@ describe('DynamicColorScheme', () => {
       sourceColor: 0xFF0000,
       style: PaletteStyle.Expressive
     });
-    expect(scheme.variant).toEqual(PaletteStyle.Expressive.variant);
+    expect(scheme.variant).toEqual(PaletteStyle.Expressive.value);
   });
 
   test('should set isDark to true when provided', () => {
@@ -45,7 +43,7 @@ describe('DynamicColorScheme', () => {
       sourceColor: 0xFF0000,
       style
     });
-    expect(scheme.variant).toBe(style.variant);
+    expect(scheme.variant).toBe(style.value);
   });
 
   test('should default contrastLevel to Contrast.Default.value', () => {
@@ -71,9 +69,9 @@ describe('DynamicColorScheme', () => {
       style: PaletteStyle.Expressive
     })
 
-    expect(scheme1.variant).toEqual(PaletteStyle.TonalSpot.variant);
-    expect(scheme2.variant).toEqual(PaletteStyle.TonalSpot.variant);
-    expect(scheme3.variant).toEqual(PaletteStyle.Expressive.variant);
+    expect(scheme1.variant).toEqual(PaletteStyle.TonalSpot.value);
+    expect(scheme2.variant).toEqual(PaletteStyle.TonalSpot.value);
+    expect(scheme3.variant).toEqual(PaletteStyle.Expressive.value);
   });
 
   it('should accept sourceColor and options separately', () => {
