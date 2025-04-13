@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 // scripts/dev.ts
-// This script runs the development server for all workspaces using Bun's native APIs
+// This script runs the development server from all workspaces using Bun's native APIs
 
 import {existsSync, type PathLike} from "fs";
 import {readdir} from "fs/promises";
 
-console.log("Starting development servers for workspaces...");
+console.log("Starting development servers from workspaces...");
 
 const processes: any[] = [];
 

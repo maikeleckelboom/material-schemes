@@ -1,5 +1,5 @@
 {
-  "name": "@material-schemes/core",
+  "name": "@chromavert/material-schemes",
   "module": "src/index.ts",
   "type": "module",
   "version": "0.0.0",

@@ -1,11 +1,11 @@
 {
-  "name": "material-schemes",
+  "name": "@chromavert/material-schemes",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run ./packages/cli/src/index.ts --no-cache --smol"
+    "dev": "bun run ./scripts/dev.ts"
   }
 }

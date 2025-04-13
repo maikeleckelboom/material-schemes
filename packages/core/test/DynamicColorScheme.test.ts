@@ -1,7 +1,7 @@
 import {DynamicColorScheme} from "../src/theme/DynamicColorScheme.ts";
-import {PaletteStyle} from "../src/constants/PaletteStyle.ts";
-import {Contrast} from "../src/constants/Contrast.ts";
-import {describe, expect, test} from "vitest";
+import {PaletteStyle} from "../src/theme/PaletteStyle.ts";
+import {Contrast} from "../src/theme/Contrast.ts";
+import {describe, expect, it, test} from "vitest";
 
 describe('DynamicColorScheme', () => {
   test('should initialize with default parameters when only sourceColor is provided', () => {
@@ -9,12 +9,12 @@ describe('DynamicColorScheme', () => {
     const scheme = new DynamicColorScheme({sourceColor});
 
     expect(scheme.sourceColorArgb).toBe(sourceColor);
-    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.variant);
     expect(scheme.isDark).toBe(false);
+    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.variant);
     expect(scheme.contrastLevel).toBe(Contrast.Default.value);
   });
 
-  test('should accept PaletteStyle name for style option', () => {
+  test('should accept PaletteStyle id from style option', () => {
     const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       style: PaletteStyle.Expressive
@@ -39,7 +39,7 @@ describe('DynamicColorScheme', () => {
     expect(scheme.contrastLevel).toBe(contrastLevel);
   });
 
-  test('should use provided PaletteStyle instance for style', () => {
+  test('should use provided PaletteStyle instance from style', () => {
     const style = PaletteStyle.Expressive;
     const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
@@ -55,21 +55,7 @@ describe('DynamicColorScheme', () => {
     expect(scheme.contrastLevel).toBe(Contrast.Default.value);
   });
 
-  // toJSON
-  test('should return a ColorScheme object', () => {
-    const scheme = new DynamicColorScheme({
-      sourceColor: 0xFF0000
-    });
-    const colorScheme = scheme.toJSON()
-    expect(colorScheme).toHaveProperty('primaryPaletteKeyColor');
-    expect(colorScheme).toHaveProperty('secondaryPaletteKeyColor');
-    expect(colorScheme).toHaveProperty('tertiaryPaletteKeyColor');
-    expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
-    expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
-  });
-
-
-  test('should accept any casing/format for style names', () => {
+  test('should accept any casing/format from style names', () => {
     const scheme1 = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       style: 'tonal-spot'
@@ -89,4 +75,47 @@ describe('DynamicColorScheme', () => {
     expect(scheme2.variant).toEqual(PaletteStyle.TonalSpot.variant);
     expect(scheme3.variant).toEqual(PaletteStyle.Expressive.variant);
   });
-});
+
+  it('should accept sourceColor and options separately', () => {
+    const scheme = new DynamicColorScheme(0xFF0000, {
+      primary: 0xFF00FF,
+      secondary: 0xFFFF00,
+      tertiary: 0x00FFFF,
+      neutral: 0xFFFFFF,
+      neutralVariant: 0x000000,
+    });
+
+    expect(scheme.sourceColorArgb).toBeDefined()
+  })
+
+  it('should accept options object', () => {
+    const scheme = new DynamicColorScheme({
+      sourceColor: 0xFF0000,
+      primary: 0xFF00FF,
+      secondary: 0xFFFF00,
+      tertiary: 0x00FFFF,
+      neutral: 0xFFFFFF,
+      neutralVariant: 0x000000,
+    });
+    expect(scheme.sourceColorArgb).toBeDefined()
+  })
+
+  it('should return a ColorScheme object with correct properties', () => {
+    const scheme = new DynamicColorScheme({
+      sourceColor: 0xFF0000,
+      primary: 0xFF00FF,
+      secondary: 0xFFFF00,
+      tertiary: 0x00FFFF,
+      neutral: 0xFFFFFF,
+      neutralVariant: 0x000000,
+    });
+
+    const colorScheme = scheme.toJSON();
+    expect(colorScheme).toHaveProperty('primaryPaletteKeyColor');
+    expect(colorScheme).toHaveProperty('secondaryPaletteKeyColor');
+    expect(colorScheme).toHaveProperty('tertiaryPaletteKeyColor');
+    expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
+    expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
+  });
+})
+

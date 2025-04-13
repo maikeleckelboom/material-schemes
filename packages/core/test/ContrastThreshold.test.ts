@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ContrastThreshold} from '../src/constants/ContrastThreshold.ts';
+import {ContrastThreshold} from '../src/theme/ContrastThreshold.ts';
 
 describe('ContrastThreshold', () => {
 
@@ -28,7 +28,7 @@ describe('ContrastThreshold', () => {
       expect(result.name).toBe('WCAG_AA_LARGE_TEXT');
     });
 
-    it('should return WCAG_AA_NORMAL_TEXT for 4.5', () => {
+    it('should return WCAG_AA_NORMAL_TEXT from 4.5', () => {
       const result = ContrastThreshold.fromName('WCAG_AA_NORMAL_TEXT')
       expect(result.value).toBe(4.5);
     });

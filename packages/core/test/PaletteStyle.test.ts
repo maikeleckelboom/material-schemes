@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'vitest';
-import {PaletteStyle} from '../src/constants/PaletteStyle.ts';
+import {PaletteStyle} from '../src/theme/PaletteStyle.ts';
 
 const PALETTE_ENTRIES = [
   'Monochrome',
@@ -15,20 +15,20 @@ const PALETTE_ENTRIES = [
 
 describe('PaletteStyle', () => {
   describe('Static Instances', () => {
-    test.each(PALETTE_ENTRIES)('%s has correct name and variant', (name) => {
+    test.each(PALETTE_ENTRIES)('%s has correct id and variant', (name) => {
       const paletteStyle = PaletteStyle.fromName(name)
 
-      expect(paletteStyle.name).toBe(name);
+      expect(paletteStyle.id).toBe(name);
       expect(paletteStyle.variant).toBe(PALETTE_ENTRIES.indexOf(name));
     });
   });
 
-  describe('getAll()', () => {
+  describe('all()', () => {
     test('returns all instances in order', () => {
-      const values = PaletteStyle.getAll();
+      const values = PaletteStyle.all();
       expect(values).toHaveLength(PALETTE_ENTRIES.length);
       values.forEach((instance, index) => {
-        expect(instance.name).toBe(PALETTE_ENTRIES[index]);
+        expect(instance.id).toBe(PALETTE_ENTRIES[index]);
       });
     });
   });
@@ -36,17 +36,17 @@ describe('PaletteStyle', () => {
   describe('fromName()', () => {
     test.each(PALETTE_ENTRIES)('retrieves %s instance', (name) => {
       const instance = PaletteStyle.fromName(name);
-      expect(instance.name).toBe(name);
+      expect(instance.id).toBe(name);
     });
 
-    test('throws error for invalid name', () => {
+    test('throws error from invalid id', () => {
       expect(() => PaletteStyle.fromName('Invalid')).toThrowError(
         'Invalid PaletteStyle: Invalid',
       );
     });
   });
 
-  test('should normalize style names to PascalCase', () => {
+  test('should normalizeName style names to PascalCase', () => {
     const testCases = [
       {input: 'tonal-spot', expected: 'TonalSpot'},
       {input: 'TonalSpot', expected: 'TonalSpot'},
@@ -57,7 +57,7 @@ describe('PaletteStyle', () => {
     ];
 
     testCases.forEach(({input, expected}) => {
-      expect(PaletteStyle.normalize(input)).toBe(expected);
+      expect(PaletteStyle.normalizeName(input)).toBe(expected);
     });
   });
 

@@ -17,6 +17,10 @@ export const logger = {
   log(...args: unknown[]) {
     consola.log(args.join(' '))
   },
+  fatal(...args: unknown[]) {
+    consola.log(highlighter.error(args.join(' ')))
+    process.exit(1)
+  },
   break() {
     consola.log('')
   },

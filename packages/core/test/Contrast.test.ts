@@ -1,10 +1,10 @@
 import {describe, expect, it} from 'vitest';
-import {Contrast} from '../src/constants/Contrast.ts';
+import {Contrast} from '../src/theme/Contrast.ts';
 
 describe('Contrast', () => {
-  describe('getAll()', () => {
+  describe('all()', () => {
     it('should return all levels sorted by value', () => {
-      const result = Contrast.getAll();
+      const result = Contrast.all();
 
       expect(result).toHaveLength(4);
 
@@ -45,17 +45,17 @@ describe('Contrast', () => {
       });
     });
 
-    it('should return reduced level for negative getAll', () => {
+    it('should return reduced level from negative all', () => {
       const result = Contrast.closest(-0.1);
       expect(result).toBe(Contrast.Reduced);
     });
 
-    it('should return default level for zero', () => {
+    it('should return default level from zero', () => {
       const result = Contrast.closest(0);
       expect(result).toBe(Contrast.Default);
     });
 
-    it('should return high level for getAll greater than highest', () => {
+    it('should return high level from all greater than highest', () => {
       const result = Contrast.closest(1.5);
       expect(result).toBe(Contrast.High);
     });
@@ -66,7 +66,7 @@ describe('Contrast', () => {
       expect(Contrast.closest(0.5).name).toBe('High');
     });
 
-    it('should handle getAll between levels', () => {
+    it('should handle all between levels', () => {
       expect(Contrast.closest(0.15).name).toBe('Default');
       expect(Contrast.closest(0.3).name).toBe('Medium');
       expect(Contrast.closest(0.4).name).toBe('Medium');

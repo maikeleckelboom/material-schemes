@@ -1,6 +1,6 @@
-import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import {PaletteStyle} from "../constants/PaletteStyle.ts";
-import {Contrast} from "../constants/Contrast.ts";
+import {DynamicScheme as M3DynamicScheme, TonalPalette} from "@material/material-color-utilities";
+import {PaletteStyle} from "./PaletteStyle.ts";
+import {Contrast} from "./Contrast.ts";
 
 export interface ColorScheme {
   primaryPaletteKeyColor: number;
@@ -59,40 +59,33 @@ export interface ColorScheme {
   onTertiaryFixedVariant: number;
 }
 
+export type Color = number
 
-type AdditionalOptions = {
+export interface DynamicSchemeOptions {
+  sourceColor?: Color;
+  primary?: Color;
+  secondary?: Color;
+  tertiary?: Color;
+  neutral?: Color;
+  neutralVariant?: Color;
   style?: PaletteStyle | string;
-  isDark?: boolean;
   contrastLevel?: number;
-  secondary?: number;
-  tertiary?: number;
-  neutral?: number;
-  neutralVariant?: number;
-};
-
-export type DynamicColorSchemeOptions =
-  | ({ sourceColor: number; primary?: number } & AdditionalOptions)
-  | ({ sourceColor?: number; primary: number } & AdditionalOptions);
-
-function paletteStyleFromName(style: string | PaletteStyle): string {
-  return typeof style === 'string' ? style : style.name;
+  isDark?: boolean;
 }
 
-export class DynamicColorScheme extends DynamicScheme {
-  // Overload 1: Accepts a source color and then extra options (sourceColor not repeated)
-  constructor(sourceColor: number, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>);
-  // Overload 2: Accepts a configuration object
-  constructor(config: DynamicColorSchemeOptions);
-  // Actual implementation
-  constructor(arg1: number | DynamicColorSchemeOptions, arg2?: Omit<DynamicColorSchemeOptions, 'sourceColor'>) {
-    let config: DynamicColorSchemeOptions;
-    if (typeof arg1 === 'number') {
-      // If the first argument is a number, we combine it with the rest of the options.
-      config = {sourceColor: arg1, ...arg2};
-    } else {
-      // Otherwise, the caller passed a configuration object.
-      config = arg1;
-    }
+export type DynamicSchemeOptionsInput =
+  | ({ sourceColor: number; primary?: number } & DynamicSchemeOptions)
+  | ({ sourceColor?: number; primary: number } & DynamicSchemeOptions);
+
+export class DynamicColorScheme extends M3DynamicScheme {
+  // Overload 1: Accepts sourceColor and options separately
+  constructor(sourceColor: Color, options?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>);
+  // Overload 2: Accepts a full configuration object
+  constructor(options: DynamicSchemeOptionsInput);
+  constructor(arg1: Color | DynamicSchemeOptionsInput, arg2?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>) {
+    const options: DynamicSchemeOptionsInput = typeof arg1 === 'number'
+      ? {sourceColor: arg1, ...arg2}
+      : arg1;
 
     const {
       sourceColor,
@@ -104,21 +97,17 @@ export class DynamicColorScheme extends DynamicScheme {
       isDark = false,
       style = PaletteStyle.TonalSpot,
       contrastLevel = Contrast.Default.value
-    } = config;
+    } = options;
 
     const sourceColorArgb = Number(sourceColor ?? primary);
     if (isNaN(sourceColorArgb)) {
-      throw new Error("Either sourceColor or primary must be provided.");
+      throw new Error("Valid color required: provide either sourceColor or primary");
     }
 
-    const paletteStyle = PaletteStyle.fromName(paletteStyleFromName(style));
-    const scheme = paletteStyle.createScheme(sourceColorArgb, isDark, contrastLevel);
+    const scheme = PaletteStyle.from(style).toScheme(sourceColorArgb, isDark, contrastLevel);
 
     super({
-      isDark,
-      contrastLevel,
-      variant: scheme.variant,
-      sourceColorArgb,
+      ...scheme,
       primaryPalette: primary ? TonalPalette.fromInt(primary) : scheme.primaryPalette,
       secondaryPalette: secondary ? TonalPalette.fromInt(secondary) : scheme.secondaryPalette,
       tertiaryPalette: tertiary ? TonalPalette.fromInt(tertiary) : scheme.tertiaryPalette,

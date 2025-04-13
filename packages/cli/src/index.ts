@@ -1,52 +1,48 @@
 import {Command, type CommanderError} from 'commander';
-import {logger} from "./utils/logger.ts";
-import {handleError} from "./utils/error.ts";
-import {generateCommand} from "./commands/generate.ts";
+import {logger} from './utils/logger';
+import {generateCommand} from './commands/generate';
+import {CustomError} from "./utils/errors";
+import {getErrorExitCode, handleError} from "./utils/error";
 
-const program = new Command();
+import {version} from '../package.json' assert {type: 'json'};
 
-program
-  .name('material-schemes/cli')
-  .description('A CLI that effortlessly generates complete Material 3 color schemes.')
-  .version('0.0.1')
-  .configureOutput({
-    writeOut: (str: string) => logger.info(str),
-    writeErr: (str: string) => logger.error(str),
-  });
+async function main() {
+  const program = new Command();
 
-program.addCommand(generateCommand);
-
-program.exitOverride((err: CommanderError) => {
-  if (err.code === 'commander.help') process.exit(0);
-  throw err;
-});
-
-
-program.hook('preAction', async (thisCommand: Command) => {
-});
-
-program.hook('postAction', async (thisCommand: Command) => {
-});
-
-process.on('uncaughtException', (error: Error) => {
-  if (error.name === 'ExitPromptError') {
-    logger.log('👋 Until next time!');
-    process.exit(0);
-  }
-  handleError(error);
-});
-
-process.on('unhandledRejection', (reason: unknown) => {
-  handleError(new Error(`Unhandled rejection: ${reason}`));
-});
-
-async function run() {
   try {
+    program
+      .name('material-schemes/cli')
+      .description('A CLI for generating complete Material 3 color schemes')
+      .version(version)
+      .configureOutput({
+        writeOut: (str) => logger.info(str),
+        writeErr: (str) => logger.error(`[Commander] ${str}`),  // Add context
+      })
+      .exitOverride((err: CommanderError) => {
+        throw new CustomError(err.message, err.exitCode, {code: err.code});
+      })
+      .showHelpAfterError('(add --help for additional information)');
+
+    program.addCommand(generateCommand);
+
     await program.parseAsync(process.argv);
-    process.exit(0);
-  } catch (error) {
-    process.exit(1);
+
+  } catch (error: unknown) {
+    handleError(error);
+    process.exit(getErrorExitCode(error));
   }
 }
 
-run();
+// Global error handlers
+process.on('uncaughtException', (error: Error) => {
+  handleError(error);
+  process.exit(getErrorExitCode(error));
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  handleError(reason);
+  process.exit(getErrorExitCode(reason));
+});
+
+// Start the CLI
+main();

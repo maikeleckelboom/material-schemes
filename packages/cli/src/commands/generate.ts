@@ -1,9 +1,9 @@
 import {Command, type OptionValues} from 'commander';
-import {input, select} from '@inquirer/prompts';
-import dedent from "dedent";
+import {select} from '@inquirer/prompts';
+import {logger} from "../utils/logger.ts";
 
 /**
- * Configuration options for generating a Material Design 3 color scheme
+ * Configuration options from generating a Material Design 3 color scheme
  */
 interface ColorSchemeOptions {
   source?: string;
@@ -12,67 +12,160 @@ interface ColorSchemeOptions {
   tertiary?: string;
   neutral?: string;
   neutralVariant?: string;
-  dark?: boolean;
-  light?: boolean;
-  contrast?: string;
+  style?: string;
+  isDark?: boolean;
+  contrastLevel?: string;
   variant?: string;
+
+  [key: string]: any;
 }
 
-const description = dedent(`
-  Generate a Material Design 3 color scheme based on a source color.
-  See MD3 specs: https://m3.material.io/styles/color/overview
-`)
 
+/**
+ * Initializes the Material Design 3 color scheme generator.
+ *
+ * @command init
+ * @description Generate a Material Design 3 color scheme.
+ *
+ * @option --source [color]
+ * Seed color for generating the scheme (optional).
+ *
+ * @option --primary [color]
+ * Override the primary palette color. Used for key UI components and primary actions.
+ *
+ * @option --secondary [color]
+ * Override the secondary palette color. Used for less prominent components and secondary actions.
+ *
+ * @option --tertiary [color]
+ * Override the tertiary palette color. Used for contrasting accents and special UI elements.
+ *
+ * @option --neutral [color]
+ * Override the neutral palette color. Used for backgrounds, surfaces, and standard text.
+ *
+ * @option --neutral-variant [color]
+ * Override the neutral variant palette color. Used for medium emphasis elements and component variants.
+ *
+ * @option --dark [boolean]
+ * Generate a dark mode color scheme when true, light mode when false.
+ *
+ * @option --contrast-level [contrast-level]
+ * Set the contrast level for accessibility (reduced | low | medium | high). Default is 'medium 0.0'.
+ *
+ * @option --style [style]
+ * Specify the palette style variant (tonal-spot | expressive | vibrant | default). Default is 'tonal-spot'.
+ *
+ * @example
+ * // Correct usage with hex color values:
+ * // Note: The '#' character must be escaped or quoted to prevent shell misinterpretation.
+ *
+ * // Using quotes:
+ * your-cli init --primary "#ff00ff"
+ *
+ * // Escaping the '#' character:
+ * your-cli init --primary \#ff00ff
+ *
+ * // Using '=' to assign the value:
+ * your-cli init --primary=#ff00ff
+ *
+ * // Incorrect usage (shell may ignore the argument after '#'):
+ * your-cli init --primary #ff00ff
+ */
 export const generateCommand = new Command()
-  .command('generate')
-  .alias('gen')
-  .description(description)
-  .option('--source <color>', 'Base color for scheme generation (HEX or CSS color name)')
-  .option('--primary <color>', 'Primary color override (HEX or CSS color name)')
-  .option('--secondary <color>', 'Secondary color override')
-  .option('--tertiary <color>', 'Tertiary color override')
-  .option('--neutral <color>', 'Neutral color override')
-  .option('--neutral-variant <color>', 'Neutral variant color override')
-  .option('--dark <boolean>', 'Generate dark mode scheme')
-  .option('-c, --contrast <contrast-level>', 'Contrast level (low|medium|high)', 'medium')
-  .option('-v, --variant <palette-style>', 'Color scheme variant (tonal-spot|expressive|vibrant|default)')
+  .command('init')
+  .description('Generate a Material Design 3 color scheme')
+  .option('-s, --source [color]', 'Seed color for generating the scheme (optional)')
+  .option('-p, --primary [color]', 'Override the primary palette color.')
+  .option('-e, --secondary [color]', 'Override the secondary palette color.')
+  .option('-t, --tertiary [color]', 'Override the tertiary palette color.')
+  .option('-n, --neutral [color]', 'Override the neutral palette color.')
+  .option('-v, --neutral-variant [color]', 'Override the neutral variant palette color.')
+  .option('-d, --dark [boolean]', 'Generate a dark mode color scheme when true, light mode when false.', false)
+  .option('-c, --contrast-level [contrast-level]', 'Set the contrast level for accessibility (reduced | low | medium | high)', 'medium 0.0')
+  //     Monochrome,
+  //     Neutral,
+  //     TonalSpot,
+  //     Vibrant,
+  //     Expressive,
+  //     Fidelity,
+  //     Content,
+  //     Rainbow,
+  //     FruitSalad,
+
+  .option('-y, --style [style]', 'Specify the palette style variant (tonal-spot | expressive | rain-bow | fidelity |  vibrant | content | fruit-salad | monochrome | vibrant)', 'tonal-spot')
   .action(async (options: OptionValues, command: Command) => {
-    const config: ColorSchemeOptions = options;
-
-    // Only prompt for these if not provided in CLI
-    const essentialOptions = {
-      variant: {
-        message: 'Choose color scheme variant',
-        choices: [
-          {value: 'tonal-spot', name: 'Tonal Spot - Balanced contrast with tonal accents'},
-          {value: 'expressive', name: 'Expressive - Vibrant, saturated colors'},
-          {value: 'vibrant', name: 'Vibrant - High-contrast bold colors'},
-          {value: 'default', name: 'Default - Material Design baseline'}
-        ]
-      },
-      contrast: {
-        message: 'Select contrast level',
-        choices: [
-          {value: 'high', name: 'High - Maximum readability'},
-          {value: 'medium', name: 'Medium - Balanced contrast (recommended)'},
-          {value: 'low', name: 'Low - Subtle contrast'}
-        ]
-      }
-    };
-
-    // Prompt for remaining essential options
-    for (const [option, settings] of Object.entries(essentialOptions)) {
-      // @ts-ignore
-      if (!config[option]) {
-        // @ts-ignore
-        config[option] = await select(settings);
-      }
-    }
-
-    // Add scheme generation logic
-    console.log('Generating scheme with:', {
-      ...config,
-      // Default to light mode if no scheme specified
-      mode: config.dark ? 'dark' : 'light'
-    });
+    const config = await processConfig(options);
+    logger.info('Processed the configuration', JSON.stringify(config, null, 2));
   });
+
+
+/**
+ * Process the configuration options for generating a color scheme.
+ *
+ * This function checks if essential color options are provided.
+ * If not, it prompts the user to select from predefined choices.
+ *
+ * @param config - The initial configuration object.
+ * @returns A promise that resolves to the processed configuration object with all essential options filled.
+ */
+async function processConfig(config: ColorSchemeOptions): Promise<ColorSchemeOptions> {
+
+  const essentialOptions = {
+    source: {
+      message: 'Select a source color',
+      choices: ['#FF0000', '#00FF00', '#0000FF'],
+      default: '#FF0000',
+    },
+    primary: {
+      message: 'Select a primary color',
+      choices: ['#FF0000', '#00FF00', '#0000FF'],
+      default: '#FF0000',
+    },
+    secondary: {
+      message: 'Select a secondary color',
+      choices: ['#FF0000', '#00FF00', '#0000FF'],
+      default: '#00FF00',
+    },
+    tertiary: {
+      message: 'Select a tertiary color',
+      choices: ['#FF0000', '#00FF00', '#0000FF'],
+      default: '#0000FF',
+    },
+    neutral: {
+      message: 'Select a neutral color',
+      choices: ['#FFFFFF', '#CCCCCC', '#999999'],
+      default: '#FFFFFF',
+    },
+    neutralVariant: {
+      message: 'Select a neutral variant color',
+      choices: ['#FFFFFF', '#CCCCCC', '#999999'],
+      default: '#CCCCCC',
+    },
+    style: {
+      message: 'Select a palette style',
+      choices: ['tonal-spot', 'expressive', 'vibrant'],
+      default: 'tonal-spot',
+    },
+    contrast: {
+      message: 'Select a contrast level',
+      choices: ['reduced', 'low', 'medium', 'high'],
+      default: 'medium',
+    },
+    isDark: {
+      message: 'Should the scheme be in dark mode?',
+      choices: ['true', 'false'],
+      default: 'false',
+    },
+  } as const;
+
+  for (const [key, settings] of Object.entries(essentialOptions)) {
+    if (!config[key]) {
+      config[key] = await select({
+        message: settings.message,
+        choices: settings.choices,
+        default: settings.default,
+      });
+    }
+  }
+
+  return config;
+}
