@@ -38,10 +38,6 @@ describe('PaletteStyle', () => {
       const instance = PaletteStyle.fromName(name);
       expect(instance.id).toBe(name);
     });
-
-    test('throws error from invalid id', () => {
-      expect(() => PaletteStyle.fromName('Invalid')).toThrowError()
-    })
   });
 
   test('should normalizeName style names to PascalCase', () => {

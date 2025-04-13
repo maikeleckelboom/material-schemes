@@ -4,4 +4,5 @@ export * from './theme/ContrastThreshold'
 export * from './theme/DynamicColorScheme'
 export * from './theme/Theme'
 export * from './utils/conversion'
-export * from '@material-schemes/cli/src/utils/errors.ts'
+export * from './utils/custom-color'
+
