@@ -10,8 +10,8 @@ import {
   SchemeTonalSpot,
   SchemeVibrant,
 } from '@material/material-color-utilities';
-import { Contrast } from './Contrast';
-import { z } from 'zod';
+import {Contrast} from './Contrast';
+import {z} from 'zod';
 
 type SchemeConstructor = new (
   sourceColor: Hct,
@@ -202,13 +202,12 @@ export class PaletteStyle {
   }
 
   private static handleError(message: string, cause?: unknown): never {
-    const error = new Error(`[PaletteStyle] ${message}`, { cause });
+    const error = new Error(`[PaletteStyle] ${message}`, {cause});
     console.error(error);
     throw error;
   }
 }
 
-// Validator must be declared after class definition
 const PaletteStyleValidator = z.union([
   z.instanceof(PaletteStyle),
   z.string().transform(val => PaletteStyle.normalizeName(val)),

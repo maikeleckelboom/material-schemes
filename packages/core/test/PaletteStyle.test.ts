@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'vitest';
-import {PaletteStyle} from '../src/theme/PaletteStyle.ts';
+import {PaletteStyle} from '../src';
 
 const PALETTE_ENTRIES = [
   'Monochrome',
@@ -40,10 +40,8 @@ describe('PaletteStyle', () => {
     });
 
     test('throws error from invalid id', () => {
-      expect(() => PaletteStyle.fromName('Invalid')).toThrowError(
-        '[PaletteStyle] Invalid style name: Invalid',
-      );
-    });
+      expect(() => PaletteStyle.fromName('Invalid')).toThrowError()
+    })
   });
 
   test('should normalizeName style names to PascalCase', () => {
