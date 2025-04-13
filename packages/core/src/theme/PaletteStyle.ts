@@ -10,100 +10,37 @@ import {
   SchemeTonalSpot,
   SchemeVibrant,
 } from '@material/material-color-utilities';
-import {Contrast} from "./Contrast.ts";
+import { Contrast } from './Contrast';
+import { z } from 'zod';
 
+type SchemeConstructor = new (
+  sourceColor: Hct,
+  isDark: boolean,
+  contrastLevel: number
+) => SchemeContent;
 
-// Base scheme configuration with type safety
-const PALETTE_SCHEMES = {
-  Monochrome: SchemeMonochrome,
-  Neutral: SchemeNeutral,
-  TonalSpot: SchemeTonalSpot,
-  Vibrant: SchemeVibrant,
-  Expressive: SchemeExpressive,
-  Fidelity: SchemeFidelity,
-  Content: SchemeContent,
-  Rainbow: SchemeRainbow,
-  FruitSalad: SchemeFruitSalad,
-} as const;
-
-export type SchemeVariant = typeof PALETTE_SCHEMES[keyof typeof PALETTE_SCHEMES];
-export type PaletteStyleIdentifier = keyof typeof PALETTE_SCHEMES;
+export type PaletteStyleIdentifier =
+  | 'Monochrome'
+  | 'Neutral'
+  | 'TonalSpot'
+  | 'Vibrant'
+  | 'Expressive'
+  | 'Fidelity'
+  | 'Content'
+  | 'Rainbow'
+  | 'FruitSalad';
 
 /**
  * Material Design palette styling system for dynamic color scheme generation.
- *
- * Provides 9 predefined styling strategies that map to Material Design's theming system.
- * Each style produces different visual characteristics while maintaining
- * proper contrastLevel and accessibility standards.
  */
 export class PaletteStyle {
-  /**
-   * Achromatic theme using only black, white, and gray tones
-   * @example
-   * Ideal for minimalist interfaces or secondary themes
-   */
-  static readonly Monochrome = new PaletteStyle('Monochrome', 0);
+  private static readonly STYLE_CACHE = new Map<string, PaletteStyle>();
+  private static readonly VARIANT_CACHE = new Map<number, PaletteStyle>();
+  private static readonly NORMALIZATION_REGEX = {
+    NON_ALPHA_NUM: /[^a-zA-Z0-9]/g,
+    CAMEL_CASE: /([a-z])([A-Z])/g,
+  };
 
-  /**
-   * Subtle chromatic palette with desaturated colors
-   * @example
-   * Suitable for professional or conservative applications
-   */
-  static readonly Neutral = new PaletteStyle('Neutral', 1);
-
-  /**
-   * Muted colors with tonal variations from a single hue
-   * @example
-   * Creates calm, harmonious interfaces
-   */
-  static readonly TonalSpot = new PaletteStyle('TonalSpot', 2);
-
-  /**
-   * Maximum color saturation with high contrastLevel
-   * @example
-   * Best for bold, attention-grabbing designs
-   */
-  static readonly Vibrant = new PaletteStyle('Vibrant', 3);
-
-  /**
-   * Artistic interpretation with hue-shifted accents
-   * @example
-   * Useful for creative or emotional interfaces
-   */
-  static readonly Expressive = new PaletteStyle('Expressive', 4);
-
-  /**
-   * Color-accurate scheme prioritizing container fidelity
-   * @example
-   * Maintains color relationships from source material
-   */
-  static readonly Fidelity = new PaletteStyle('Fidelity', 5);
-
-  /**
-   * Content-focused scheme with primary container emphasis
-   * @example
-   * Optimized for text-heavy interfaces
-   */
-  static readonly Content = new PaletteStyle('Content', 6);
-
-  /**
-   * Multi-hue playful theme with wide color distribution
-   * @example
-   * Creates energetic, dynamic interfaces
-   */
-  static readonly Rainbow = new PaletteStyle('Rainbow', 7);
-
-  /**
-   * High-contrastLevel complementary color combinations
-   * @example
-   * Ideal for data visualization and charts
-   */
-  static readonly FruitSalad = new PaletteStyle('FruitSalad', 8);
-
-  /**
-   * Map of palette styles to their respective scheme constructors
-   * @internal
-   */
   private static readonly SCHEME_MAP = {
     Monochrome: SchemeMonochrome,
     Neutral: SchemeNeutral,
@@ -116,19 +53,30 @@ export class PaletteStyle {
     FruitSalad: SchemeFruitSalad,
   } as const;
 
-  private constructor(
-    /** Unique identifier in PascalCase */
+  // Predefined instances
+  static readonly Monochrome = new PaletteStyle('Monochrome', 0);
+  static readonly Neutral = new PaletteStyle('Neutral', 1);
+  static readonly TonalSpot = new PaletteStyle('TonalSpot', 2);
+  static readonly Vibrant = new PaletteStyle('Vibrant', 3);
+  static readonly Expressive = new PaletteStyle('Expressive', 4);
+  static readonly Fidelity = new PaletteStyle('Fidelity', 5);
+  static readonly Content = new PaletteStyle('Content', 6);
+  static readonly Rainbow = new PaletteStyle('Rainbow', 7);
+  static readonly FruitSalad = new PaletteStyle('FruitSalad', 8);
+
+  public constructor(
     public readonly id: PaletteStyleIdentifier,
-    /** A one-to-one mapping to the corresponding scheme variant */
     public readonly variant: number
   ) {
+    if (new.target !== PaletteStyle) {
+      throw new Error('PaletteStyle cannot be subclassed');
+    }
   }
 
   /**
-   * Retrieve all available palette styles in declaration order
-   * @returns Readonly array of all PaletteStyle instances
+   * Retrieve all available palette styles
    */
-  public static all(): PaletteStyle[] {
+  public static all(): ReadonlyArray<PaletteStyle> {
     return [
       this.Monochrome,
       this.Neutral,
@@ -144,86 +92,125 @@ export class PaletteStyle {
 
   /**
    * Resolve a palette style from various input types
-   * @param style - Can be a PaletteStyle instance, style ID string, or variant number
-   * @returns Corresponding PaletteStyle instance
-   * @throws {Error} When input cannot be resolved to a valid style
    */
-  public static from(style: PaletteStyle | PaletteStyleIdentifier | string): PaletteStyle {
-    if (typeof style !== 'string') return style;
-    const normalizedName = this.paletteStyleFromName(style);
-    return this.fromName(normalizedName);
+  public static from(style: unknown): PaletteStyle {
+    const result = PaletteStyleValidator.safeParse(style);
+
+    if (!result.success) {
+      throw this.handleError('Invalid style input', result.error);
+    }
+
+    if (result.data instanceof PaletteStyle) {
+      return result.data;
+    }
+
+    if (typeof result.data === 'string') {
+      return this.fromName(result.data);
+    }
+
+    return this.fromVariant(result.data);
   }
 
   /**
-   * Retrieve style by case-insensitive name with automatic formatting
-   * @param name - Style identifier in any casing format
-   * @returns Matching PaletteStyle instance
-   * @throws {Error} When no matching style exists
+   * Get style by normalized name
    */
   public static fromName(name: string): PaletteStyle {
-    const style = this.all().find((s) => s.id === this.normalizeName(name));
-    if (!style) throw new Error(`Invalid PaletteStyle: ${name}`);
+    const normalized = this.normalizeName(name);
+
+    if (this.STYLE_CACHE.has(normalized)) {
+      return this.STYLE_CACHE.get(normalized)!;
+    }
+
+    const style = this.all().find(s => s.id === normalized);
+
+    if (!style) {
+      throw this.handleError(`Invalid style name: ${name}`);
+    }
+
+    this.STYLE_CACHE.set(normalized, style);
     return style;
   }
 
   /**
-   * Normalizes a given id to PascalCase.
-   *
-   * @param name - A string in PascalCase, kebab-case, snake_case, or camelCase.
-   * @returns The normalized string in PascalCase.
-   */
-  public static normalizeName(name: string): string {
-    return name
-      .replace(/[^a-zA-Z0-9]/g, ' ') // Replace non-alphanumerics with spaces
-      .replace(/([a-z])([A-Z])/g, '$1 $2') // Split camelCase into words
-      .toLowerCase()
-      .split(' ')
-      .filter((word) => word.length > 0)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join('');
-  }
-
-  /**
-   * Retrieves a `PaletteStyle` instance based on its variant.
-   *
-   * @param variant - The variant number of the palette style.
-   * @returns The corresponding `PaletteStyle` instance.
-   * @throws Error if no matching style is found.
+   * Get style by variant number (0-8)
    */
   public static fromVariant(variant: number): PaletteStyle {
-    const style = this.all().find((s) => s.variant === variant);
-    if (!style) throw new Error(`Invalid PaletteStyle variant: ${variant}`);
+    if (!Number.isInteger(variant)) {
+      throw this.handleError(`Invalid variant type: ${typeof variant}`);
+    }
+
+    if (variant < 0 || variant > 8) {
+      throw this.handleError(`Variant out of range: ${variant}`);
+    }
+
+    if (this.VARIANT_CACHE.has(variant)) {
+      return this.VARIANT_CACHE.get(variant)!;
+    }
+
+    const style = this.all().find(s => s.variant === variant);
+
+    if (!style) {
+      throw this.handleError(`Invalid variant: ${variant}`);
+    }
+
+    this.VARIANT_CACHE.set(variant, style);
     return style;
   }
 
   /**
-   * Creates a `DynamicScheme` using the current palette style and a source color.
-   *
-   * Key colors (primary, secondary, tertiary, neutral, and neutralVariant) are derived
-   * based on the selected style and the provided source color.
-   *
-   * @param sourceColor - The input color in ARGB format.
-   * @param isDark - Whether the scheme should target a dark theme. Defaults to `false`.
-   * @param contrastLevel - Adjusts contrastLevel; 0.0 is default, positive/negative values tweak intensity.
-   * @returns A `DynamicScheme` instance based on the source color and palette style.
+   * Create DynamicScheme with current style
    */
   public toScheme(
     sourceColor: number,
     isDark: boolean = false,
     contrastLevel: number = Contrast.Default.value,
   ) {
-    const SchemeConstructor = PaletteStyle.SCHEME_MAP[this.id];
-    return new SchemeConstructor(Hct.fromInt(sourceColor), isDark, contrastLevel);
+    if (sourceColor < 0x00000000 || sourceColor > 0xFFFFFFFF) {
+      throw PaletteStyle.handleError(`Invalid ARGB value: ${sourceColor}`);
+    }
+
+    const SchemeConstructor = this.getSchemeConstructor();
+    return new SchemeConstructor(
+      Hct.fromInt(sourceColor),
+      isDark,
+      contrastLevel
+    );
   }
 
   /**
-   * Retrieves the color scheme associated with this palette style.
-   *
-   * @internal
+   * Normalize style names to PascalCase
    */
-  private static paletteStyleFromName(name: string): PaletteStyleIdentifier {
-    const style = this.all().find((s) => s.id === this.normalizeName(name));
-    if (!style) throw new Error(`Invalid PaletteStyle: ${name}`);
-    return style.id;
+  public static normalizeName(name: string): string {
+    return name
+      .replace(this.NORMALIZATION_REGEX.NON_ALPHA_NUM, ' ')
+      .replace(this.NORMALIZATION_REGEX.CAMEL_CASE, '$1 $2')
+      .toLowerCase()
+      .split(' ')
+      .filter(word => word.length > 0)
+      .map(word => word[0]!.toUpperCase() + word.slice(1))
+      .join('');
+  }
+
+  private getSchemeConstructor(): SchemeConstructor {
+    const constructor = PaletteStyle.SCHEME_MAP[this.id];
+    if (!constructor) {
+      throw PaletteStyle.handleError(
+        `Missing scheme constructor for style: ${this.id}`
+      );
+    }
+    return constructor;
+  }
+
+  private static handleError(message: string, cause?: unknown): never {
+    const error = new Error(`[PaletteStyle] ${message}`, { cause });
+    console.error(error);
+    throw error;
   }
 }
+
+// Validator must be declared after class definition
+const PaletteStyleValidator = z.union([
+  z.instanceof(PaletteStyle),
+  z.string().transform(val => PaletteStyle.normalizeName(val)),
+  z.number().int().min(0).max(8),
+]);

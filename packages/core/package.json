@@ -1,12 +1,50 @@
 {
   "name": "@chromavert/material-schemes",
+  "description": "Core utilities for generating and manipulating Material 3 color schemes",
+  "version": "0.1.0-alpha.0",
   "module": "src/index.ts",
   "type": "module",
-  "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/maikeleckelboom/material-schemes.git",
     "directory": "packages/core"
+  },
+  "sideEffects": false,
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/maikeleckelboom"
+  },
+  "homepage": "https://github.com/maikeleckelboom/material-schemes#readme",
+  "bugs": "https://github.com/maikeleckelboom/material-schemes/issues",
+  "author": "Maikel Eckelboom",
+  "keywords": [
+    "material-design",
+    "material-3",
+    "color-schemes",
+    "design-tokens",
+    "color-science",
+    "theme-generation"
+  ],
+
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:browser": "vitest --browser",
+    "dev": "vitest --watch"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -16,11 +54,7 @@
   },
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "commander": "^13.1.0"
-  },
-  "scripts": {
-    "test": "vitest",
-    "test:browser": "vitest --browser",
-    "dev": "vitest --watch"
+    "colorjs.io": "^0.5.2",
+    "zod": "^3.24.2"
   }
 }

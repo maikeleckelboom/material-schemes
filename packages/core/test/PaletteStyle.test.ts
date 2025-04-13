@@ -41,7 +41,7 @@ describe('PaletteStyle', () => {
 
     test('throws error from invalid id', () => {
       expect(() => PaletteStyle.fromName('Invalid')).toThrowError(
-        'Invalid PaletteStyle: Invalid',
+        '[PaletteStyle] Invalid style name: Invalid',
       );
     });
   });
