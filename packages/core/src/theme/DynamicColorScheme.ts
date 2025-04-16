@@ -1,9 +1,25 @@
 import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import {PaletteStyle} from "./PaletteStyle.ts";
-import type {Color, ColorScheme} from "../types";
-import {toArgb, toHct} from "../utils";
-import {isColor} from "../utils/color.ts";
+import type {Color, ColorScheme} from "../";
+import {ContrastLevel, isColor, PaletteStyle, toArgb, toHct} from "../";
 
+
+/**
+ * Configuration options to override specific palettes and adjust parameters when generating a dynamic color scheme.
+ *
+ * @interface DynamicColorSchemeConfig
+ *
+ * @property {Color} [secondary] - An optional override for the secondary color palette.
+ *   If not provided, the secondary palette is generated from the source color based on the selected palette style.
+ * @property {Color} [tertiary] - An optional override for the tertiary color palette.
+ *   Defaults to a generated value from the source color.
+ * @property {Color} [neutral] - An optional override for the neutral background palette.
+ *   Defaults to a generated value from the source color.
+ * @property {Color} [neutralVariant] - An optional override for a variant of the neutral palette,
+ *   used for subtle visual differences.
+ * @property {PaletteStyle} [style=PaletteStyle.TonalSpot] - Visual style used for palette generation.
+ * @property {number} [contrastLevel=0] - Numeric value for contrast adjustment (0 means default contrast, 1 indicates maximum contrast).
+ * @property {boolean} [isDark=false] - Flag to determine if the generated scheme should be tailored for dark mode.
+ */
 export interface DynamicColorSchemeConfig {
   secondary?: Color;
   tertiary?: Color;
@@ -14,34 +30,78 @@ export interface DynamicColorSchemeConfig {
   isDark?: boolean;
 }
 
-// The input must have at least one of sourceColor or primary.
-// If both are provided, both types are valid.
+/**
+ * Options for constructing a dynamic color scheme.
+ *
+ * This union type requires that either a `sourceColor` or a `primary` color is provided.
+ * The provided color serves as the basis for scheme generation, while the additional configuration
+ * is defined in {@link DynamicColorSchemeConfig}.
+ *
+ * @property {Object} DynamicColorSchemeOptions
+ * @property {Color} [sourceColor] - The base color from which to generate the color scheme. Use this if you want to generate a scheme from a single source color.
+ * @property {Color} [primary] - A primary color override. Use this when you want to provide a direct primary color.
+ */
 export type DynamicColorSchemeOptions =
   | ({ sourceColor: Color; primary?: Color } & DynamicColorSchemeConfig)
   | ({ sourceColor?: Color; primary: Color } & DynamicColorSchemeConfig);
 
+/**
+ * A customizable dynamic color scheme generator that extends Material Design's DynamicScheme.
+ *
+ * This class leverages Material Color Utilities to create adaptable color schemes which support:
+ * - Light and dark mode variations.
+ * - Contrast level adjustments.
+ * - Customizable palette overrides (secondary, tertiary, neutral, etc.).
+ *
+ * It accepts either a source color (with an optional primary override) or a complete configuration object.
+ *
+ * @example <caption>Overload Example 1: Using a source color with additional options</caption>
+ * // Create a dynamic color scheme by passing a source color along with extra configuration options.
+ * const scheme = new DynamicColorScheme(0xFF6750A4, {
+ *   style: PaletteStyle.Vibrant,
+ *   isDark: true,
+ *   contrastLevel: 0.7,
+ *   secondary: '#FF4081'
+ * });
+ *
+ * @example <caption>Overload Example 2: Using a complete configuration object</caption>
+ * // Create a dynamic color scheme using an object that includes either a sourceColor or a primary color.
+ * const scheme = new DynamicColorScheme({
+ *   primary: '#2196F3',
+ *   tertiary: '#FFC107',
+ *   contrastLevel: 0.5
+ * });
+ *
+ * @extends DynamicScheme
+ */
 export class DynamicColorScheme extends DynamicScheme {
   /**
-   * Creates a color scheme from a source color and optional overrides
-   * @param sourceColor - Base color for the scheme
-   * @param options - Additional customization parameters (without sourceColor)
+   * Constructs a DynamicColorScheme instance.
+   *
+   * There are two overloads:
+   *
+   * **Overload 1: ** Create by providing a `sourceColor` along with optional additional options.
+   *
+   * @param {Color} sourceColor - The base color in any supported format (e.g., hex, RGB, HCT).
+   * @param {Omit<DynamicColorSchemeOptions, 'sourceColor'>} [options] - Additional options such as palette overrides, style, dark mode flag, and contrast level.
+   *
+   * **Overload 2: ** Create by providing a complete configuration object that requires `sourceColor` or `primary` color.
+   *
+   * @param {DynamicColorSchemeOptions} options - A configuration object with all necessary parameters.
+   *
+   * @throws Will throw an error if neither a source color nor a primary color override is provided.
    */
   constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>);
-  /**
-   * Creates a color scheme from a configuration object
-   * @param options - Configuration with at least sourceColor or primary
-   */
   constructor(options: DynamicColorSchemeOptions);
   constructor(
-    sourceOrOptions: Color | DynamicColorSchemeOptions,
-    maybeOptions?: Omit<DynamicColorSchemeOptions, 'sourceColor'>
+    seedOrOptions: Color | DynamicColorSchemeOptions,
+    optionsOrNull?: Omit<DynamicColorSchemeOptions, 'sourceColor'>
   ) {
-    const opts: DynamicColorSchemeOptions = isColor(sourceOrOptions)
-      ? {sourceColor: sourceOrOptions, ...maybeOptions}
-      : sourceOrOptions;
+    const opts: DynamicColorSchemeOptions = isColor(seedOrOptions)
+      ? {sourceColor: seedOrOptions, ...optionsOrNull}
+      : seedOrOptions;
 
     const {
-      sourceColor,
       primary,
       secondary,
       tertiary,
@@ -49,11 +109,11 @@ export class DynamicColorScheme extends DynamicScheme {
       neutralVariant,
       isDark = false,
       style = PaletteStyle.TonalSpot,
-      contrastLevel = 0
+      contrastLevel = ContrastLevel.Default.value
     } = opts;
 
-    const sourceColorHct = toHct(sourceColor ?? primary ?? 0);
-    const scheme = style.createScheme(sourceColorHct, isDark, contrastLevel);
+    const sourceColor = toHct(opts.sourceColor ?? primary ?? 0);
+    const scheme = style.createScheme(sourceColor, isDark, contrastLevel);
 
     super({
       ...scheme,
@@ -65,6 +125,17 @@ export class DynamicColorScheme extends DynamicScheme {
     });
   }
 
+  /**
+   * Serializes the dynamic color scheme into a plain object for external use, such as theme injection or storage.
+   *
+   * The returned object adheres to the {@link ColorScheme} type, containing all key palette and surface colors.
+   *
+   * @returns {ColorScheme} An object representing the complete color scheme.
+   *
+   * @example
+   * const jsonScheme = scheme.toJSON();
+   * console.log(jsonScheme.primary); // Outputs the primary color value.
+   */
   public toJSON(): ColorScheme {
     return {
       primaryPaletteKeyColor: this.primaryPaletteKeyColor,
@@ -122,5 +193,18 @@ export class DynamicColorScheme extends DynamicScheme {
       onTertiaryFixed: this.onTertiaryFixed,
       onTertiaryFixedVariant: this.onTertiaryFixedVariant,
     };
+  }
+
+  /**
+   * Generates a color scheme based on the current instance and applies any modifications specified in the options.
+   * @param opts - Optional configuration object to modify the generated color scheme.
+   * @returns {ColorScheme} The generated color scheme, potentially modified by the provided options.
+   */
+  public toColorScheme(opts?: { modifyColorScheme?: (scheme: ColorScheme) => ColorScheme; }): ColorScheme {
+    const scheme = this.toJSON();
+    if (opts?.modifyColorScheme) {
+      return opts.modifyColorScheme(scheme);
+    }
+    return scheme;
   }
 }

@@ -1,6 +1,6 @@
-import type {ThemeOptions} from "../types";
+import type {MaterialThemeOptions} from "../types";
 
-export function createMaterialTheme(opts: ThemeOptions) {
+export function createMaterialTheme(opts: MaterialThemeOptions) {
   return {}
 }
 

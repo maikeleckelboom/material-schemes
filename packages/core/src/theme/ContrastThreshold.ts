@@ -1,18 +1,29 @@
+/**
+ * Represents WCAG (Web Content Accessibility Guidelines) contrast ratio requirements.
+ * These thresholds ensure the text remains readable for users with visual impairments.
+ */
 export class ContrastThreshold {
+  /** Human-readable threshold name (e.g., "WCAG_AA_NORMAL_TEXT") */
   public readonly name: string;
+  /** Minimum contrast ratio required by the standard */
   public readonly value: number;
 
+  /** @private Prevents arbitrary instance creation - use predefined static instances */
   private constructor(name: string, value: number) {
     this.name = name;
     this.value = value;
   }
 
+  /** WCAG 2.0 Level AA - Normal text (4.5:1) */
   public static readonly WCAG_AA_NORMAL_TEXT = new ContrastThreshold("WCAG_AA_NORMAL_TEXT", 4.5);
+  /** WCAG 2.0 Level AA - Large text (3:1) */
   public static readonly WCAG_AA_LARGE_TEXT = new ContrastThreshold("WCAG_AA_LARGE_TEXT", 3);
+  /** WCAG 2.0 Level AAA - Normal text (7:1) */
   public static readonly WCAG_AAA_NORMAL_TEXT = new ContrastThreshold("WCAG_AAA_NORMAL_TEXT", 7);
+  /** WCAG 2.0 Level AAA - Large text (4.5:1) */
   public static readonly WCAG_AAA_LARGE_TEXT = new ContrastThreshold("WCAG_AAA_LARGE_TEXT", 4.5);
 
-  /** List of all available contrast thresholds */
+  /** All available contrast thresholds in recommended evaluation order */
   public static readonly entries: readonly ContrastThreshold[] = [
     ContrastThreshold.WCAG_AA_NORMAL_TEXT,
     ContrastThreshold.WCAG_AA_LARGE_TEXT,
@@ -21,8 +32,11 @@ export class ContrastThreshold {
   ];
 
   /**
-   * Gets a contrast threshold by name.
-   * @throws Error if no threshold with given name exists.
+   * Retrieves a ContrastThreshold by its exact name
+   *
+   * @param name - Case-sensitive threshold name (e.g., "WCAG_AA_LARGE_TEXT")
+   * @returns Matching ContrastThreshold instance
+   * @throws {Error} For invalid/unrecognized threshold names
    */
   static valueOf(name: string): ContrastThreshold {
     const threshold = ContrastThreshold.entries.find(t => t.name === name);
@@ -33,8 +47,16 @@ export class ContrastThreshold {
   }
 
   /**
-   * Gets the closest contrast threshold that does not exceed the target value.
-   * If none is found, defaults to WCAG_AA_LARGE_TEXT.
+   * Finds the most rigorous contrast standard met by a given ratio.
+   * Prioritizes higher standards first while ensuring minimum requirements are met.
+   *
+   * @param targetValue - Measured contrast ratio to evaluate
+   * @returns Best achievable threshold that doesn't exceed the target,
+   *          defaults to WCAG_AA_LARGE_TEXT if none found
+   *
+   * @example
+   * ContrastThreshold.closest(4.2) // Returns WCAG_AA_LARGE_TEXT
+   * ContrastThreshold.closest(4.6) // Returns WCAG_AAA_LARGE_TEXT
    */
   static closest(targetValue: number): ContrastThreshold {
     const thresholds = this.entries;

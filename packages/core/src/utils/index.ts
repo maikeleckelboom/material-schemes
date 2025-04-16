@@ -9,3 +9,4 @@ export * from './dislike';
 export * from './palette';
 export * from './scoring';
 export * from './theme';
+export * from './color';

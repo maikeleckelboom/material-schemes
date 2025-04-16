@@ -74,7 +74,7 @@ export type ColorSchemeReturnType<V extends boolean> = V extends true
  * @property {V} [brightnessVariants=false] - Generate light/dark variants when true
  * @property {Function} [modifyColorScheme] - Post-processing function for scheme customization
  */
-export interface ColorSchemeOptions<V extends boolean = false, T extends boolean = false> {
+export interface ColorSchemeOptions<V extends boolean = false> {
   /**
    * Whether to use the dark scheme
    * @default false

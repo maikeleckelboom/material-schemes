@@ -1,5 +1,5 @@
-import {type CustomColorGroup, TonalPalette,} from '@material/material-color-utilities';
-import {DynamicColorScheme} from "../theme";
+import {type CustomColorGroup, Hct, TonalPalette,} from '@material/material-color-utilities';
+import {DynamicColorScheme, type DynamicColorSchemeOptions} from "../theme";
 
 enum Variant {
   MONOCHROME = 0,
@@ -19,23 +19,7 @@ export interface StaticColor {
   blend?: boolean;
 }
 
-export type Color = number | string;
-
-export interface FullSchemeOptions {
-  sourceColor?: Color;
-  primary?: Color;
-  secondary?: Color;
-  tertiary?: Color;
-  neutral?: Color;
-  neutralVariant?: Color;
-  variant?: Variant;
-  contrastLevel?: number;
-  isDark?: boolean;
-}
-
-export type SchemeOptions =
-  | (FullSchemeOptions & { primary: Color; sourceColor?: Color })
-  | (FullSchemeOptions & { sourceColor: Color; primary?: Color });
+export type Color = number | string | Hct;
 
 export interface MaterialThemeJSON {
   source: number;
@@ -58,7 +42,7 @@ export interface MaterialThemeJSON {
 export interface MaterialTheme {
   source: number;
   contrastLevel: number;
-  variant: Variant;
+  style: string;
   schemes: {
     light: DynamicColorScheme;
     dark: DynamicColorScheme;
@@ -71,9 +55,8 @@ export interface MaterialTheme {
     neutralVariant: TonalPalette;
   };
   customColors: CustomColorGroup[];
-  toJSON: () => MaterialThemeJSON
 }
 
-export type ThemeOptions = Omit<SchemeOptions, 'isDark'> & {
+export type MaterialThemeOptions = Omit<DynamicColorSchemeOptions, 'isDark'> & {
   staticColors?: StaticColor[];
 };
