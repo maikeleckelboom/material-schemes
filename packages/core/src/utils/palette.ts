@@ -13,15 +13,3 @@ export function createTonalPalette(color: Color): TonalPalette {
   return TonalPalette.fromInt(toArgb(color));
 }
 
-/**
- * Extracts color entries for specified tones from a TonalPalette.
- * @param palette - A TonalPalette instance.
- * @param tones - An array of tone entries.
- * @returns An object mapping tone entries to color entries.
- */
-export function getColorsFromPalette(
-  palette: TonalPalette,
-  tones: number[] = [...DEFAULT_PALETTE_TONES],
-): Record<number, Color> {
-  return Object.fromEntries(tones.map((tone) => [tone, palette.tone(tone)]));
-}

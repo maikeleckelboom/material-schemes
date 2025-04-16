@@ -1,4 +1,16 @@
 /**
+ * Palette key color roles for Material Design 3.
+ * These roles are used to define the five core key colors.
+ */
+export const PALETTE_KEY_COLOR_ROLES = [
+  'primaryPaletteKeyColor',
+  'secondaryPaletteKeyColor',
+  'tertiaryPaletteKeyColor',
+  'neutralPaletteKeyColor',
+  'neutralVariantPaletteKeyColor',
+] as const;
+
+/**
  * Material Design 3 color role tokens for creating consistent, theme-aware interfaces.
  *
  * @constant {ReadonlyArray<string>} COLOR_ROLES
@@ -17,11 +29,7 @@
  * The array is frozen to ensure the integrity of the design system by preventing any modifications.
  */
 export const COLOR_ROLES = [
-  'primaryPaletteKeyColor',
-  'secondaryPaletteKeyColor',
-  'tertiaryPaletteKeyColor',
-  'neutralPaletteKeyColor',
-  'neutralVariantPaletteKeyColor',
+  ...PALETTE_KEY_COLOR_ROLES,
   'background',
   'onBackground',
   'surface',

@@ -1,5 +1,5 @@
 import {beforeAll, describe, expect, it} from "vitest";
-import {createColorScheme, DynamicColorScheme} from "../src";
+import {generateColorScheme, DynamicColorScheme} from "../src";
 
 let dynamicScheme: DynamicColorScheme
 
@@ -8,8 +8,8 @@ beforeAll(() => {
 })
 
 describe('Exposed Utilities', () => {
-  it('should be able to use createColorScheme', () => {
-    const colorScheme = createColorScheme(dynamicScheme, {
+  it('should be able to use generateColorScheme', () => {
+    const colorScheme = generateColorScheme(dynamicScheme, {
       dark: true,
       modifyColorScheme: (colors) => ({
         ...colors,
@@ -17,6 +17,6 @@ describe('Exposed Utilities', () => {
       })
     })
     expect(colorScheme).toBeDefined();
-    expect(colorScheme.accent).toBeDefined();
+    expect(colorScheme.accent).toBe(colorScheme.primary);
   });
 })

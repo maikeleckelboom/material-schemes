@@ -1,4 +1,5 @@
 import {COLOR_ROLES} from "../constants";
+import type {Color} from "./theme.ts";
 
 /**
  * Union type representing valid color scheme keys or any string.
@@ -15,8 +16,8 @@ export type ColorRoleKey = (typeof COLOR_ROLES)[number];
  * @description Maps M3 color roles to their actual color entries. While extensible via string index,
  * custom properties should follow M3 naming conventions.
  */
-export interface ColorScheme extends Record<ColorRoleKey | string, number> {
-  [key: string]: number;
+export interface ColorScheme extends Record<ColorRoleKey | string, Color> {
+  [key: string]: Color;
 }
 
 /**
@@ -27,7 +28,7 @@ export interface ColorScheme extends Record<ColorRoleKey | string, number> {
  * type PrimaryLight = SuffixedColorScheme<'Light'>; // Creates { primaryLight: number, ... }
  */
 type SuffixedColorScheme<Suffix extends string> = {
-  [K in ColorRoleKey as `${K}${Suffix}`]: number;
+  [K in ColorRoleKey as `${K}${Suffix}`]: Color;
 };
 
 /**
@@ -42,25 +43,9 @@ export type LightColorScheme = SuffixedColorScheme<'Light'>;
  */
 export type DarkColorScheme = SuffixedColorScheme<'Dark'>;
 
-interface PaletteColorScheme {
-  primary: Record<string, number>;
-  secondary: Record<string, number>;
-  tertiary: Record<string, number>;
-  neutral: Record<string, number>;
-  neutralVariant: Record<string, number>;
-  error: Record<string, number>;
-}
-
 /**
  * Return type for color scheme generation based on options
  * @template BV - Boolean type for brightness variants flag
- * @type {ColorScheme | (ColorScheme & LightColorScheme & DarkColorScheme)} ColorSchemeReturnType
- * @description When brightnessVariants=true, combines the base scheme with light/dark variants
- * @example
- * // With variants:
- * type FullScheme = ColorSchemeReturnType<true>; // Contains 'primary', 'primaryLight', 'primaryDark'
- * // Without variants:
- * type BaseScheme = ColorSchemeReturnType; // Only contains base keys
  */
 export type ColorSchemeReturnType<V extends boolean> = V extends true
   ? ColorScheme & LightColorScheme & DarkColorScheme
@@ -74,7 +59,10 @@ export type ColorSchemeReturnType<V extends boolean> = V extends true
  * @property {V} [brightnessVariants=false] - Generate light/dark variants when true
  * @property {Function} [modifyColorScheme] - Post-processing function for scheme customization
  */
-export interface ColorSchemeOptions<V extends boolean = false> {
+export interface ColorSchemeOptions<
+  V extends boolean = false,
+  U extends ColorSchemeReturnType<V> = ColorSchemeReturnType<V>
+> {
   /**
    * Whether to use the dark scheme
    * @default false
@@ -97,5 +85,11 @@ export interface ColorSchemeOptions<V extends boolean = false> {
    * Type-safe color scheme modifier that preserves existing properties
    * while allowing new property additions
    */
-  modifyColorScheme?: <T extends ColorSchemeReturnType<V>>(colorScheme: T) => T;
+  /**
+   * The color scheme modifier accepts the generated color scheme and should
+   * return a value that extends the base color scheme type.
+   * This lets you add,
+   * remove, or transform properties as long as the final result is assignable to U.
+   */
+  modifyColorScheme?: (colorScheme: ColorSchemeReturnType<V>) => U;
 }

@@ -39,24 +39,6 @@ export interface MaterialThemeJSON {
   customColors: CustomColorGroup[];
 }
 
-export interface MaterialTheme {
-  source: number;
-  contrastLevel: number;
-  style: string;
-  schemes: {
-    light: DynamicColorScheme;
-    dark: DynamicColorScheme;
-  };
-  palettes: {
-    primary: TonalPalette;
-    secondary: TonalPalette;
-    tertiary: TonalPalette;
-    neutral: TonalPalette;
-    neutralVariant: TonalPalette;
-  };
-  customColors: CustomColorGroup[];
-}
-
-export type MaterialThemeOptions = Omit<DynamicColorSchemeOptions, 'isDark'> & {
+export type MaterialThemeOptions =DynamicColorSchemeOptions & {
   staticColors?: StaticColor[];
 };

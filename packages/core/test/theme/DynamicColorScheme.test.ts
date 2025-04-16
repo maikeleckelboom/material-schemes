@@ -4,7 +4,7 @@ import {describe, expect, it, test} from "vitest";
 describe('DynamicScheme', () => {
 
   it('should have the same palettes in light and dark', () => {
-    const lightScheme = new DynamicColorScheme(0xFF6200EE, {isDark: false});
+    const lightScheme = new DynamicColorScheme(0xFF6200EE);
     const darkScheme = new DynamicColorScheme(0xFF6200EE, {isDark: true});
     expect(lightScheme.primaryPalette).toEqual(darkScheme.primaryPalette);
     expect(lightScheme.secondaryPalette).toEqual(darkScheme.secondaryPalette);

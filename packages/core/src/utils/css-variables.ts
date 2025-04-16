@@ -1,6 +1,5 @@
 import {formatCssVarName, toHex} from '../utils';
 import type {Color, ColorScheme} from "../types";
-import {DynamicColorScheme} from "../theme";
 
 /**
  * Creates a mapping of CSS variable names to hex color entries from a color scheme.
@@ -12,7 +11,7 @@ import {DynamicColorScheme} from "../theme";
  * createCssVarMap({ Primary: 0xFF0000 })
  * // → { '--primary': '#ff0000' }
  */
-function createCssVarMap<T extends Record<string, Color>>(
+export function createCssVarMap<T extends Record<string, Color>>(
   colorScheme: T,
 ): Record<string, string> {
   return Object.fromEntries(
@@ -38,7 +37,7 @@ function createCssVarMap<T extends Record<string, Color>>(
  * serializeCssVarMap({ '--primary': '#ff0000' }, ':root')
  * // → ":root { --primary: #ff0000; }"
  */
-function serializeCssVarMap(
+export function serializeCssVarMap(
   mapping: Record<string, string>,
   selector?: string,
 ): string {

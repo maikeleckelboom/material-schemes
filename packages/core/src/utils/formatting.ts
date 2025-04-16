@@ -1,6 +1,7 @@
 import camelCase from 'camelcase';
+import camelcase from 'camelcase';
 import kebabCase from 'kebab-case';
-import type { KebabCase } from 'type-fest';
+import type {KebabCase} from 'type-fest';
 
 /**
  * An interface for formatting options, allowing for optional prefix and suffix.
@@ -21,7 +22,7 @@ export interface FormatOptions {
  * formatTokenName('button', { prefix: 'ui', suffix: 'large' }); // 'uiButtonLarge'
  */
 export function formatTokenName(name: string, options: FormatOptions = {}): string {
-  const { prefix, suffix } = options;
+  const {prefix, suffix} = options;
   return camelCase(`${prefix ? `${prefix}-` : ''}${name}${suffix ? `-${suffix}` : ''}`);
 }
 
@@ -40,7 +41,7 @@ export function formatTokenName(name: string, options: FormatOptions = {}): stri
  */
 export function formatColorToken(pattern: string, name: string, suffix?: string): string {
   const formattedName = formatTokenName(name);
-  let result = pattern.replace(/color/gi, formattedName);
+  let result = pattern.replace(/color/gi, camelcase(formattedName, {pascalCase: true}));
   if (suffix) {
     result += `-${suffix}`;
   }

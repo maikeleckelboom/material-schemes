@@ -1,6 +1,15 @@
 import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import type {Color, ColorScheme} from "../";
-import {ContrastLevel, isColor, PaletteStyle, toArgb, toHct} from "../";
+import type {Color, ColorScheme, ColorSchemeOptions} from "../";
+import {
+  ContrastLevel,
+  DEFAULT_PALETTE_TONES, generateColorScheme,
+  generateTonalPaletteTokens,
+  generateToneMapFromPalette,
+  isColor,
+  PaletteStyle,
+  toArgb,
+  toHct
+} from "../";
 
 
 /**
@@ -21,6 +30,8 @@ import {ContrastLevel, isColor, PaletteStyle, toArgb, toHct} from "../";
  * @property {boolean} [isDark=false] - Flag to determine if the generated scheme should be tailored for dark mode.
  */
 export interface DynamicColorSchemeConfig {
+  sourceColor?: Color;
+  primary?: Color;
   secondary?: Color;
   tertiary?: Color;
   neutral?: Color;
@@ -197,14 +208,10 @@ export class DynamicColorScheme extends DynamicScheme {
 
   /**
    * Generates a color scheme based on the current instance and applies any modifications specified in the options.
-   * @param opts - Optional configuration object to modify the generated color scheme.
+   * @param options - Optional configuration object to modify the generated color scheme.
    * @returns {ColorScheme} The generated color scheme, potentially modified by the provided options.
    */
-  public toColorScheme(opts?: { modifyColorScheme?: (scheme: ColorScheme) => ColorScheme; }): ColorScheme {
-    const scheme = this.toJSON();
-    if (opts?.modifyColorScheme) {
-      return opts.modifyColorScheme(scheme);
-    }
-    return scheme;
+  public toColorScheme(options?: ColorSchemeOptions): ColorScheme {
+    return generateColorScheme(this, options);
   }
 }
