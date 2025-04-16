@@ -1,33 +1,33 @@
 import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import {PaletteStyle} from "./PaletteStyle.ts";
-import {ContrastLevel} from "./ContrastLevel.ts";
-import type {ColorScheme, Color} from "../types";
+import {PaletteStyle, type PaletteStyleIdentifier} from "./PaletteStyle.ts";
+import type {Color, ColorScheme} from "../types";
+import {toArgb} from "../utils";
 
 
-export interface DynamicSchemeOptions {
-  sourceColor?: number;
-  primary?: number;
-  secondary?: number;
-  tertiary?: number;
-  neutral?: number;
-  neutralVariant?: number;
-  style?: PaletteStyle | string;
+export interface DynamicColorSchemeOptions {
+  sourceColor?: Color;
+  primary?: Color;
+  secondary?: Color;
+  tertiary?: Color;
+  neutral?: Color;
+  neutralVariant?: Color;
+  style?: PaletteStyleIdentifier | string;
   contrastLevel?: number;
   isDark?: boolean;
 }
 
-export type DynamicSchemeInput =
-  | ({ sourceColor: number; primary?: number } & DynamicSchemeOptions)
-  | ({ sourceColor?: number; primary: number } & DynamicSchemeOptions);
+type DynamicColorSchemeInputOptions =
+  | ({ sourceColor: Color; primary?: Color } & DynamicColorSchemeOptions)
+  | ({ sourceColor?: Color; primary: Color } & DynamicColorSchemeOptions);
 
 export class DynamicColorScheme extends DynamicScheme {
-  constructor(sourceColor: number, options?: Omit<DynamicSchemeInput, 'sourceColor'>);
-  constructor(options: DynamicSchemeInput);
+  constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeInputOptions, 'sourceColor'>);
+  constructor(options: DynamicColorSchemeInputOptions);
   constructor(
-    sourceColorOrOptions: number | DynamicSchemeInput,
-    optionsOrUndefined?: Omit<DynamicSchemeInput, 'sourceColor'>
+    sourceColorOrOptions: Color | DynamicColorSchemeInputOptions,
+    optionsOrUndefined?: Omit<DynamicColorSchemeInputOptions, 'sourceColor'>
   ) {
-    const options: DynamicSchemeInput = typeof sourceColorOrOptions === 'number'
+    const options: DynamicColorSchemeInputOptions = (typeof sourceColorOrOptions === 'number' || typeof sourceColorOrOptions === 'string')
       ? {sourceColor: sourceColorOrOptions, ...optionsOrUndefined}
       : sourceColorOrOptions;
 
@@ -39,25 +39,20 @@ export class DynamicColorScheme extends DynamicScheme {
       neutral,
       neutralVariant,
       isDark = false,
-      style = PaletteStyle.TonalSpot.value,
-      contrastLevel = ContrastLevel.Default.value
+      style = 'TonalSpot',
+      contrastLevel = 0
     } = options;
 
-    const sourceColorArgb = Number(sourceColor ?? primary);
-
-    if (isNaN(sourceColorArgb)) {
-      throw new Error("Valid color required: provide either `sourceColor` or `primary`");
-    }
-
+    const sourceColorArgb = toArgb(sourceColor ?? primary ?? 0);
     const scheme = PaletteStyle.from(style).toScheme(sourceColorArgb, isDark, contrastLevel);
 
     super({
       ...scheme,
-      primaryPalette: primary ? TonalPalette.fromInt(primary) : scheme.primaryPalette,
-      secondaryPalette: secondary ? TonalPalette.fromInt(secondary) : scheme.secondaryPalette,
-      tertiaryPalette: tertiary ? TonalPalette.fromInt(tertiary) : scheme.tertiaryPalette,
-      neutralPalette: neutral ? TonalPalette.fromInt(neutral) : scheme.neutralPalette,
-      neutralVariantPalette: neutralVariant ? TonalPalette.fromInt(neutralVariant) : scheme.neutralVariantPalette,
+      primaryPalette: primary ? TonalPalette.fromInt(toArgb(primary)) : scheme.primaryPalette,
+      secondaryPalette: secondary ? TonalPalette.fromInt(toArgb(secondary)) : scheme.secondaryPalette,
+      tertiaryPalette: tertiary ? TonalPalette.fromInt(toArgb(tertiary)) : scheme.tertiaryPalette,
+      neutralPalette: neutral ? TonalPalette.fromInt(toArgb(neutral)) : scheme.neutralPalette,
+      neutralVariantPalette: neutralVariant ? TonalPalette.fromInt(toArgb(neutralVariant)) : scheme.neutralVariantPalette,
     });
   }
 

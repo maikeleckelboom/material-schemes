@@ -10,7 +10,8 @@ import {
   SchemeTonalSpot,
   SchemeVibrant,
 } from '@material/material-color-utilities';
-import { ContrastLevel } from './ContrastLevel.ts';
+import {ContrastLevel} from './ContrastLevel.ts';
+import camelcase from "camelcase";
 
 export type PaletteStyleIdentifier =
   | 'Monochrome'
@@ -42,11 +43,6 @@ export type SchemeConstructor = new (
  * Material Design palette styling system for dynamic color scheme generation.
  */
 export class PaletteStyle {
-  private static readonly NORMALIZATION_REGEX = {
-    NON_ALPHA_NUM: /[^a-zA-Z0-9]/g,
-    CAMEL_CASE: /([a-z])([A-Z])/g,
-  };
-
   private static readonly SCHEME_MAP = {
     Monochrome: SchemeMonochrome,
     Neutral: SchemeNeutral,
@@ -70,7 +66,7 @@ export class PaletteStyle {
   static readonly FruitSalad = new PaletteStyle('FruitSalad', 8);
 
   public constructor(
-    public readonly id: PaletteStyleIdentifier,
+    public readonly name: PaletteStyleIdentifier,
     public readonly value: number
   ) {
     if (new.target !== PaletteStyle) {
@@ -118,8 +114,8 @@ export class PaletteStyle {
    * @private Get style by normalized name
    */
   private static fromName(name: string): PaletteStyle {
-    const normalized = this.normalizeName(name);
-    const style = this.values().find(s => s.id === normalized);
+    const normalized = camelcase(name, {pascalCase: true});
+    const style = this.values().find(s => s.name === normalized);
 
     if (!style) {
       throw Error(`[PaletteStyle] Invalid style name: ${name}`);
@@ -150,20 +146,6 @@ export class PaletteStyle {
   }
 
   /**
-   * @private Normalize style names to PascalCase
-   */
-  private static normalizeName(name: string): string {
-    return name
-      .replace(this.NORMALIZATION_REGEX.NON_ALPHA_NUM, ' ')
-      .replace(this.NORMALIZATION_REGEX.CAMEL_CASE, '$1 $2')
-      .toLowerCase()
-      .split(' ')
-      .filter(word => word.length > 0)
-      .map(word => word[0]!.toUpperCase() + word.slice(1))
-      .join('');
-  }
-
-  /**
    * Create DynamicColorScheme with current style
    */
   public toScheme(
@@ -183,10 +165,10 @@ export class PaletteStyle {
    * @private Get the constructor for the current style
    */
   private getSchemeConstructor(): SchemeConstructor {
-    const constructor = PaletteStyle.SCHEME_MAP[this.id];
+    const constructor = PaletteStyle.SCHEME_MAP[this.name];
     if (!constructor) {
       throw Error(
-        `[PaletteStyle] Missing scheme constructor for style: ${this.id}`
+        `[PaletteStyle] Missing scheme constructor for style: ${this.name}`
       );
     }
     return constructor;

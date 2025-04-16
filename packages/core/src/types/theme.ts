@@ -1,7 +1,5 @@
-import {
-  DynamicScheme,
-  TonalPalette,
-} from '@material/material-color-utilities';
+import {type CustomColorGroup, TonalPalette,} from '@material/material-color-utilities';
+import {DynamicColorScheme} from "../theme";
 
 enum Variant {
   MONOCHROME = 0,
@@ -15,33 +13,13 @@ enum Variant {
   FRUIT_SALAD = 8
 }
 
-export type Color = number | string;
-
-export interface ColorGroup {
-  color: number;
-  onColor: number;
-  colorContainer: number;
-  onColorContainer: number;
-}
-
-export interface CustomColorGroup {
-  color: CustomColor;
-  value: number;
-  light: ColorGroup;
-  dark: ColorGroup;
-}
-
-export interface CustomColor {
-  value: number;
-  name: string;
-  blend: boolean;
-}
-
 export interface StaticColor {
   name: string;
   value: Color;
   blend?: boolean;
 }
+
+export type Color = number | string;
 
 export interface FullSchemeOptions {
   sourceColor?: Color;
@@ -59,13 +37,31 @@ export type SchemeOptions =
   | (FullSchemeOptions & { primary: Color; sourceColor?: Color })
   | (FullSchemeOptions & { sourceColor: Color; primary?: Color });
 
-export interface Theme {
+export interface MaterialThemeJSON {
+  source: number;
+  contrastLevel: number;
+  style: string;
+  schemes: {
+    light: Record<string, number>;
+    dark: Record<string, number>;
+  };
+  palettes: {
+    primary: Record<string, number>;
+    secondary: Record<string, number>;
+    tertiary: Record<string, number>;
+    neutral: Record<string, number>;
+    neutralVariant: Record<string, number>;
+  };
+  customColors: CustomColorGroup[];
+}
+
+export interface MaterialTheme {
   source: number;
   contrastLevel: number;
   variant: Variant;
   schemes: {
-    light: DynamicScheme;
-    dark: DynamicScheme;
+    light: DynamicColorScheme;
+    dark: DynamicColorScheme;
   };
   palettes: {
     primary: TonalPalette;
@@ -73,9 +69,9 @@ export interface Theme {
     tertiary: TonalPalette;
     neutral: TonalPalette;
     neutralVariant: TonalPalette;
-    error: TonalPalette;
   };
   customColors: CustomColorGroup[];
+  toJSON: () => MaterialThemeJSON
 }
 
 export type ThemeOptions = Omit<SchemeOptions, 'isDark'> & {

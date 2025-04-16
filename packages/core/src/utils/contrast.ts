@@ -1,7 +1,7 @@
 import {clampDouble, Contrast, Hct, lstarFromArgb} from '@material/material-color-utilities';
 import type {Color} from '../types';
 import {toArgb, toHct} from './index.ts';
-import {ContrastThreshold} from "../theme/ContrastThreshold.ts";
+import {ContrastThreshold} from "../theme";
 
 /**
  * Get a contrasting tone based on a base tone and a contrast ratio.

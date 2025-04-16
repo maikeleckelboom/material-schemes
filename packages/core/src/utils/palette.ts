@@ -19,9 +19,9 @@ export function createTonalPalette(color: Color): TonalPalette {
  * @param tones - An array of tone values.
  * @returns An object mapping tone values to color values.
  */
-export function getTonalColors(
+export function getColorsFromPalette(
   palette: TonalPalette,
   tones: number[] = [...DEFAULT_PALETTE_TONES],
-): Record<number, number> {
+): Record<number, Color> {
   return Object.fromEntries(tones.map((tone) => [tone, palette.tone(tone)]));
 }

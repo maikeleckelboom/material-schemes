@@ -8,4 +8,5 @@ export default defineConfig({
   clean: true,                 // Clean the output directory before each build.
   dts: true,                   // Generate TypeScript declaration files.
   external: [],
+  noExternal: ['@material/material-color-utilities'],
 });

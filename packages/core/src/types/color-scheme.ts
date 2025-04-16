@@ -16,6 +16,8 @@ export type ColorRoleKey = (typeof COLOR_ROLES)[number];
  * custom properties should follow M3 naming conventions.
  */
 export interface ColorScheme extends Record<ColorRoleKey | string, number> {
+  [key: string]: number;
+
 }
 
 /**
