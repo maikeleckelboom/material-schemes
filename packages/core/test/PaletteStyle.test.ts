@@ -16,16 +16,16 @@ const PALETTE_ENTRIES = [
 describe('PaletteStyle', () => {
   describe('Static Instances', () => {
     test.each(PALETTE_ENTRIES)('%s has correct id and value', (name) => {
-      const paletteStyle = PaletteStyle.fromName(name)
+      const paletteStyle = PaletteStyle.from(name)
 
       expect(paletteStyle.id).toBe(name);
       expect(paletteStyle.value).toBe(PALETTE_ENTRIES.indexOf(name));
     });
   });
 
-  describe('all()', () => {
-    test('returns all instances in order', () => {
-      const values = PaletteStyle.all();
+  describe('values()', () => {
+    test('returns values instances in order', () => {
+      const values = PaletteStyle.values();
       expect(values).toHaveLength(PALETTE_ENTRIES.length);
       values.forEach((instance, index) => {
         expect(instance.id).toBe(PALETTE_ENTRIES[index]);
@@ -35,7 +35,7 @@ describe('PaletteStyle', () => {
 
   describe('fromName()', () => {
     test.each(PALETTE_ENTRIES)('retrieves %s instance', (name) => {
-      const instance = PaletteStyle.fromName(name);
+      const instance = PaletteStyle.from(name);
       expect(instance.id).toBe(name);
     });
   });

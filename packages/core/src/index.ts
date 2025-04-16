@@ -1,7 +1,4 @@
-export * from './theme/PaletteStyle'
-export * from './theme/Contrast'
-export * from './theme/ContrastThreshold'
-export * from './theme/DynamicColorScheme'
-export * from './theme/Theme'
-
+export * from './theme'
 export * from './utils'
+export * from './constants'
+export type * from './types'

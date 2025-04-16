@@ -1,14 +1,14 @@
 import {argbFromHex, Hct, hexFromArgb} from "@material/material-color-utilities";
-import type {Color} from "../theme/DynamicColorScheme.ts";
+import type {Color} from "../types";
 
-export function toArgb(color: string | number) {
+export function toArgb(color: Color) {
   if (typeof color === 'number') {
     return color;
   }
   return argbFromHex(color);
 }
 
-export function toHex(color: string | number) {
+export function toHex(color: Color) {
   if (typeof color === 'number') {
     return hexFromArgb(color);
   }

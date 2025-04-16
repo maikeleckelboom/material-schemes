@@ -10,7 +10,7 @@ import {
   SchemeTonalSpot,
   SchemeVibrant,
 } from '@material/material-color-utilities';
-import {Contrast} from './Contrast';
+import { ContrastLevel } from './ContrastLevel.ts';
 
 export type PaletteStyleIdentifier =
   | 'Monochrome'
@@ -42,8 +42,6 @@ export type SchemeConstructor = new (
  * Material Design palette styling system for dynamic color scheme generation.
  */
 export class PaletteStyle {
-  private static readonly STYLE_CACHE = new Map<string, PaletteStyle>();
-  private static readonly VARIANT_CACHE = new Map<number, PaletteStyle>();
   private static readonly NORMALIZATION_REGEX = {
     NON_ALPHA_NUM: /[^a-zA-Z0-9]/g,
     CAMEL_CASE: /([a-z])([A-Z])/g,
@@ -61,7 +59,6 @@ export class PaletteStyle {
     FruitSalad: SchemeFruitSalad,
   } as const;
 
-  // Predefined instances
   static readonly Monochrome = new PaletteStyle('Monochrome', 0);
   static readonly Neutral = new PaletteStyle('Neutral', 1);
   static readonly TonalSpot = new PaletteStyle('TonalSpot', 2);
@@ -82,9 +79,9 @@ export class PaletteStyle {
   }
 
   /**
-   * Retrieve all available palette styles
+   * Retrieve values available palette styles
    */
-  public static all(): ReadonlyArray<PaletteStyle> {
+  public static values(): ReadonlyArray<PaletteStyle> {
     return [
       this.Monochrome,
       this.Neutral,
@@ -118,29 +115,23 @@ export class PaletteStyle {
   }
 
   /**
-   * Get style by normalized name
+   * @private Get style by normalized name
    */
-  public static fromName(name: string): PaletteStyle {
+  private static fromName(name: string): PaletteStyle {
     const normalized = this.normalizeName(name);
-
-    if (this.STYLE_CACHE.has(normalized)) {
-      return this.STYLE_CACHE.get(normalized)!;
-    }
-
-    const style = this.all().find(s => s.id === normalized);
+    const style = this.values().find(s => s.id === normalized);
 
     if (!style) {
       throw Error(`[PaletteStyle] Invalid style name: ${name}`);
     }
 
-    this.STYLE_CACHE.set(normalized, style);
     return style;
   }
 
   /**
-   * Get style by value number (0-8)
+   * @private Get style by value number (0-8)
    */
-  public static fromVariant(variant: number): PaletteStyle {
+  private static fromVariant(variant: number): PaletteStyle {
     if (!Number.isInteger(variant)) {
       throw Error(`[PaletteStyle] Invalid variant type: ${typeof variant}`);
     }
@@ -149,40 +140,19 @@ export class PaletteStyle {
       throw Error(`[PaletteStyle] Variant out of range: ${variant}`);
     }
 
-    if (this.VARIANT_CACHE.has(variant)) {
-      return this.VARIANT_CACHE.get(variant)!;
-    }
-
-    const style = this.all().find(s => s.value === variant);
+    const style = this.values().find(s => s.value === variant);
 
     if (!style) {
       throw Error(`[PaletteStyle] Invalid variant: ${variant}`);
     }
 
-    this.VARIANT_CACHE.set(variant, style);
     return style;
   }
 
   /**
-   * Create DynamicScheme with current style
+   * @private Normalize style names to PascalCase
    */
-  public toScheme(
-    sourceColor: number,
-    isDark: boolean = false,
-    contrastLevel: number = Contrast.Default.value,
-  ) {
-    const SchemeConstructor = this.getSchemeConstructor();
-    return new SchemeConstructor(
-      Hct.fromInt(sourceColor),
-      isDark,
-      contrastLevel
-    );
-  }
-
-  /**
-   * Normalize style names to PascalCase
-   */
-  public static normalizeName(name: string): string {
+  private static normalizeName(name: string): string {
     return name
       .replace(this.NORMALIZATION_REGEX.NON_ALPHA_NUM, ' ')
       .replace(this.NORMALIZATION_REGEX.CAMEL_CASE, '$1 $2')
@@ -193,6 +163,25 @@ export class PaletteStyle {
       .join('');
   }
 
+  /**
+   * Create DynamicColorScheme with current style
+   */
+  public toScheme(
+    sourceColor: number,
+    isDark: boolean = false,
+    contrastLevel: number = ContrastLevel.Default.value,
+  ) {
+    const SchemeConstructor = this.getSchemeConstructor();
+    return new SchemeConstructor(
+      Hct.fromInt(sourceColor),
+      isDark,
+      contrastLevel
+    );
+  }
+
+  /**
+   * @private Get the constructor for the current style
+   */
   private getSchemeConstructor(): SchemeConstructor {
     const constructor = PaletteStyle.SCHEME_MAP[this.id];
     if (!constructor) {

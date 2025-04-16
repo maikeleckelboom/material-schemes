@@ -1,9 +1,9 @@
 import {describe, expect, it} from 'vitest';
-import {ContrastThreshold} from '../src/theme/ContrastThreshold.ts';
+import {ContrastThreshold} from '../src';
 
 describe('ContrastThreshold', () => {
 
-  describe('closest', () => {
+  describe('contrastLevel', () => {
     const testCases = [
       {input: 2, expected: 'WCAG_AA_LARGE_TEXT'},
       {input: 3, expected: 'WCAG_AA_LARGE_TEXT'},

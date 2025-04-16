@@ -1,91 +1,35 @@
-import {DynamicScheme as M3DynamicScheme, TonalPalette} from "@material/material-color-utilities";
+import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
 import {PaletteStyle} from "./PaletteStyle.ts";
-import {Contrast} from "./Contrast.ts";
+import {ContrastLevel} from "./ContrastLevel.ts";
+import type {ColorScheme, Color} from "../types";
 
-export interface ColorScheme {
-  primaryPaletteKeyColor: number;
-  secondaryPaletteKeyColor: number;
-  tertiaryPaletteKeyColor: number;
-  neutralPaletteKeyColor: number;
-  neutralVariantPaletteKeyColor: number;
-  background: number;
-  onBackground: number;
-  surface: number;
-  surfaceDim: number;
-  surfaceBright: number;
-  surfaceContainerLowest: number;
-  surfaceContainerLow: number;
-  surfaceContainer: number;
-  surfaceContainerHigh: number;
-  surfaceContainerHighest: number;
-  onSurface: number;
-  surfaceVariant: number;
-  onSurfaceVariant: number;
-  inverseSurface: number;
-  inverseOnSurface: number;
-  outline: number;
-  outlineVariant: number;
-  shadow: number;
-  scrim: number;
-  surfaceTint: number;
-  primary: number;
-  onPrimary: number;
-  primaryContainer: number;
-  onPrimaryContainer: number;
-  inversePrimary: number;
-  secondary: number;
-  onSecondary: number;
-  secondaryContainer: number;
-  onSecondaryContainer: number;
-  tertiary: number;
-  onTertiary: number;
-  tertiaryContainer: number;
-  onTertiaryContainer: number;
-  error: number;
-  onError: number;
-  errorContainer: number;
-  onErrorContainer: number;
-  primaryFixed: number;
-  primaryFixedDim: number;
-  onPrimaryFixed: number;
-  onPrimaryFixedVariant: number;
-  secondaryFixed: number;
-  secondaryFixedDim: number;
-  onSecondaryFixed: number;
-  onSecondaryFixedVariant: number;
-  tertiaryFixed: number;
-  tertiaryFixedDim: number;
-  onTertiaryFixed: number;
-  onTertiaryFixedVariant: number;
-}
-
-export type Color = number
 
 export interface DynamicSchemeOptions {
-  sourceColor?: Color;
-  primary?: Color;
-  secondary?: Color;
-  tertiary?: Color;
-  neutral?: Color;
-  neutralVariant?: Color;
+  sourceColor?: number;
+  primary?: number;
+  secondary?: number;
+  tertiary?: number;
+  neutral?: number;
+  neutralVariant?: number;
   style?: PaletteStyle | string;
   contrastLevel?: number;
   isDark?: boolean;
 }
 
-export type DynamicSchemeOptionsInput =
+export type DynamicSchemeInput =
   | ({ sourceColor: number; primary?: number } & DynamicSchemeOptions)
   | ({ sourceColor?: number; primary: number } & DynamicSchemeOptions);
 
-export class DynamicColorScheme extends M3DynamicScheme {
-  // Overload 1: sourceColor and options separately
-  constructor(sourceColor: Color, options?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>);
-  // Overload 2: full configuration object
-  constructor(options: DynamicSchemeOptionsInput);
-  constructor(arg1: Color | DynamicSchemeOptionsInput, arg2?: Omit<DynamicSchemeOptionsInput, 'sourceColor'>) {
-    const options: DynamicSchemeOptionsInput = typeof arg1 === 'number'
-      ? {sourceColor: arg1, ...arg2}
-      : arg1;
+export class DynamicColorScheme extends DynamicScheme {
+  constructor(sourceColor: number, options?: Omit<DynamicSchemeInput, 'sourceColor'>);
+  constructor(options: DynamicSchemeInput);
+  constructor(
+    sourceColorOrOptions: number | DynamicSchemeInput,
+    optionsOrUndefined?: Omit<DynamicSchemeInput, 'sourceColor'>
+  ) {
+    const options: DynamicSchemeInput = typeof sourceColorOrOptions === 'number'
+      ? {sourceColor: sourceColorOrOptions, ...optionsOrUndefined}
+      : sourceColorOrOptions;
 
     const {
       sourceColor,
@@ -95,13 +39,14 @@ export class DynamicColorScheme extends M3DynamicScheme {
       neutral,
       neutralVariant,
       isDark = false,
-      style = PaletteStyle.TonalSpot,
-      contrastLevel = Contrast.Default.value
+      style = PaletteStyle.TonalSpot.value,
+      contrastLevel = ContrastLevel.Default.value
     } = options;
 
     const sourceColorArgb = Number(sourceColor ?? primary);
+
     if (isNaN(sourceColorArgb)) {
-      throw new Error("Valid color required: provide either sourceColor or primary");
+      throw new Error("Valid color required: provide either `sourceColor` or `primary`");
     }
 
     const scheme = PaletteStyle.from(style).toScheme(sourceColorArgb, isDark, contrastLevel);
