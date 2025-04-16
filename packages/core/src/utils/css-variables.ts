@@ -1,10 +1,11 @@
 import {formatCssVarName, toHex} from '../utils';
 import type {Color, ColorScheme} from "../types";
+import {DynamicColorScheme} from "../theme";
 
 /**
- * Creates a mapping of CSS variable names to hex color values from a color scheme.
+ * Creates a mapping of CSS variable names to hex color entries from a color scheme.
  *
- * @param colorScheme - An object mapping keys to color values
+ * @param colorScheme - An object mapping keys to color entries
  * @returns A record of `--kebab-case-name` to hex value
  *
  * @example
@@ -25,7 +26,7 @@ export function createCssVarMap<T extends Record<string, Color>>(
 /**
  * Converts a mapping of CSS variables to a CSS string.
  *
- * @param mapping - A record of CSS variable names to values
+ * @param mapping - A record of CSS variable names to entries
  * @param selector - Optional selector to wrap the vars in
  * @returns A CSS string (with or without selector)
  *
@@ -54,7 +55,7 @@ export function serializeCssVarMap(
  * @param selector - The CSS selector to which the variables should be applied (default is ':root').
  * @returns A string containing the CSS variable definitions.
  */
-export function createCssVariables(colorScheme: ColorScheme, selector?: string): string {
+export function toCssVariables(colorScheme: ColorScheme, selector?: string): string {
   const cssVarMapping = createCssVarMap(colorScheme);
   return serializeCssVarMap(cssVarMapping, selector);
 }

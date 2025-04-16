@@ -1,35 +1,44 @@
 import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import {PaletteStyle, type PaletteStyleIdentifier} from "./PaletteStyle.ts";
+import {PaletteStyle} from "./PaletteStyle.ts";
 import type {Color, ColorScheme} from "../types";
-import {toArgb} from "../utils";
+import {toArgb, toHct} from "../utils";
+import {isColor} from "../utils/color.ts";
 
-
-export interface DynamicColorSchemeOptions {
-  sourceColor?: Color;
-  primary?: Color;
+export interface DynamicColorSchemeConfig {
   secondary?: Color;
   tertiary?: Color;
   neutral?: Color;
   neutralVariant?: Color;
-  style?: PaletteStyleIdentifier | string;
+  style?: PaletteStyle;
   contrastLevel?: number;
   isDark?: boolean;
 }
 
-type DynamicColorSchemeInputOptions =
-  | ({ sourceColor: Color; primary?: Color } & DynamicColorSchemeOptions)
-  | ({ sourceColor?: Color; primary: Color } & DynamicColorSchemeOptions);
+// The input must have at least one of sourceColor or primary.
+// If both are provided, both types are valid.
+export type DynamicColorSchemeOptions =
+  | ({ sourceColor: Color; primary?: Color } & DynamicColorSchemeConfig)
+  | ({ sourceColor?: Color; primary: Color } & DynamicColorSchemeConfig);
 
 export class DynamicColorScheme extends DynamicScheme {
-  constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeInputOptions, 'sourceColor'>);
-  constructor(options: DynamicColorSchemeInputOptions);
+  /**
+   * Creates a color scheme from a source color and optional overrides
+   * @param sourceColor - Base color for the scheme
+   * @param options - Additional customization parameters (without sourceColor)
+   */
+  constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>);
+  /**
+   * Creates a color scheme from a configuration object
+   * @param options - Configuration with at least sourceColor or primary
+   */
+  constructor(options: DynamicColorSchemeOptions);
   constructor(
-    sourceColorOrOptions: Color | DynamicColorSchemeInputOptions,
-    optionsOrUndefined?: Omit<DynamicColorSchemeInputOptions, 'sourceColor'>
+    sourceOrOptions: Color | DynamicColorSchemeOptions,
+    maybeOptions?: Omit<DynamicColorSchemeOptions, 'sourceColor'>
   ) {
-    const options: DynamicColorSchemeInputOptions = (typeof sourceColorOrOptions === 'number' || typeof sourceColorOrOptions === 'string')
-      ? {sourceColor: sourceColorOrOptions, ...optionsOrUndefined}
-      : sourceColorOrOptions;
+    const opts: DynamicColorSchemeOptions = isColor(sourceOrOptions)
+      ? {sourceColor: sourceOrOptions, ...maybeOptions}
+      : sourceOrOptions;
 
     const {
       sourceColor,
@@ -39,12 +48,12 @@ export class DynamicColorScheme extends DynamicScheme {
       neutral,
       neutralVariant,
       isDark = false,
-      style = 'TonalSpot',
+      style = PaletteStyle.TonalSpot,
       contrastLevel = 0
-    } = options;
+    } = opts;
 
-    const sourceColorArgb = toArgb(sourceColor ?? primary ?? 0);
-    const scheme = PaletteStyle.from(style).toScheme(sourceColorArgb, isDark, contrastLevel);
+    const sourceColorHct = toHct(sourceColor ?? primary ?? 0);
+    const scheme = style.createScheme(sourceColorHct, isDark, contrastLevel);
 
     super({
       ...scheme,

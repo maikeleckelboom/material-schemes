@@ -1,4 +1,4 @@
-import {ContrastLevel, DynamicColorScheme, PaletteStyle} from "../src";
+import {ContrastLevel, DynamicColorScheme, PaletteStyle} from "../../src";
 import {describe, expect, it, test} from "vitest";
 
 describe('DynamicScheme', () => {
@@ -20,16 +20,16 @@ describe('DynamicScheme', () => {
 
     expect(scheme.sourceColorArgb).toBe(sourceColor);
     expect(scheme.isDark).toBe(false);
-    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.value);
+    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.ordinal);
     expect(scheme.contrastLevel).toBe(ContrastLevel.Default.value);
   });
 
   test('should accept PaletteStyle name from style option', () => {
     const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
-      style: PaletteStyle.Expressive
+      style: PaletteStyle.Fidelity,
     });
-    expect(scheme.variant).toEqual(PaletteStyle.Expressive.value);
+    expect(scheme.variant).toEqual(PaletteStyle.Fidelity.ordinal);
   });
 
   test('should set isDark to true when provided', () => {
@@ -49,15 +49,6 @@ describe('DynamicScheme', () => {
     expect(scheme.contrastLevel).toBe(contrastLevel);
   });
 
-  test('should use provided PaletteStyle instance from style', () => {
-    const style = PaletteStyle.Expressive;
-    const scheme = new DynamicColorScheme({
-      sourceColor: 0xFF0000,
-      style
-    });
-    expect(scheme.variant).toBe(style.value);
-  });
-
   test('should default contrastLevel to ContrastLevel.Default.value', () => {
     const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000
@@ -65,28 +56,6 @@ describe('DynamicScheme', () => {
     expect(scheme.contrastLevel).toBe(ContrastLevel.Default.value);
   });
 
-  test('should accept any casing/format from style names', () => {
-    const scheme1 = new DynamicColorScheme({
-      sourceColor: 0xFF0000,
-      style: 'tonal-spot'
-    });
-
-
-    const scheme2 = new DynamicColorScheme({
-      sourceColor: 0xFF0000,
-      style: 'TonalSpot'
-    });
-
-
-    const scheme3 = new DynamicColorScheme({
-      sourceColor: 0xFF0000,
-      style: PaletteStyle.TonalSpot
-    })
-
-    expect(scheme1.variant).toEqual(PaletteStyle.TonalSpot.value);
-    expect(scheme2.variant).toEqual(PaletteStyle.TonalSpot.value);
-    expect(scheme3.variant).toEqual(PaletteStyle.TonalSpot.value);
-  });
 
   it('should accept sourceColor and options separately', () => {
     const scheme = new DynamicColorScheme(0xFF0000, {

@@ -14,10 +14,10 @@ export function createTonalPalette(color: Color): TonalPalette {
 }
 
 /**
- * Extracts color values for specified tones from a TonalPalette.
+ * Extracts color entries for specified tones from a TonalPalette.
  * @param palette - A TonalPalette instance.
- * @param tones - An array of tone values.
- * @returns An object mapping tone values to color values.
+ * @param tones - An array of tone entries.
+ * @returns An object mapping tone entries to color entries.
  */
 export function getColorsFromPalette(
   palette: TonalPalette,

@@ -21,7 +21,7 @@ export interface ScoreOptions {
  *
  * @param colorToCount - A map of colors to their frequencies.
  * @param options - ScoreOptions (official naming) for computing rankings.
- * @returns A tuple with the best score followed by additional ranked values.
+ * @returns A tuple with the best score followed by additional ranked entries.
  */
 export function score(
   colorToCount: Map<number, number>,

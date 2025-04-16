@@ -3,6 +3,7 @@ import type {Color, ColorScheme, ColorSchemeOptions, ColorSchemeReturnType, Mate
 import {formatColorToken, formatTokenName} from '../utils';
 import {getColorsFromPalette} from './palette.ts';
 import {COLOR_ROLES, DEFAULT_PALETTE_TONES} from "../constants";
+import {DynamicColorScheme} from "../theme";
 
 /**
  * Generates a color scheme from a MaterialTheme or DynamicScheme, supporting dark mode,
@@ -11,7 +12,7 @@ import {COLOR_ROLES, DEFAULT_PALETTE_TONES} from "../constants";
  * @template {boolean} [V=false] Whether brightness variants are included
  * @param {MaterialTheme | DynamicScheme} source Color scheme source data
  * @param {ColorSchemeOptions<V extends boolean>} [options] Configuration options
- * @returns {ColorSchemeReturnType<V extends boolean>} Color scheme with numeric color values
+ * @returns {ColorSchemeReturnType<V extends boolean>} Color scheme with numeric color entries
  *
  * @example
  * // Basic usage with a theme
@@ -35,8 +36,12 @@ export function createColorScheme(
   source: DynamicScheme,
   options?: ColorSchemeOptions,
 ): ColorScheme;
+export function createColorScheme<V extends boolean = false>(
+  source: DynamicColorScheme,
+  options?: ColorSchemeOptions<V>,
+): ColorSchemeReturnType<V>;
 export function createColorScheme(
-  source: MaterialTheme | DynamicScheme,
+  source: MaterialTheme | DynamicScheme | DynamicColorScheme,
   options?: ColorSchemeOptions,
 ): ColorScheme {
   return 'schemes' in source
@@ -48,7 +53,6 @@ function createFromTheme(theme: MaterialTheme, options: ColorSchemeOptions = {})
   const {
     dark = false,
     brightnessVariants = false,
-    paletteTones,
     modifyColorScheme,
   } = options;
 
@@ -56,8 +60,11 @@ function createFromTheme(theme: MaterialTheme, options: ColorSchemeOptions = {})
 
   const scheme: ColorScheme = {};
 
-  if (paletteTones) {
-    Object.assign(scheme, getPaletteColorsFromTheme(theme, paletteTones));
+  if (options.paletteTones) {
+    if (typeof options.paletteTones !== 'number' && options.paletteTones) {
+      options.paletteTones = [...DEFAULT_PALETTE_TONES];
+    }
+    Object.assign(scheme, getPaletteColorsFromTheme(theme, options.paletteTones));
   }
 
   Object.assign(

@@ -1,9 +1,4 @@
 export class ContrastLevel {
-  static readonly Reduced = new ContrastLevel("Reduced", -1);
-  static readonly Default = new ContrastLevel("Default", 0);
-  static readonly Medium = new ContrastLevel("Medium", 0.5);
-  static readonly High = new ContrastLevel("High", 1.0);
-
   public readonly name: string;
   public readonly value: number;
 
@@ -12,12 +7,18 @@ export class ContrastLevel {
     this.value = value;
   }
 
-  /**
-   * Returns an array of values defined contrast levels.
-   */
-  public static values(): ContrastLevel[] {
-    return Object.values(this).filter((v) => v instanceof ContrastLevel) as ContrastLevel[];
-  }
+  public static readonly Reduced = new ContrastLevel("Reduced", -1);
+  public static readonly Default = new ContrastLevel("Default", 0);
+  public static readonly Medium = new ContrastLevel("Medium", 0.5);
+  public static readonly High = new ContrastLevel("High", 1.0);
+
+  /** List of all defined contrast levels */
+  public static readonly entries: readonly ContrastLevel[] = [
+    ContrastLevel.Reduced,
+    ContrastLevel.Default,
+    ContrastLevel.Medium,
+    ContrastLevel.High,
+  ];
 
   /**
    * Determines and returns the appropriate contrast level for a given numeric value.
@@ -26,12 +27,12 @@ export class ContrastLevel {
    * @returns The corresponding ContrastLevel instance.
    */
   public static closest(value: number): ContrastLevel {
-    if (value < 0) return this.Reduced;
+    if (value < 0) return ContrastLevel.Reduced;
 
-    const levels = this.values()
+    const levels = ContrastLevel.entries
       .filter((l) => l.value >= 0)
       .sort((a, b) => b.value - a.value);
 
-    return levels.find((l) => value >= l.value) ?? this.Default;
+    return levels.find((l) => value >= l.value) ?? ContrastLevel.Default;
   }
 }

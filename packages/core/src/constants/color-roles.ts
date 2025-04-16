@@ -4,7 +4,7 @@
  * @constant {ReadonlyArray<string>} COLOR_ROLES
  * @see {@link https://m3.material.io/styles/color/overview Material Design 3 Color-system}
  * @example
- * // Iterate through values Material Design 3 color roles.
+ * // Iterate through entries Material Design 3 color roles.
  * COLOR_ROLES.forEach(role => {
  *   console.log('Supported color role:', role);
  * });

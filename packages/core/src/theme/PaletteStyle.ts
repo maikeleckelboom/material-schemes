@@ -8,27 +8,10 @@ import {
   SchemeNeutral,
   SchemeRainbow,
   SchemeTonalSpot,
-  SchemeVibrant,
-} from '@material/material-color-utilities';
-import {ContrastLevel} from './ContrastLevel.ts';
-import camelcase from "camelcase";
+  SchemeVibrant
+} from "@material/material-color-utilities";
 
-export type PaletteStyleIdentifier =
-  | 'Monochrome'
-  | 'Neutral'
-  | 'TonalSpot'
-  | 'Vibrant'
-  | 'Expressive'
-  | 'Fidelity'
-  | 'Content'
-  | 'Rainbow'
-  | 'FruitSalad';
-
-export type SchemeConstructor = new (
-  sourceColor: Hct,
-  isDark: boolean,
-  contrastLevel: number
-) =>
+type SchemeVariant =
   | SchemeContent
   | SchemeExpressive
   | SchemeFidelity
@@ -39,138 +22,119 @@ export type SchemeConstructor = new (
   | SchemeTonalSpot
   | SchemeVibrant;
 
+type SchemeConstructor = new (
+  sourceColor: Hct,
+  isDark: boolean,
+  contrastLevel: number
+) => SchemeVariant;
+
 /**
- * Material Design palette styling system for dynamic color scheme generation.
+ * Represents palette styles mapped to Material Design schemes with
+ * integrated scheme construction capabilities.
  */
 export class PaletteStyle {
-  private static readonly SCHEME_MAP = {
-    Monochrome: SchemeMonochrome,
-    Neutral: SchemeNeutral,
-    TonalSpot: SchemeTonalSpot,
-    Vibrant: SchemeVibrant,
-    Expressive: SchemeExpressive,
-    Fidelity: SchemeFidelity,
-    Content: SchemeContent,
-    Rainbow: SchemeRainbow,
-    FruitSalad: SchemeFruitSalad,
-  } as const;
+  public readonly name: string;
+  public readonly ordinal: number;
+  public readonly schemeConstructor: SchemeConstructor;
 
-  static readonly Monochrome = new PaletteStyle('Monochrome', 0);
-  static readonly Neutral = new PaletteStyle('Neutral', 1);
-  static readonly TonalSpot = new PaletteStyle('TonalSpot', 2);
-  static readonly Vibrant = new PaletteStyle('Vibrant', 3);
-  static readonly Expressive = new PaletteStyle('Expressive', 4);
-  static readonly Fidelity = new PaletteStyle('Fidelity', 5);
-  static readonly Content = new PaletteStyle('Content', 6);
-  static readonly Rainbow = new PaletteStyle('Rainbow', 7);
-  static readonly FruitSalad = new PaletteStyle('FruitSalad', 8);
-
-  public constructor(
-    public readonly name: PaletteStyleIdentifier,
-    public readonly value: number
+  private constructor(
+    name: string,
+    ordinal: number,
+    schemeConstructor: SchemeConstructor
   ) {
-    if (new.target !== PaletteStyle) {
-      throw new Error('PaletteStyle cannot be subclassed');
-    }
+    this.name = name;
+    this.ordinal = ordinal;
+    this.schemeConstructor = schemeConstructor;
   }
 
   /**
-   * Retrieve values available palette styles
+   * Creates a color scheme instance using this palette style.
+   * @param sourceColor Base color in HCT color space
+   * @param isDark Whether to generate dark mode scheme
+   * @param contrastLevel Contrast level (0-1)
    */
-  public static values(): ReadonlyArray<PaletteStyle> {
-    return [
-      this.Monochrome,
-      this.Neutral,
-      this.TonalSpot,
-      this.Vibrant,
-      this.Expressive,
-      this.Fidelity,
-      this.Content,
-      this.Rainbow,
-      this.FruitSalad,
-    ];
+  createScheme(
+    sourceColor: Hct,
+    isDark: boolean,
+    contrastLevel: number
+  ): SchemeVariant {
+    return new this.schemeConstructor(sourceColor, isDark, contrastLevel);
   }
 
+  public static readonly Monochrome = new PaletteStyle(
+    "Monochrome",
+    0,
+    SchemeMonochrome
+  );
+
+  public static readonly Neutral = new PaletteStyle(
+    "Neutral",
+    1,
+    SchemeNeutral
+  );
+
+  public static readonly TonalSpot = new PaletteStyle(
+    "TonalSpot",
+    2,
+    SchemeTonalSpot
+  );
+
+  public static readonly Vibrant = new PaletteStyle(
+    "Vibrant",
+    3,
+    SchemeVibrant
+  );
+
+  public static readonly Expressive = new PaletteStyle(
+    "Expressive",
+    4,
+    SchemeExpressive
+  );
+
+  public static readonly Fidelity = new PaletteStyle(
+    "Fidelity",
+    5,
+    SchemeFidelity
+  );
+
+  public static readonly Content = new PaletteStyle(
+    "Content",
+    6,
+    SchemeContent
+  );
+
+  public static readonly Rainbow = new PaletteStyle(
+    "Rainbow",
+    7,
+    SchemeRainbow
+  );
+
+  public static readonly FruitSalad = new PaletteStyle(
+    "FruitSalad",
+    8,
+    SchemeFruitSalad
+  );
+
+  /* List of all available palette styles */
+  public static readonly entries: readonly PaletteStyle[] = [
+    PaletteStyle.Monochrome,
+    PaletteStyle.Neutral,
+    PaletteStyle.TonalSpot,
+    PaletteStyle.Vibrant,
+    PaletteStyle.Expressive,
+    PaletteStyle.Fidelity,
+    PaletteStyle.Content,
+    PaletteStyle.Rainbow,
+    PaletteStyle.FruitSalad,
+  ];
+
   /**
-   * Resolve a palette style from various input types
+   * Gets a palette style by name
+   * @throws Error if no style with given name exists
    */
-  public static from(style: unknown): PaletteStyle {
-    if (style instanceof PaletteStyle) {
-      return style;
-    }
-
-    if (typeof style === 'string') {
-      return this.fromName(style);
-    }
-
-    if (typeof style === 'number') {
-      return this.fromVariant(style);
-    }
-
-    throw new Error(`[PaletteStyle] Invalid style: ${style}`);
-  }
-
-  /**
-   * @private Get style by normalized name
-   */
-  private static fromName(name: string): PaletteStyle {
-    const normalized = camelcase(name, {pascalCase: true});
-    const style = this.values().find(s => s.name === normalized);
-
-    if (!style) {
-      throw Error(`[PaletteStyle] Invalid style name: ${name}`);
-    }
-
+  static valueOf(name: string): PaletteStyle {
+    const style = PaletteStyle.entries.find(s => s.name === name);
+    if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)
     return style;
-  }
-
-  /**
-   * @private Get style by value number (0-8)
-   */
-  private static fromVariant(variant: number): PaletteStyle {
-    if (!Number.isInteger(variant)) {
-      throw Error(`[PaletteStyle] Invalid variant type: ${typeof variant}`);
-    }
-
-    if (variant < 0 || variant > 8) {
-      throw Error(`[PaletteStyle] Variant out of range: ${variant}`);
-    }
-
-    const style = this.values().find(s => s.value === variant);
-
-    if (!style) {
-      throw Error(`[PaletteStyle] Invalid variant: ${variant}`);
-    }
-
-    return style;
-  }
-
-  /**
-   * Create DynamicColorScheme with current style
-   */
-  public toScheme(
-    sourceColor: number,
-    isDark: boolean = false,
-    contrastLevel: number = ContrastLevel.Default.value,
-  ) {
-    const SchemeConstructor = this.getSchemeConstructor();
-    return new SchemeConstructor(
-      Hct.fromInt(sourceColor),
-      isDark,
-      contrastLevel
-    );
-  }
-
-  /**
-   * @private Get the constructor for the current style
-   */
-  private getSchemeConstructor(): SchemeConstructor {
-    const constructor = PaletteStyle.SCHEME_MAP[this.name];
-    if (!constructor) {
-      throw Error(
-        `[PaletteStyle] Missing scheme constructor for style: ${this.name}`
-      );
-    }
-    return constructor;
   }
 }

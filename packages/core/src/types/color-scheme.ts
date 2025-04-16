@@ -12,12 +12,11 @@ export type ColorRoleKey = (typeof COLOR_ROLES)[number];
  * Interface representing a complete Material Design 3 color scheme
  * @interface
  * @property {number} [key] - Numeric color value (typically 32-bit integer in 0xAARRGGBB format)
- * @description Maps M3 color roles to their actual color values. While extensible via string index,
+ * @description Maps M3 color roles to their actual color entries. While extensible via string index,
  * custom properties should follow M3 naming conventions.
  */
 export interface ColorScheme extends Record<ColorRoleKey | string, number> {
   [key: string]: number;
-
 }
 
 /**
@@ -43,14 +42,23 @@ export type LightColorScheme = SuffixedColorScheme<'Light'>;
  */
 export type DarkColorScheme = SuffixedColorScheme<'Dark'>;
 
+interface PaletteColorScheme {
+  primary: Record<string, number>;
+  secondary: Record<string, number>;
+  tertiary: Record<string, number>;
+  neutral: Record<string, number>;
+  neutralVariant: Record<string, number>;
+  error: Record<string, number>;
+}
+
 /**
  * Return type for color scheme generation based on options
  * @template BV - Boolean type for brightness variants flag
  * @type {ColorScheme | (ColorScheme & LightColorScheme & DarkColorScheme)} ColorSchemeReturnType
- * @description When brightnessVariants=true, combines base scheme with light/dark variants
+ * @description When brightnessVariants=true, combines the base scheme with light/dark variants
  * @example
  * // With variants:
- * type FullScheme = ColorSchemeReturnType<true>;  // Contains 'primary', 'primaryLight', 'primaryDark'
+ * type FullScheme = ColorSchemeReturnType<true>; // Contains 'primary', 'primaryLight', 'primaryDark'
  * // Without variants:
  * type BaseScheme = ColorSchemeReturnType; // Only contains base keys
  */
@@ -66,7 +74,7 @@ export type ColorSchemeReturnType<V extends boolean> = V extends true
  * @property {V} [brightnessVariants=false] - Generate light/dark variants when true
  * @property {Function} [modifyColorScheme] - Post-processing function for scheme customization
  */
-export interface ColorSchemeOptions<V extends boolean = false> {
+export interface ColorSchemeOptions<V extends boolean = false, T extends boolean = false> {
   /**
    * Whether to use the dark scheme
    * @default false
@@ -79,11 +87,12 @@ export interface ColorSchemeOptions<V extends boolean = false> {
   brightnessVariants?: V;
   /**
    * Specifies which tonal palette tones to generate and include in the color scheme.
-   * Set to `false` to disable tonal palette generation.
-   * If an array is provided, it should contain the tones to be generated.
-   * @default [0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100]
+   * - When `true`, uses the default array: [0,5,10,15,20,25,30,35,40,50,60,70,80,90,95,98,99,100]
+   * - When `false` (default), disables tonal palette generation
+   * - Provide a custom number array to specify exact tones
+   * @default false
    */
-  paletteTones?: number[];
+  paletteTones?: boolean | number[];
   /**
    * Type-safe color scheme modifier that preserves existing properties
    * while allowing new property additions
