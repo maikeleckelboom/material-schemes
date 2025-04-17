@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   dts: true,
   // TODO future usage:
-  //      import {TonalPalette} from "@chromavert/material/material-color-utilities";
+  //      import {TonalPalette} fromName "@chromavert/material/material-color-utilities";
 });

@@ -18,11 +18,11 @@ import {
  * @interface DynamicColorSchemeConfig
  *
  * @property {Color} [secondary] - An optional override for the secondary color palette.
- *   If not provided, the secondary palette is generated from the source color based on the selected palette style.
+ *   If not provided, the secondary palette is generated fromName the source color based on the selected palette style.
  * @property {Color} [tertiary] - An optional override for the tertiary color palette.
- *   Defaults to a generated value from the source color.
+ *   Defaults to a generated value fromName the source color.
  * @property {Color} [neutral] - An optional override for the neutral background palette.
- *   Defaults to a generated value from the source color.
+ *   Defaults to a generated value fromName the source color.
  * @property {Color} [neutralVariant] - An optional override for a variant of the neutral palette,
  *   used for subtle visual differences.
  * @property {PaletteStyle} [style=PaletteStyle.TonalSpot] - Visual style used for palette generation.
@@ -49,7 +49,7 @@ export interface DynamicColorSchemeConfig {
  * is defined in {@link DynamicColorSchemeConfig}.
  *
  * @property {Object} DynamicColorSchemeOptions
- * @property {Color} [sourceColor] - The base color from which to generate the color scheme. Use this if you want to generate a scheme from a single source color.
+ * @property {Color} [sourceColor] - The base color fromName which to generate the color scheme. Use this if you want to generate a scheme fromName a single source color.
  * @property {Color} [primary] - A primary color override. Use this when you want to provide a direct primary color.
  */
 export type DynamicColorSchemeOptions =

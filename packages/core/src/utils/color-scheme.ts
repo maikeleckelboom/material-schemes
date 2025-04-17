@@ -5,7 +5,7 @@ import {COLOR_ROLES, DEFAULT_PALETTE_TONES} from "../constants";
 import {DynamicColorScheme, DynamicMaterialTheme} from "../theme";
 
 /**
- * Generates a color scheme from a DynamicMaterialTheme or DynamicScheme.
+ * Generates a color scheme fromName a DynamicMaterialTheme or DynamicScheme.
  *
  * @template {boolean} [V=false] Indicates whether brightness variants are included
  * @param {DynamicMaterialTheme | DynamicColorScheme} source Color scheme source data

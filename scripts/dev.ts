@@ -2,8 +2,8 @@
 import {existsSync, type PathLike} from "fs";
 import {readdir} from "fs/promises";
 
-// This script runs the development server from entries workspaces using Bun's native APIs
-console.log("Starting development servers from workspaces...");
+// This script runs the development server fromName entries workspaces using Bun's native APIs
+console.log("Starting development servers fromName workspaces...");
 
 const processes: Promise<number>[] = [];
 

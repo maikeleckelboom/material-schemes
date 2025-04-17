@@ -1,26 +1,29 @@
 <script lang="ts" setup>
-import {type DynamicScheme, Hct, MaterialDynamicColors} from '@material/material-color-utilities';
-import {contrastColorRole, type DynamicColor, PaletteStyle, toHex} from "@chromavert/material";
+import {DynamicColor, type DynamicScheme, Hct, MaterialDynamicColors} from '@material/material-color-utilities';
+import {contrastColorRole, PaletteStyle, toHex} from "@chromavert/material";
 
-const paletteStyle = PaletteStyle.valueOf('FruitSalad');
-const dynamicScheme = paletteStyle.dynamicScheme(Hct.fromInt(0xff6750a4));
+const seedColor = Hct.fromInt(0xff6750a4)
+const paletteStyle = PaletteStyle.fromName('FruitSalad');
+const dynamicScheme = paletteStyle.dynamicScheme(seedColor);
 
-function generateDynamicColors(scheme: DynamicScheme) {
-  const result: Record<string, string> = {}
-  for (const [key, token] of Object.entries(
-    MaterialDynamicColors
-  ) as [string, DynamicColor][]) {
-    if (token?.getArgb) {
-      result[key] = toHex(token.getArgb(scheme))
+function filterDynamicColors(dynamicScheme: DynamicScheme) {
+  const result: Record<string, string> = {};
+  const dynamicKeys = Object.keys(MaterialDynamicColors);
+  for (let i = 0, len = dynamicKeys.length; i < len; i++) {
+    const key = dynamicKeys[i] as keyof typeof MaterialDynamicColors;
+    const token = MaterialDynamicColors[key];
+    if (token && token instanceof DynamicColor) {
+      result[key] = toHex(token.getArgb(dynamicScheme));
     }
   }
-  return result
+  return result;
 }
+
 </script>
 
 <template>
   <div class="flex gap-0.5 flex-wrap">
-    <div v-for="(dynamicColor, role) in generateDynamicColors(dynamicScheme)"
+    <div v-for="(dynamicColor, role) in filterDynamicColors(dynamicScheme)"
          :key="role"
          :style="{
            backgroundColor: toHex(dynamicColor),

@@ -24,7 +24,7 @@ describe('DynamicScheme', () => {
     expect(scheme.contrastLevel).toBe(ContrastLevel.Default.value);
   });
 
-  test('should accept PaletteStyle name from style option', () => {
+  test('should accept PaletteStyle name fromName style option', () => {
     const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       style: PaletteStyle.Fidelity,

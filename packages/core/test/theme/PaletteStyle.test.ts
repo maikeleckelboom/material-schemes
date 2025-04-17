@@ -32,7 +32,7 @@ describe('PaletteStyle', () => {
   });
 
   it('should have entries in the declared order', () => {
-    expect(PaletteStyle.entries).toEqual([
+    expect(PaletteStyle.values).toEqual([
       PaletteStyle.Monochrome,
       PaletteStyle.Neutral,
       PaletteStyle.TonalSpot,
@@ -45,20 +45,20 @@ describe('PaletteStyle', () => {
     ]);
   });
 
-  it('valueOf should return the correct PaletteStyle instance for a valid name', () => {
-    expect(PaletteStyle.valueOf("Monochrome")).toBe(PaletteStyle.Monochrome);
-    expect(PaletteStyle.valueOf("Neutral")).toBe(PaletteStyle.Neutral);
-    expect(PaletteStyle.valueOf("TonalSpot")).toBe(PaletteStyle.TonalSpot);
-    expect(PaletteStyle.valueOf("Vibrant")).toBe(PaletteStyle.Vibrant);
-    expect(PaletteStyle.valueOf("Expressive")).toBe(PaletteStyle.Expressive);
-    expect(PaletteStyle.valueOf("Fidelity")).toBe(PaletteStyle.Fidelity);
-    expect(PaletteStyle.valueOf("Content")).toBe(PaletteStyle.Content);
-    expect(PaletteStyle.valueOf("Rainbow")).toBe(PaletteStyle.Rainbow);
-    expect(PaletteStyle.valueOf("FruitSalad")).toBe(PaletteStyle.FruitSalad);
+  it('fromName should return the correct PaletteStyle instance for a valid name', () => {
+    expect(PaletteStyle.fromName("Monochrome")).toBe(PaletteStyle.Monochrome);
+    expect(PaletteStyle.fromName("Neutral")).toBe(PaletteStyle.Neutral);
+    expect(PaletteStyle.fromName("TonalSpot")).toBe(PaletteStyle.TonalSpot);
+    expect(PaletteStyle.fromName("Vibrant")).toBe(PaletteStyle.Vibrant);
+    expect(PaletteStyle.fromName("Expressive")).toBe(PaletteStyle.Expressive);
+    expect(PaletteStyle.fromName("Fidelity")).toBe(PaletteStyle.Fidelity);
+    expect(PaletteStyle.fromName("Content")).toBe(PaletteStyle.Content);
+    expect(PaletteStyle.fromName("Rainbow")).toBe(PaletteStyle.Rainbow);
+    expect(PaletteStyle.fromName("FruitSalad")).toBe(PaletteStyle.FruitSalad);
   });
 
-  it('valueOf should throw an error when given an invalid name', () => {
-    expect(() => PaletteStyle.valueOf("NonExisting")).toThrowError(
+  it('fromName should throw an error when given an invalid name', () => {
+    expect(() => PaletteStyle.fromName("NonExisting")).toThrowError(
       "No PaletteStyle with name 'NonExisting' found."
     );
   });

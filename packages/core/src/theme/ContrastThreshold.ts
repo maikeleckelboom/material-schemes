@@ -24,7 +24,7 @@ export class ContrastThreshold {
   public static readonly WCAG_AAA_LARGE_TEXT = new ContrastThreshold("WCAG_AAA_LARGE_TEXT", 4.5);
 
   /** All available contrast thresholds in recommended evaluation order */
-  public static readonly entries: readonly ContrastThreshold[] = [
+  public static readonly values: readonly ContrastThreshold[] = [
     ContrastThreshold.WCAG_AA_NORMAL_TEXT,
     ContrastThreshold.WCAG_AA_LARGE_TEXT,
     ContrastThreshold.WCAG_AAA_NORMAL_TEXT,
@@ -38,8 +38,8 @@ export class ContrastThreshold {
    * @returns Matching ContrastThreshold instance
    * @throws {Error} For invalid/unrecognized threshold names
    */
-  static valueOf(name: string): ContrastThreshold {
-    const threshold = ContrastThreshold.entries.find(t => t.name === name);
+  static fromName(name: string): ContrastThreshold {
+    const threshold = ContrastThreshold.values.find(t => t.name === name);
     if (!threshold) {
       throw new Error(`Invalid ContrastThreshold: ${name}`);
     }
@@ -55,11 +55,11 @@ export class ContrastThreshold {
    *          defaults to WCAG_AA_LARGE_TEXT if none found
    *
    * @example
-   * ContrastThreshold.closest(4.2) // Returns WCAG_AA_LARGE_TEXT
-   * ContrastThreshold.closest(4.6) // Returns WCAG_AAA_LARGE_TEXT
+   * ContrastThreshold.findClosest(4.2) // Returns WCAG_AA_LARGE_TEXT
+   * ContrastThreshold.findClosest(4.6) // Returns WCAG_AAA_LARGE_TEXT
    */
-  static closest(targetValue: number): ContrastThreshold {
-    const thresholds = this.entries;
+  static findClosest(targetValue: number): ContrastThreshold {
+    const thresholds = this.values;
     let currentMax = -Infinity;
     let currentCandidate: ContrastThreshold | null = null;
 

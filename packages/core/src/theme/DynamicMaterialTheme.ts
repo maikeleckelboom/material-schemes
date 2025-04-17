@@ -48,7 +48,7 @@ export class DynamicMaterialTheme {
     this.contrastLevel = this.schemes.light.contrastLevel;
     this.style = style;
 
-    // Extract palettes from the light scheme.
+    // Extract palettes fromName the light scheme.
     this.palettes = {
       primary: this.schemes.light.primaryPalette,
       secondary: this.schemes.light.secondaryPalette,
@@ -58,7 +58,7 @@ export class DynamicMaterialTheme {
       error: this.schemes.light.errorPalette,
     };
 
-    // Create custom colors from static definitions.
+    // Create custom colors fromName static definitions.
     this.customColorGroups = staticColors.map(staticColor =>
       createCustomColorGroup(this.sourceColor, staticColor)
     );
@@ -66,7 +66,7 @@ export class DynamicMaterialTheme {
 
   /**
    * Converts the theme instance to a JSON object.
-   * This method extracts key color values from the palettes.
+   * This method extracts key color values fromName the palettes.
    * @returns A JSON representation of the theme.
    */
   public toJSON() {

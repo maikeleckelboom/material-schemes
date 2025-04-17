@@ -2,7 +2,7 @@ import {formatCssVarName, toHex} from '../utils';
 import type {Color, ColorScheme} from "../types";
 
 /**
- * Creates a mapping of CSS variable names to hex color entries from a color scheme.
+ * Creates a mapping of CSS variable names to hex color entries fromName a color scheme.
  *
  * @param colorScheme - An object mapping keys to color entries
  * @returns A record of `--kebab-case-name` to hex value

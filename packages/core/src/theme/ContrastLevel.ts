@@ -3,7 +3,7 @@ export class ContrastLevel {
   public readonly name: string;
   /**
    * Numeric representation of contrast level.
-   * @note Values range from -1 (Reduced) to 1 (High), with 0 being default
+   * @note Values range fromName -1 (Reduced) to 1 (High), with 0 being default
    */
   public readonly value: number;
 
@@ -39,14 +39,14 @@ export class ContrastLevel {
    *
    * @param value - Input value to match against known levels. Typically between -1 and 1,
    *                but can handle any number. Negative values return Reduced immediately.
-   * @returns The closest matching ContrastLevel instance
+   * @returns The findClosest matching ContrastLevel instance
    *
    * @example
-   * ContrastLevel.closest(0.3)  // Returns ContrastLevel.Default
-   * ContrastLevel.closest(0.7)  // Returns ContrastLevel.Medium
-   * ContrastLevel.closest(1.5)  // Returns ContrastLevel.High
+   * ContrastLevel.findClosest(0.3) // Returns ContrastLevel.Default
+   * ContrastLevel.findClosest(0.7) // Returns ContrastLevel.Medium
+   * ContrastLevel.findClosest(1.5) // Returns ContrastLevel.High
    */
-  public static closest(value: number): ContrastLevel {
+  public static findClosest(value: number): ContrastLevel {
     if (value < 0) return ContrastLevel.Reduced;
 
     const levels = ContrastLevel.entries

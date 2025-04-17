@@ -30,9 +30,8 @@ type SchemeConstructor = new (
 ) => SchemeVariant;
 
 /**
- * Represents different visual styles for color palette generation,
- * each corresponding to specific Material Design theme variants.
- * These styles control how colors are derived from the source color and arranged in the palette.
+ * Represents different visual styles for color palette generation using
+ * the 'typesafe enum pattern', each corresponding to specific Material Design theme variants.
  */
 export class PaletteStyle {
   /** Human-readable style name (e.g., "Vibrant", "Monochrome") */
@@ -54,96 +53,94 @@ export class PaletteStyle {
     value: number,
     schemeConstructor: SchemeConstructor
   ) {
+    // Variant name in pascalcase format
     this.name = name;
+    // Value is 1-1 mapped to the variant enum value
     this.value = value;
     this.schemeConstructor = schemeConstructor;
   }
 
   /**
-   * Generates a complete color scheme based on this palette style.
+   * Creates a dynamic color scheme based on the provided source color.
    *
-   * @param sourceColor Base color in HCT (Hue-Chroma-Tone) color space
+   * @param sourceColorHct Base color in HCT (Hue-Chroma-Tone) color space
    * @param isDark Whether to generate a dark mode variant
    * @param contrastLevel Contrast adjustment (0 = default, 1 = maximum)
    * @returns Configured color scheme instance
-   *
-   * @example
-   * const style = PaletteStyle.TonalSpot;
-   * const scheme = style.dynamicScheme(Hct.fromInt(0xff0000), false, 0.5);
    */
   dynamicScheme(
-    sourceColor: Hct,
+    sourceColorHct: Hct,
     isDark: boolean = false,
     contrastLevel: number = ContrastLevel.Default.value
   ): SchemeVariant {
-    return new this.schemeConstructor(sourceColor, isDark, contrastLevel);
+    return new this.schemeConstructor(sourceColorHct, isDark, contrastLevel);
   }
 
   /** Minimalist grayscale palette */
   public static readonly Monochrome = new PaletteStyle(
-    "Monochrome",
+    'Monochrome',
     0,
     SchemeMonochrome
   );
 
   /** Subtle, low-chroma colors with natural feel */
   public static readonly Neutral = new PaletteStyle(
-    "Neutral",
+    'Neutral',
     1,
     SchemeNeutral
   );
 
   /** Classic Material Design style with tonal variations */
   public static readonly TonalSpot = new PaletteStyle(
-    "TonalSpot",
+    'TonalSpot',
     2,
     SchemeTonalSpot
   );
 
   /** Bold, high-chroma colors with maximum vibrancy */
   public static readonly Vibrant = new PaletteStyle(
-    "Vibrant",
+    'Vibrant',
     3,
     SchemeVibrant
   );
 
   /** Expressive blends with artistic color transitions */
   public static readonly Expressive = new PaletteStyle(
-    "Expressive",
+    'Expressive',
     4,
     SchemeExpressive
   );
 
   /** Color-accurate palettes maintaining source hue */
   public static readonly Fidelity = new PaletteStyle(
-    "Fidelity",
+    'Fidelity',
     5,
     SchemeFidelity
   );
 
   /** Optimized for readability in text-heavy interfaces */
   public static readonly Content = new PaletteStyle(
-    "Content",
+    'Content',
     6,
     SchemeContent
   );
 
   /** Full spectrum color progression */
   public static readonly Rainbow = new PaletteStyle(
-    "Rainbow",
+    'Rainbow',
     7,
     SchemeRainbow
   );
 
   /** Complementary color pairs with natural harmony */
   public static readonly FruitSalad = new PaletteStyle(
-    "FruitSalad",
+    'FruitSalad',
     8,
     SchemeFruitSalad
   );
 
   /** Complete list of available palette styles in value order */
-  public static readonly entries: readonly PaletteStyle[] = [
+  public static readonly values: readonly PaletteStyle[] = [
     PaletteStyle.Monochrome,
     PaletteStyle.Neutral,
     PaletteStyle.TonalSpot,
@@ -163,10 +160,10 @@ export class PaletteStyle {
    * @throws {Error} When no matching style exists
    *
    * @example
-   * PaletteStyle.valueOf("Vibrant") // Returns Vibrant instance
+   * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
    */
-  static valueOf(name: string): PaletteStyle {
-    const style = PaletteStyle.entries.find(s => s.name === name);
+  static fromName(name: string): PaletteStyle {
+    const style = PaletteStyle.values.find(s => s.name === name);
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)
     return style;
   }
