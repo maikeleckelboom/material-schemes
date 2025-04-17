@@ -6,7 +6,7 @@ import type {KebabCase} from 'type-fest';
 /**
  * An interface for formatting options, allowing for optional prefix and suffix.
  */
-export interface FormatOptions {
+export interface TokenFormatterOptions {
   prefix?: string;
   suffix?: string;
 }
@@ -21,7 +21,7 @@ export interface FormatOptions {
  * @example
  * formatTokenName('button', { prefix: 'ui', suffix: 'large' }); // 'uiButtonLarge'
  */
-export function formatTokenName(name: string, options: FormatOptions = {}): string {
+export function formatTokenName(name: string, options: TokenFormatterOptions = {}): string {
   const {prefix, suffix} = options;
   return camelCase(`${prefix ? `${prefix}-` : ''}${name}${suffix ? `-${suffix}` : ''}`);
 }
@@ -33,7 +33,6 @@ export function formatTokenName(name: string, options: FormatOptions = {}): stri
  * @param pattern - A template string containing 'color' (case-insensitive) as a placeholder.
  * @param name - The color name to interpolate into the pattern.
  * @param suffix - Optional suffix to append after the replacement.
- * @returns The resulting string formatted in camelCase.
  *
  * @example
  * formatColorToken('onColorContainer', 'primary'); // 'onPrimaryContainer'
@@ -52,7 +51,6 @@ export function formatColorToken(pattern: string, name: string, suffix?: string)
  * Formats a string as a CSS custom property name (kebab-case with -- prefix).
  *
  * @param key - The name to convert to CSS variable format.
- * @returns The formatted CSS variable name.
  *
  * @example
  * formatCssVarName('primaryColor'); // '--primary-color'

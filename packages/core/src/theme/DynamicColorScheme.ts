@@ -124,7 +124,7 @@ export class DynamicColorScheme extends DynamicScheme {
     } = opts;
 
     const sourceColor = toHct(opts.sourceColor ?? primary ?? 0);
-    const scheme = style.createScheme(sourceColor, isDark, contrastLevel);
+    const scheme = style.dynamicScheme(sourceColor, isDark, contrastLevel);
 
     super({
       ...scheme,

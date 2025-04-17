@@ -2,7 +2,7 @@ import {customColor, type CustomColorGroup} from "@material/material-color-utili
 import {toArgb} from "./conversion.ts";
 import type {Color, StaticColor} from "../types";
 
-export function createCustomColor(source: Color, staticColor: StaticColor): CustomColorGroup {
+export function createCustomColorGroup(source: Color, staticColor: StaticColor): CustomColorGroup {
   return customColor(toArgb(source), {
     name: staticColor.name,
     value: toArgb(staticColor.value),

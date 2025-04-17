@@ -1,12 +1,13 @@
-import type {ColorSchemeOptions, ColorSchemeReturnType, MaterialThemeOptions} from "../types";
+import type {Color, ColorSchemeOptions, ColorSchemeReturnType, MaterialThemeJSON, MaterialThemeOptions} from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
 import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
 import {
-  createCustomColor,
-  createTonalPalette,
+  createCustomColorGroup,
+  createPalette,
   formatTokenName,
   generateColorScheme,
+  createTokensFromCustomColor,
   generateToneMapFromPalette
 } from "../utils";
 
@@ -15,7 +16,7 @@ import {
  * It includes palette extraction, custom colors handling, and JSON transformation.
  */
 export class DynamicMaterialTheme {
-  public readonly sourceColor: number;
+  public readonly sourceColor: Color;
   public readonly contrastLevel: number;
   public readonly style: PaletteStyle;
   public readonly schemes: {
@@ -29,17 +30,11 @@ export class DynamicMaterialTheme {
     neutral: TonalPalette;
     neutralVariant: TonalPalette;
     error: TonalPalette;
+    [key: string]: TonalPalette;
   };
-  public readonly customColors: CustomColorGroup[];
-
-  /**
-   * Creates an instance of DynamicMaterialTheme.
-   * @param options - Configuration options for the material theme.
-   */
+  public readonly customColorGroups: CustomColorGroup[];
   constructor(options: MaterialThemeOptions) {
     const {staticColors = [], style = PaletteStyle.TonalSpot, ...schemeConfig} = options;
-
-    // Helper to reduce repetitive construction logic.
     const createScheme = (isDark: boolean): DynamicColorScheme =>
       new DynamicColorScheme({...schemeConfig, style, isDark});
 
@@ -64,8 +59,8 @@ export class DynamicMaterialTheme {
     };
 
     // Create custom colors from static definitions.
-    this.customColors = staticColors.map(staticColor =>
-      createCustomColor(this.sourceColor, staticColor)
+    this.customColorGroups = staticColors.map(staticColor =>
+      createCustomColorGroup(this.sourceColor, staticColor)
     );
   }
 
@@ -78,10 +73,20 @@ export class DynamicMaterialTheme {
     return {
       sourceColor: this.sourceColor,
       contrastLevel: this.contrastLevel,
-      style: this.style,
+      style: this.style.name,
       schemes: {
-        light: this.schemes.light.toJSON(),
-        dark: this.schemes.dark.toJSON(),
+        light: {
+          ...this.schemes.light.toJSON(),
+          ...createTokensFromCustomColor(this.customColorGroups, {
+            dark: false
+          })
+        },
+        dark: {
+          ...this.schemes.dark.toJSON(),
+          ...createTokensFromCustomColor(this.customColorGroups, {
+            dark: true
+          })
+        },
       },
       palettes: {
         primary: generateToneMapFromPalette(this.palettes.primary),
@@ -91,13 +96,13 @@ export class DynamicMaterialTheme {
         neutralVariant: generateToneMapFromPalette(this.palettes.neutralVariant),
         error: generateToneMapFromPalette(this.palettes.error),
         ...Object.fromEntries(
-          this.customColors.map(customColor => [
+          this.customColorGroups.map(customColor => [
             formatTokenName(customColor.color.name),
-            generateToneMapFromPalette(createTonalPalette(customColor.value)),
+            generateToneMapFromPalette(createPalette(customColor.value)),
           ])
         ),
       },
-      customColors: this.customColors,
+      customColors: this.customColorGroups.map((group) => group.color)
     };
   }
 

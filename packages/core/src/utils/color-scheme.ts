@@ -1,6 +1,6 @@
-import type {TonalPalette} from '@material/material-color-utilities';
+import type {CustomColorGroup, TonalPalette} from '@material/material-color-utilities';
 import type {Color, ColorScheme, ColorSchemeOptions, ColorSchemeReturnType} from '../types';
-import {createTonalPalette, formatColorToken, formatTokenName} from '../utils';
+import {createPalette, formatColorToken, formatTokenName} from '../utils';
 import {COLOR_ROLES, DEFAULT_PALETTE_TONES} from "../constants";
 import {DynamicColorScheme, DynamicMaterialTheme} from "../theme";
 
@@ -51,8 +51,8 @@ export function extractSchemeFromTheme(theme: DynamicMaterialTheme, options: Col
   if (options.paletteTones) {
     const tones = Array.isArray(options.paletteTones) ? options.paletteTones : [...DEFAULT_PALETTE_TONES];
     Object.assign(scheme, extractTonalPalettesFromTheme(theme, tones));
-    for (const customColor of theme.customColors) {
-      const palette = createTonalPalette(customColor.value);
+    for (const customColor of theme.customColorGroups) {
+      const palette = createPalette(customColor.value);
       if (palette) {
         const paletteColors = generateToneMapFromPalette(palette, tones);
         Object.assign(scheme, generateTonalPaletteTokens(customColor.color.name, paletteColors));
@@ -62,15 +62,15 @@ export function extractSchemeFromTheme(theme: DynamicMaterialTheme, options: Col
 
   Object.assign(
     scheme,
-    getSchemeColorTokens(baseScheme),
-    generateCustomColorTokens(theme, options),
+    createSchemeColorTokens(baseScheme),
+    createTokensFromCustomColor(theme.customColorGroups, options),
   );
 
   if (brightnessVariants) {
     Object.assign(
       scheme,
-      getSchemeColorTokens(theme.schemes.light, 'light'),
-      getSchemeColorTokens(theme.schemes.dark, 'dark'),
+      createSchemeColorTokens(theme.schemes.light, 'light'),
+      createSchemeColorTokens(theme.schemes.dark, 'dark'),
     );
   }
 
@@ -81,16 +81,16 @@ function extractSchemeFromDynamic(
   scheme: DynamicColorScheme,
   options?: ColorSchemeOptions,
 ): ColorScheme {
-  return options?.modifyColorScheme?.(getSchemeColorTokens(scheme)) ?? getSchemeColorTokens(scheme);
+  return options?.modifyColorScheme?.(createSchemeColorTokens(scheme)) ?? createSchemeColorTokens(scheme);
 }
 
-export function generateCustomColorTokens(
-  theme: DynamicMaterialTheme,
+export function createTokensFromCustomColor(
+  customColorGroups: CustomColorGroup[],
   options: ColorSchemeOptions = {},
-): ColorScheme {
+):ColorScheme {
   const customColors: ColorScheme[] = [];
 
-  for (const customColor of theme.customColors) {
+  for (const customColor of customColorGroups) {
     const variants: { type: 'light' | 'dark'; suffix?: string }[] = [
       {type: options.dark ? 'dark' : 'light'},
     ];
@@ -114,7 +114,7 @@ export function generateCustomColorTokens(
   return Object.assign({}, ...customColors);
 }
 
-function getSchemeColorTokens(scheme: DynamicColorScheme, suffix?: string): ColorScheme {
+function createSchemeColorTokens(scheme: DynamicColorScheme, suffix?: string): ColorScheme {
   return COLOR_ROLES.reduce((acc, key) => {
     const colorName = formatTokenName(key, {suffix});
     acc[colorName] = scheme[key];
@@ -128,8 +128,8 @@ function extractTonalPalettesFromTheme(theme: DynamicMaterialTheme, tones?: numb
     const paletteColors = generateToneMapFromPalette(palette, tones);
     Object.assign(tonalColors, generateTonalPaletteTokens(paletteName, paletteColors));
   }
-  for (const customColor of theme.customColors) {
-    const palette = createTonalPalette(customColor.value);
+  for (const customColor of theme.customColorGroups) {
+    const palette = createPalette(customColor.value);
     if (palette) {
       const paletteColors = generateToneMapFromPalette(palette, tones);
       Object.assign(tonalColors, generateTonalPaletteTokens(customColor.color.name, paletteColors));

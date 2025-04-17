@@ -2,33 +2,33 @@ import {describe, expect, it} from 'vitest';
 import {PaletteStyle} from "../../src";
 
 describe('PaletteStyle', () => {
-  it('should have correct name and ordinal for each instance', () => {
+  it('should have correct name and value for each instance', () => {
     expect(PaletteStyle.Monochrome.name).toBe("Monochrome");
-    expect(PaletteStyle.Monochrome.ordinal).toBe(0);
+    expect(PaletteStyle.Monochrome.value).toBe(0);
 
     expect(PaletteStyle.Neutral.name).toBe("Neutral");
-    expect(PaletteStyle.Neutral.ordinal).toBe(1);
+    expect(PaletteStyle.Neutral.value).toBe(1);
 
     expect(PaletteStyle.TonalSpot.name).toBe("TonalSpot");
-    expect(PaletteStyle.TonalSpot.ordinal).toBe(2);
+    expect(PaletteStyle.TonalSpot.value).toBe(2);
 
     expect(PaletteStyle.Vibrant.name).toBe("Vibrant");
-    expect(PaletteStyle.Vibrant.ordinal).toBe(3);
+    expect(PaletteStyle.Vibrant.value).toBe(3);
 
     expect(PaletteStyle.Expressive.name).toBe("Expressive");
-    expect(PaletteStyle.Expressive.ordinal).toBe(4);
+    expect(PaletteStyle.Expressive.value).toBe(4);
 
     expect(PaletteStyle.Fidelity.name).toBe("Fidelity");
-    expect(PaletteStyle.Fidelity.ordinal).toBe(5);
+    expect(PaletteStyle.Fidelity.value).toBe(5);
 
     expect(PaletteStyle.Content.name).toBe("Content");
-    expect(PaletteStyle.Content.ordinal).toBe(6);
+    expect(PaletteStyle.Content.value).toBe(6);
 
     expect(PaletteStyle.Rainbow.name).toBe("Rainbow");
-    expect(PaletteStyle.Rainbow.ordinal).toBe(7);
+    expect(PaletteStyle.Rainbow.value).toBe(7);
 
     expect(PaletteStyle.FruitSalad.name).toBe("FruitSalad");
-    expect(PaletteStyle.FruitSalad.ordinal).toBe(8);
+    expect(PaletteStyle.FruitSalad.value).toBe(8);
   });
 
   it('should have entries in the declared order', () => {

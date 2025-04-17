@@ -4,14 +4,15 @@ import {
   type DynamicColorSchemeOptions,
   PaletteStyle,
   toCssVariables,
-  toHex
+  toHex,
 } from "@chromavert/material";
+import PrintJSON from "~/components/PrintJSON.vue";
 
 const options = shallowReactive<DynamicColorSchemeOptions>({
   sourceColor: '#54B6FF',
   contrastLevel: 0.35,
   style: PaletteStyle.TonalSpot,
-  isDark: true,
+  isDark: false,
   primary: undefined,
   secondary: undefined,
   tertiary: undefined,
@@ -34,12 +35,6 @@ useHead({
       textContent: computed(() => toCssVariables(colorScheme.value, ':root'))
     },
   ],
-})
-
-const paletteStyles: readonly PaletteStyle[] = PaletteStyle.entries
-
-onMounted(() => {
-  console.log(colorScheme.value.accent)
 })
 </script>
 
@@ -121,7 +116,7 @@ onMounted(() => {
         <fieldset>
           <legend>Palette Style</legend>
           <select v-model="options.style">
-            <option v-for="style in paletteStyles" :key="style.name" :value="style">
+            <option v-for="style in PaletteStyle.entries" :key="style.name" :value="style">
               {{ style.name }}
             </option>
           </select>
@@ -133,6 +128,8 @@ onMounted(() => {
         </fieldset>
       </div>
     </div>
-    <pre>{{ scheme }}</pre>
+    <div>
+      <PrintJSON :data="scheme.toJSON()"/>
+    </div>
   </div>
 </template>

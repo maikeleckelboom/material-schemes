@@ -47,7 +47,7 @@ export type DarkColorScheme = SuffixedColorScheme<'Dark'>;
  * Return type for color scheme generation based on options
  * @template BV - Boolean type for brightness variants flag
  */
-export type ColorSchemeReturnType<V extends boolean> = V extends true
+export type ColorSchemeReturnType<V extends boolean | undefined> = V extends true
   ? ColorScheme & LightColorScheme & DarkColorScheme
   : ColorScheme;
 
@@ -60,7 +60,7 @@ export type ColorSchemeReturnType<V extends boolean> = V extends true
  * @property {Function} [modifyColorScheme] - Post-processing function for scheme customization
  */
 export interface ColorSchemeOptions<
-  V extends boolean = false,
+  V extends boolean = true|false,
   U extends ColorSchemeReturnType<V> = ColorSchemeReturnType<V>
 > {
   /**

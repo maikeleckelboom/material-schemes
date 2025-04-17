@@ -1,5 +1,5 @@
-import {type CustomColorGroup, Hct, TonalPalette,} from '@material/material-color-utilities';
-import {DynamicColorScheme, type DynamicColorSchemeOptions} from "../theme";
+import {type CustomColor, type CustomColorGroup, Hct, TonalPalette,} from '@material/material-color-utilities';
+import {DynamicColorScheme, type DynamicColorSchemeOptions, PaletteStyle} from "../theme";
 
 enum Variant {
   MONOCHROME = 0,
@@ -22,21 +22,22 @@ export interface StaticColor {
 export type Color = number | string | Hct;
 
 export interface MaterialThemeJSON {
-  source: number;
+  sourceColor: Color;
   contrastLevel: number;
   style: string;
   schemes: {
-    light: Record<string, number>;
-    dark: Record<string, number>;
+    light: Record<string, Color>;
+    dark: Record<string, Color>;
   };
   palettes: {
-    primary: Record<string, number>;
-    secondary: Record<string, number>;
-    tertiary: Record<string, number>;
-    neutral: Record<string, number>;
-    neutralVariant: Record<string, number>;
+    primary: Record<string, Color>;
+    secondary: Record<string, Color>;
+    tertiary: Record<string, Color>;
+    neutral: Record<string, Color>;
+    neutralVariant: Record<string, Color>;
+    [key: string]: Record<string, Color>;
   };
-  customColors: CustomColorGroup[];
+  customColors: CustomColor[];
 }
 
 export type MaterialThemeOptions =DynamicColorSchemeOptions & {

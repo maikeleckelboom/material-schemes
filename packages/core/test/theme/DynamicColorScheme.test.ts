@@ -20,7 +20,7 @@ describe('DynamicScheme', () => {
 
     expect(scheme.sourceColorArgb).toBe(sourceColor);
     expect(scheme.isDark).toBe(false);
-    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.ordinal);
+    expect(scheme.variant).toEqual(PaletteStyle.TonalSpot.value);
     expect(scheme.contrastLevel).toBe(ContrastLevel.Default.value);
   });
 
@@ -29,7 +29,7 @@ describe('DynamicScheme', () => {
       sourceColor: 0xFF0000,
       style: PaletteStyle.Fidelity,
     });
-    expect(scheme.variant).toEqual(PaletteStyle.Fidelity.ordinal);
+    expect(scheme.variant).toEqual(PaletteStyle.Fidelity.value);
   });
 
   test('should set isDark to true when provided', () => {
@@ -98,5 +98,6 @@ describe('DynamicScheme', () => {
     expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
     expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
   });
+
 })
 

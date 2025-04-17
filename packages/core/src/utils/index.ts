@@ -10,3 +10,4 @@ export * from './palette';
 export * from './scoring';
 export * from './theme';
 export * from './color';
+export * from './dynamic-color'

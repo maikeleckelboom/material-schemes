@@ -10,6 +10,7 @@ import {
   SchemeTonalSpot,
   SchemeVibrant
 } from "@material/material-color-utilities";
+import {ContrastLevel} from "./ContrastLevel.ts";
 
 type SchemeVariant =
   | SchemeContent
@@ -40,21 +41,21 @@ export class PaletteStyle {
    * Numeric index for ordering styles.
    * @note Useful for maintaining consistent display order in UI controls
    */
-  public readonly ordinal: number;
+  public readonly value: number;
   /**
    * Constructor for the associated Material Design scheme class
-   * @private Internal use only - accessed via createScheme()
+   * @private Internal use only - accessed via dynamicScheme()
    */
   public readonly schemeConstructor: SchemeConstructor;
 
   /** @private Prevents arbitrary instance creation - use predefined static instances */
   private constructor(
     name: string,
-    ordinal: number,
+    value: number,
     schemeConstructor: SchemeConstructor
   ) {
     this.name = name;
-    this.ordinal = ordinal;
+    this.value = value;
     this.schemeConstructor = schemeConstructor;
   }
 
@@ -68,12 +69,12 @@ export class PaletteStyle {
    *
    * @example
    * const style = PaletteStyle.TonalSpot;
-   * const scheme = style.createScheme(Hct.fromInt(0xff0000), false, 0.5);
+   * const scheme = style.dynamicScheme(Hct.fromInt(0xff0000), false, 0.5);
    */
-  createScheme(
+  dynamicScheme(
     sourceColor: Hct,
-    isDark: boolean,
-    contrastLevel: number
+    isDark: boolean = false,
+    contrastLevel: number = ContrastLevel.Default.value
   ): SchemeVariant {
     return new this.schemeConstructor(sourceColor, isDark, contrastLevel);
   }
@@ -141,7 +142,7 @@ export class PaletteStyle {
     SchemeFruitSalad
   );
 
-  /** Complete list of available palette styles in ordinal order */
+  /** Complete list of available palette styles in value order */
   public static readonly entries: readonly PaletteStyle[] = [
     PaletteStyle.Monochrome,
     PaletteStyle.Neutral,

@@ -9,7 +9,7 @@ import type { Color } from '../types';
  * @param color - The base color.
  * @returns A TonalPalette instance.
  */
-export function createTonalPalette(color: Color): TonalPalette {
+export function createPalette(color: Color): TonalPalette {
   return TonalPalette.fromInt(toArgb(color));
 }
 
