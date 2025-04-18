@@ -43,9 +43,9 @@ export class PaletteStyle {
   public readonly value: number;
   /**
    * Constructor for the associated Material Design scheme class
-   * @private Internal use only - accessed via dynamicScheme()
+   * @internal Internal use only - accessed via dynamicScheme()
    */
-  public readonly schemeConstructor: SchemeConstructor;
+  private readonly schemeConstructor: SchemeConstructor;
 
   /** @private Prevents arbitrary instance creation - use predefined static instances */
   private constructor(
@@ -55,7 +55,7 @@ export class PaletteStyle {
   ) {
     // Variant name in pascalcase format
     this.name = name;
-    // Value is 1-1 mapped to the variant enum value
+    // Value is one-to-one mapped to the 'Variant' enum in Material Design
     this.value = value;
     this.schemeConstructor = schemeConstructor;
   }

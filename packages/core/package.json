@@ -52,6 +52,7 @@
   "dependencies": {
     "@material/material-color-utilities": "^0.3.0",
     "camelcase": "^8.0.0",
-    "kebab-case": "^2.0.2"
+    "kebab-case": "^2.0.2",
+    "vitest": "^3.1.1"
   }
 }

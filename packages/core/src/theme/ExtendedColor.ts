@@ -2,7 +2,7 @@
  *
  *   /// Custom Color 1
  *   static const customColor1 = ExtendedColor(
- *     seed: Color(0xffd4b08f),
+ *     source: Color(0xffd4b08f),
  *     value: Color(0xffd9ae96),
  *     light: ColorFamily(
  *       color: Color(0xff8c4f27),
@@ -49,7 +49,7 @@
  * }
  *
  * class ExtendedColor {
- *   final Color seed, value;
+ *   final Color source, value;
  *   final ColorFamily light;
  *   final ColorFamily lightHighContrast;
  *   final ColorFamily lightMediumContrast;
@@ -58,7 +58,7 @@
  *   final ColorFamily darkMediumContrast;
  *
  *   const ExtendedColor({
- *     required this.seed,
+ *     required this.source,
  *     required this.value,
  *     required this.light,
  *     required this.lightHighContrast,
@@ -115,6 +115,7 @@ export const variants = [
   'darkMediumContrast',
   'darkHighContrast',
 ] as const;
+
 export type VariantKey = typeof variants[number];
 
 /**
@@ -130,10 +131,10 @@ export function makeFamily(
 }
 
 /**
- * ExtendedColor bundles seed/value plus themed families.
+ * ExtendedColor bundles source/value plus themed families.
  */
 export class ExtendedColor {
-  public readonly seed: Color;
+  public readonly source: Color;
   public readonly value: Color;
   public readonly families: Readonly<Record<VariantKey, ColorFamily>>;
 
@@ -142,7 +143,7 @@ export class ExtendedColor {
     value: Color,
     families: Record<VariantKey, ColorFamily>
   ) {
-    this.seed = seed;
+    this.source = seed;
     this.value = value;
     // Freeze to prevent runtime mutation
     this.families = Object.freeze({...families});
@@ -153,24 +154,3 @@ export class ExtendedColor {
     return this.families[variant];
   }
 }
-
-// === Instantiate your custom color ===
-export const customColor1 = new ExtendedColor(
-  0xffd4b08f, // seed
-  0xffd9ae96, // value
-  {
-    light: makeFamily(0xff8c4f27, 0xffffffff, 0xffffdbc8, 0xff6f3811),
-    lightMediumContrast: makeFamily(0xff8c4f27, 0xffffffff, 0xffffdbc8, 0xff6f3811),
-    lightHighContrast: makeFamily(0xff8c4f27, 0xffffffff, 0xffffdbc8, 0xff6f3811),
-    dark: makeFamily(0xffffb68b, 0xff522300, 0xff6f3811, 0xffffdbc8),
-    darkMediumContrast: makeFamily(0xffffb68b, 0xff522300, 0xff6f3811, 0xffffdbc8),
-    darkHighContrast: makeFamily(0xffffb68b, 0xff522300, 0xff6f3811, 0xffffdbc8),
-  }
-);
-
-// Export your palette as an immutable tuple
-export const extendedColors = [customColor1] as const;
-
-// === Usage example ===
-// const primaryOnLight = customColor1.get('light').color;
-

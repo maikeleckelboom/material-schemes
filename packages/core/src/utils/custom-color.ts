@@ -1,11 +1,32 @@
 import {customColor, type CustomColorGroup} from "@material/material-color-utilities";
 import {toArgb} from "./conversion.ts";
-import type {Color, StaticColor} from "../types";
+import type {Color, CustomColorOptions} from "../types";
+import {formatTokenName} from "./formatting.ts";
+import {generateToneMapFromPalette} from "./color-scheme.ts";
+import {createPalette} from "./palette.ts";
 
-export function createCustomColorGroup(source: Color, staticColor: StaticColor): CustomColorGroup {
+/**
+ * Generate a custom color group from source and target color
+ *
+ * @param source Source color
+ * @param color Static color
+ * @return Custom color group
+ *
+ * @link https://m3.material.io/styles/color/the-color-system/color-roles
+ */
+export function createCustomColorGroup(source: Color, color: CustomColorOptions): CustomColorGroup {
   return customColor(toArgb(source), {
-    name: staticColor.name,
-    value: toArgb(staticColor.value),
-    blend: !!staticColor.blend,
+    name: color.name,
+    value: toArgb(color.value),
+    blend: !!color.blend,
   })
+}
+
+function generateCustomColorPalettes(customColorGroups: CustomColorGroup[]): Record<string, Record<number, Color>> {
+  return Object.fromEntries(
+    customColorGroups.map(customColor => [
+      formatTokenName(customColor.color.name),
+      generateToneMapFromPalette(createPalette(customColor.value)),
+    ])
+  );
 }

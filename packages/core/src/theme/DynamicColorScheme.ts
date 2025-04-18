@@ -1,14 +1,16 @@
-import {DynamicScheme, TonalPalette} from "@material/material-color-utilities";
-import type {Color, ColorScheme, ColorSchemeOptions} from "../";
+import {DynamicScheme} from "@material/material-color-utilities";
 import {
-  ContrastLevel,
-  DEFAULT_PALETTE_TONES, generateColorScheme,
-  generateTonalPaletteTokens,
-  generateToneMapFromPalette,
+  type Color,
+  type ColorScheme,
+  ContrastLevel, createCssVarMap,
+  createPalette,
+  type CSSColorScheme,
+  formatCssVarName,
   isColor,
+  MATERIAL_COLOR_ROLES,
   PaletteStyle,
-  toArgb,
-  toHct
+  toHct,
+  toHex
 } from "../";
 
 
@@ -30,14 +32,23 @@ import {
  * @property {boolean} [isDark=false] - Flag to determine if the generated scheme should be tailored for dark mode.
  */
 export interface DynamicColorSchemeConfig {
+  /** Base color for scheme generation (alternative to primary) */
   sourceColor?: Color;
+  /** Primary color override (alternative to sourceColor) */
   primary?: Color;
+  /** Secondary color override */
   secondary?: Color;
+  /** Tertiary color override */
   tertiary?: Color;
+  /** Neutral background color override */
   neutral?: Color;
+  /** Neutral variant color override */
   neutralVariant?: Color;
+  /** Visual style variant (default: TonalSpot) */
   style?: PaletteStyle;
+  /** Contrast adjustment (0-1, default: 0) */
   contrastLevel?: number;
+  /** Dark mode flag (default: false) */
   isDark?: boolean;
 }
 
@@ -86,33 +97,18 @@ export type DynamicColorSchemeOptions =
  * @extends DynamicScheme
  */
 export class DynamicColorScheme extends DynamicScheme {
-  /**
-   * Constructs a DynamicColorScheme instance.
-   *
-   * There are two overloads:
-   *
-   * **Overload 1: ** Create by providing a `sourceColor` along with optional additional options.
-   *
-   * @param {Color} sourceColor - The base color in any supported format (e.g., hex, RGB, HCT).
-   * @param {Omit<DynamicColorSchemeOptions, 'sourceColor'>} [options] - Additional options such as palette overrides, style, dark mode flag, and contrast level.
-   *
-   * **Overload 2: ** Create by providing a complete configuration object that requires `sourceColor` or `primary` color.
-   *
-   * @param {DynamicColorSchemeOptions} options - A configuration object with all necessary parameters.
-   *
-   * @throws Will throw an error if neither a source color nor a primary color override is provided.
-   */
   constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>);
   constructor(options: DynamicColorSchemeOptions);
   constructor(
-    seedOrOptions: Color | DynamicColorSchemeOptions,
+    sourceOrOptions: Color | DynamicColorSchemeOptions,
     optionsOrNull?: Omit<DynamicColorSchemeOptions, 'sourceColor'>
   ) {
-    const opts: DynamicColorSchemeOptions = isColor(seedOrOptions)
-      ? {sourceColor: seedOrOptions, ...optionsOrNull}
-      : seedOrOptions;
+    const opts: DynamicColorSchemeOptions = isColor(sourceOrOptions)
+      ? {sourceColor: sourceOrOptions, ...optionsOrNull}
+      : sourceOrOptions;
 
     const {
+      sourceColor,
       primary,
       secondary,
       tertiary,
@@ -123,95 +119,39 @@ export class DynamicColorScheme extends DynamicScheme {
       contrastLevel = ContrastLevel.Default.value
     } = opts;
 
-    const sourceColor = toHct(opts.sourceColor ?? primary ?? 0);
-    const scheme = style.dynamicScheme(sourceColor, isDark, contrastLevel);
+    const sourceColorHct = toHct(Number(sourceColor ?? primary));
+    const scheme = style.dynamicScheme(sourceColorHct, isDark, contrastLevel);
 
     super({
       ...scheme,
-      primaryPalette: primary ? TonalPalette.fromInt(toArgb(primary)) : scheme.primaryPalette,
-      secondaryPalette: secondary ? TonalPalette.fromInt(toArgb(secondary)) : scheme.secondaryPalette,
-      tertiaryPalette: tertiary ? TonalPalette.fromInt(toArgb(tertiary)) : scheme.tertiaryPalette,
-      neutralPalette: neutral ? TonalPalette.fromInt(toArgb(neutral)) : scheme.neutralPalette,
-      neutralVariantPalette: neutralVariant ? TonalPalette.fromInt(toArgb(neutralVariant)) : scheme.neutralVariantPalette,
+      primaryPalette: primary ? createPalette(primary) : scheme.primaryPalette,
+      secondaryPalette: secondary ? createPalette(secondary) : scheme.secondaryPalette,
+      tertiaryPalette: tertiary ? createPalette(tertiary) : scheme.tertiaryPalette,
+      neutralPalette: neutral ? createPalette(neutral) : scheme.neutralPalette,
+      neutralVariantPalette: neutralVariant ? createPalette(neutralVariant) : scheme.neutralVariantPalette,
     });
   }
 
-  /**
-   * Serializes the dynamic color scheme into a plain object for external use, such as theme injection or storage.
-   *
-   * The returned object adheres to the {@link ColorScheme} type, containing all key palette and surface colors.
-   *
-   * @returns {ColorScheme} An object representing the complete color scheme.
-   *
-   * @example
-   * const jsonScheme = scheme.toJSON();
-   * console.log(jsonScheme.primary); // Outputs the primary color value.
-   */
-  public toJSON(): ColorScheme {
-    return {
-      primaryPaletteKeyColor: this.primaryPaletteKeyColor,
-      secondaryPaletteKeyColor: this.secondaryPaletteKeyColor,
-      tertiaryPaletteKeyColor: this.tertiaryPaletteKeyColor,
-      neutralPaletteKeyColor: this.neutralPaletteKeyColor,
-      neutralVariantPaletteKeyColor: this.neutralVariantPaletteKeyColor,
-      background: this.background,
-      onBackground: this.onBackground,
-      surface: this.surface,
-      surfaceDim: this.surfaceDim,
-      surfaceBright: this.surfaceBright,
-      surfaceContainerLowest: this.surfaceContainerLowest,
-      surfaceContainerLow: this.surfaceContainerLow,
-      surfaceContainer: this.surfaceContainer,
-      surfaceContainerHigh: this.surfaceContainerHigh,
-      surfaceContainerHighest: this.surfaceContainerHighest,
-      onSurface: this.onSurface,
-      surfaceVariant: this.surfaceVariant,
-      onSurfaceVariant: this.onSurfaceVariant,
-      inverseSurface: this.inverseSurface,
-      inverseOnSurface: this.inverseOnSurface,
-      outline: this.outline,
-      outlineVariant: this.outlineVariant,
-      shadow: this.shadow,
-      scrim: this.scrim,
-      surfaceTint: this.surfaceTint,
-      primary: this.primary,
-      onPrimary: this.onPrimary,
-      primaryContainer: this.primaryContainer,
-      onPrimaryContainer: this.onPrimaryContainer,
-      inversePrimary: this.inversePrimary,
-      secondary: this.secondary,
-      onSecondary: this.onSecondary,
-      secondaryContainer: this.secondaryContainer,
-      onSecondaryContainer: this.onSecondaryContainer,
-      tertiary: this.tertiary,
-      onTertiary: this.onTertiary,
-      tertiaryContainer: this.tertiaryContainer,
-      onTertiaryContainer: this.onTertiaryContainer,
-      error: this.error,
-      onError: this.onError,
-      errorContainer: this.errorContainer,
-      onErrorContainer: this.onErrorContainer,
-      primaryFixed: this.primaryFixed,
-      primaryFixedDim: this.primaryFixedDim,
-      onPrimaryFixed: this.onPrimaryFixed,
-      onPrimaryFixedVariant: this.onPrimaryFixedVariant,
-      secondaryFixed: this.secondaryFixed,
-      secondaryFixedDim: this.secondaryFixedDim,
-      onSecondaryFixed: this.onSecondaryFixed,
-      onSecondaryFixedVariant: this.onSecondaryFixedVariant,
-      tertiaryFixed: this.tertiaryFixed,
-      tertiaryFixedDim: this.tertiaryFixedDim,
-      onTertiaryFixed: this.onTertiaryFixed,
-      onTertiaryFixedVariant: this.onTertiaryFixedVariant,
-    };
+  public toJSON(): Record<string, number> {
+    return Object.fromEntries(MATERIAL_COLOR_ROLES.map((k) => [k, this[k]]));
   }
 
-  /**
-   * Generates a color scheme based on the current instance and applies any modifications specified in the options.
-   * @param options - Optional configuration object to modify the generated color scheme.
-   * @returns {ColorScheme} The generated color scheme, potentially modified by the provided options.
-   */
-  public toColorScheme(options?: ColorSchemeOptions): ColorScheme {
-    return generateColorScheme(this, options);
+  public toCssVars(options?: { modifyColorScheme?: (colorScheme: ColorScheme) => ColorScheme }): CSSColorScheme {
+    const baseScheme = this.toJSON();
+    const modifiedScheme = options?.modifyColorScheme ? options.modifyColorScheme(baseScheme) : baseScheme;
+    return createCssVarMap(modifiedScheme, toHex);
+  }
+
+  public toCssText(options?: {
+    modifyColorScheme?: (colorScheme: ColorScheme) => ColorScheme;
+    selector?: string
+  }): string {
+    const cssVarMapping = this.toCssVars(options);
+    const cssText = Object.entries(cssVarMapping)
+      .map(([name, value]) => `${name}: ${value};`)
+      .join('\n')
+    return options?.selector
+      ? `${options.selector} {\n${cssText}\n}`
+      : cssText;
   }
 }

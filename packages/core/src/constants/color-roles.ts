@@ -2,7 +2,7 @@
  * Palette key color roles for Material Design 3.
  * These roles are used to define the five core key colors.
  */
-export const PALETTE_KEY_COLOR_ROLES = [
+export const MATERIAL_KEY_COLOR_ROLES = [
   'primaryPaletteKeyColor',
   'secondaryPaletteKeyColor',
   'tertiaryPaletteKeyColor',
@@ -13,11 +13,11 @@ export const PALETTE_KEY_COLOR_ROLES = [
 /**
  * Material Design 3 color role tokens for creating consistent, theme-aware interfaces.
  *
- * @constant {ReadonlyArray<string>} COLOR_ROLES
+ * @constant {ReadonlyArray<string>} MATERIAL_COLOR_ROLES
  * @see {@link https://m3.material.io/styles/color/overview Material Design 3 Color-system}
  * @example
  * // Iterate through entries Material Design 3 color roles.
- * COLOR_ROLES.forEach(role => {
+ * MATERIAL_COLOR_ROLES.forEach(role => {
  *   console.log('Supported color role:', role);
  * });
  *
@@ -28,8 +28,8 @@ export const PALETTE_KEY_COLOR_ROLES = [
  * supporting seamless transitions between light/dark themes and various elevations.
  * The array is frozen to ensure the integrity of the design system by preventing any modifications.
  */
-export const COLOR_ROLES = [
-  ...PALETTE_KEY_COLOR_ROLES,
+export const MATERIAL_COLOR_ROLES = [
+  ...MATERIAL_KEY_COLOR_ROLES,
   'background',
   'onBackground',
   'surface',

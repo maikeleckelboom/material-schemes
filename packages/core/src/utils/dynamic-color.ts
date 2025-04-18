@@ -1,7 +1,19 @@
 import {contrastColor} from "./contrast.ts";
 import {toHex} from "./conversion.ts";
 import {DynamicColor, type DynamicScheme, MaterialDynamicColors} from "@material/material-color-utilities";
-import camelcase from "camelcase";
+
+export function getDynamicColors(dynamicScheme: DynamicScheme) {
+  const result: Record<string, number> = {};
+  const dynamicKeys = Object.keys(MaterialDynamicColors);
+  for (let i = 0, len = dynamicKeys.length; i < len; i++) {
+    const key = dynamicKeys[i] as keyof typeof MaterialDynamicColors;
+    const dynamicColor = MaterialDynamicColors[key];
+    if (dynamicColor && dynamicColor instanceof DynamicColor) {
+      result[key] = dynamicColor.getArgb(dynamicScheme)
+    }
+  }
+  return result;
+}
 
 export function contrastColorRole(role: string, scheme: DynamicScheme): string {
   const color = getColorDefinition(role);
@@ -19,7 +31,7 @@ export function contrastColorRole(role: string, scheme: DynamicScheme): string {
   return getContrastFallback(color, scheme);
 }
 
-// Helper functions
+// Internal Helper Functions
 function getColorDefinition(role: string): DynamicColor {
   const color = MaterialDynamicColors[role as keyof typeof MaterialDynamicColors];
   if (!color) {
@@ -34,7 +46,7 @@ function getColorDefinitionSafe(role: string): DynamicColor | undefined {
 }
 
 function getOnColorForBackground(backgroundRole: string, scheme: DynamicScheme): string | undefined {
-  const onRole = `on${camelcase(backgroundRole, {pascalCase: true})}`;
+  const onRole = `on${backgroundRole.charAt(0).toUpperCase()}${backgroundRole.slice(1)}`;
   const onColor = getColorDefinitionSafe(onRole);
   return onColor ? toHex(onColor.getArgb(scheme)) : undefined;
 }

@@ -2,7 +2,6 @@ export * from './conversion';
 export * from './custom-color';
 export * from './formatting';
 export * from './color-scheme';
-export * from './css-variables';
 export * from './blend';
 export * from './contrast';
 export * from './dislike';

@@ -1,5 +1,6 @@
-import {COLOR_ROLES} from "../constants";
+import {MATERIAL_COLOR_ROLES} from "../constants";
 import type {Color} from "./theme.ts";
+import type {KebabCase} from "type-fest";
 
 /**
  * Union type representing valid color scheme keys or any string.
@@ -7,7 +8,7 @@ import type {Color} from "./theme.ts";
  * @description While technically allowing any string, should primarily use predefined M3 color keys
  * for proper type safety and design system compliance.
  */
-export type ColorRoleKey = (typeof COLOR_ROLES)[number];
+export type ColorRoleKey = (typeof MATERIAL_COLOR_ROLES)[number];
 
 /**
  * Interface representing a complete Material Design 3 color scheme
@@ -17,8 +18,21 @@ export type ColorRoleKey = (typeof COLOR_ROLES)[number];
  * custom properties should follow M3 naming conventions.
  */
 export interface ColorScheme extends Record<ColorRoleKey | string, Color> {
+  /** Custom or additional entries */
   [key: string]: Color;
 }
+
+/**
+ * Interface for CSS color scheme variables
+ * @interface
+ * @property {string} [key] - Numeric color value (typically 32-bit integer in 0xAARRGGBB format)
+ * @description Maps M3 color roles to their actual color entries. While extensible via string index,
+ * custom properties should follow M3 naming conventions.
+ */
+export interface CSSColorScheme extends Record<KebabCase<ColorRoleKey | string>, Color> {
+  [key: `--${KebabCase<ColorRoleKey | string>}`]: Color;
+}
+
 
 /**
  * Utility type for creating color scheme variants with suffix-appended keys
@@ -60,7 +74,7 @@ export type ColorSchemeReturnType<V extends boolean | undefined> = V extends tru
  * @property {Function} [modifyColorScheme] - Post-processing function for scheme customization
  */
 export interface ColorSchemeOptions<
-  V extends boolean = true|false,
+  V extends boolean = boolean,
   U extends ColorSchemeReturnType<V> = ColorSchemeReturnType<V>
 > {
   /**
@@ -81,10 +95,6 @@ export interface ColorSchemeOptions<
    * @default false
    */
   paletteTones?: boolean | number[];
-  /**
-   * Type-safe color scheme modifier that preserves existing properties
-   * while allowing new property additions
-   */
   /**
    * The color scheme modifier accepts the generated color scheme and should
    * return a value that extends the base color scheme type.

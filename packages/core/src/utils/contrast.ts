@@ -1,43 +1,63 @@
-import {clampDouble, Contrast, Hct, lstarFromArgb} from '@material/material-color-utilities';
+import {argbFromLstar, clampDouble, Contrast, Hct, lstarFromArgb} from '@material/material-color-utilities';
 import type {Color} from '../types';
 import {toArgb, toHct} from './index.ts';
 import {ContrastThreshold} from "../theme";
 
 /**
- * Get a contrasting tone based on a base tone and a contrast ratio.
+ * Finds the ARGB color with the best contrast (the highest or lowest tone) against a given color,
+ * while ensuring a minimum contrast ratio.
  *
- * @param baseTone - The base tone.
- * @param ratio - The contrast ratio.
- * @param preferLighter - Whether to prefer a lighter or darker tone. Default is true (lighter).
- * @returns The contrasting tone.
+ * @param baseColor The base ARGB color to contrast with.
+ * @param minContrastRatio The minimum contrast ratio required (default: 4.5).
+ * @returns The ARGB color (black or white) with the best contrast, or the original color if no sufficient contrast is found.
  */
-function getContrastingTone(
-  baseTone: number,
-  ratio: number,
-  preferLighter: boolean,
-): number {
-  if (preferLighter) return Contrast.lighter(baseTone, ratio);
-  else return Contrast.darker(baseTone, ratio);
+export function getBestContrastColorWithMinRatio(baseColor: Color, minContrastRatio: number = 4.5): number {
+  const baseTone = lstarFromColor(baseColor);
+  const whiteTone = 100;
+  const blackTone = 0;
+
+  const whiteContrast = Contrast.ratioOfTones(baseTone, whiteTone);
+  const blackContrast = Contrast.ratioOfTones(baseTone, blackTone);
+
+  if (whiteContrast >= minContrastRatio) {
+    return argbFromLstar(whiteTone);
+  } else if (blackContrast >= minContrastRatio) {
+    return argbFromLstar(blackTone);
+  }
+
+  // If neither black nor white provides sufficient contrast, find the best tone
+  const bestTone = findBestContrastTone(baseTone, minContrastRatio);
+  return argbFromLstar(bestTone);
 }
 
 /**
- * Get the best contrasting tone based on a base tone and a contrast ratio.
+ * Finds the best contrast tone for a given base tone and minimum contrast ratio.
  *
- * @param tone - The base tone.
- * @param ratio - The contrast ratio.
- * @returns The best contrasting tone.
+ * @param baseTone The base tone to find a contrast for.
+ * @param minContrastRatio The minimum contrast ratio required (default: 4.5).
+ * @returns The best contrast tone.
  */
-function getBestContrastingTone(
-  tone: number,
-  ratio: number = ContrastThreshold.WCAG_AAA_NORMAL_TEXT.value,
-): number {
-  const contrastWithDark = Contrast.ratioOfTones(tone, 0);
-  const contrastWithLight = Contrast.ratioOfTones(tone, 100);
-  const preferLighter = contrastWithLight > contrastWithDark;
-  if (preferLighter) return Contrast.lighter(tone, ratio);
-  else return Contrast.darker(tone, ratio);
+function findBestContrastTone(baseTone: number, minContrastRatio: number): number {
+  let low = 0;
+  let high = 100;
+  let bestTone = baseTone;
+
+  while (low <= high) {
+    const mid = Math.round((low + high) / 2);
+    const contrast = Contrast.ratioOfTones(baseTone, mid);
+
+    if (contrast >= minContrastRatio) {
+      bestTone = mid;
+      high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+
+  return bestTone;
 }
 
+// Exposed functions below
 /**
  * Returns a contrast ratio, which ranges fromName 1 to 21.
  *
@@ -72,10 +92,10 @@ export function tonalContrastRatio(color1: Color, color2: Color): number {
  * @returns The contrasting color with the same hue and chroma, but a different tone.
  */
 export function contrastColor(color: Color): number {
-  const argb = toArgb(color);
-  const {hue, chroma, tone} = Hct.fromInt(argb);
-  const contrastTone = getBestContrastingTone(tone);
-  return Hct.from(hue, chroma, contrastTone).toInt();
+  const hct = toHct(color);
+  const tone = hct.tone;
+  const contrastTone = tone < 50 ? 100 : 0;
+  return Hct.from(hct.hue, hct.chroma, contrastTone).toInt();
 }
 
 /**
