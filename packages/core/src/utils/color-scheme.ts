@@ -1,18 +1,18 @@
 import type {CustomColorGroup, DynamicScheme, TonalPalette} from '@material/material-color-utilities';
 import type {Color, ColorScheme, ColorSchemeOptions, ColorSchemeReturnType, CSSColorScheme} from '../types';
-import {createPalette, formatColorToken, formatCssVarName, formatTokenName} from '../utils';
+import {createPalette, formatColorToken, formatCssVarName, formatTokenName, toHex} from '../utils';
 import {DEFAULT_PALETTE_TONES, MATERIAL_COLOR_ROLES} from "../constants";
 import {MaterialTheme} from "../theme";
 
-export function generateColorScheme<V extends boolean = false>(
+export function toColorScheme<V extends boolean = false>(
   source: MaterialTheme,
   options?: ColorSchemeOptions<V>,
 ): ColorSchemeReturnType<V>;
-export function generateColorScheme<V extends boolean = false>(
+export function toColorScheme<V extends boolean = false>(
   source: DynamicScheme,
   options?: ColorSchemeOptions,
 ): ColorSchemeReturnType<V>;
-export function generateColorScheme(
+export function toColorScheme(
   source: MaterialTheme | DynamicScheme,
   options?: ColorSchemeOptions,
 ): ColorScheme {
@@ -133,14 +133,11 @@ export function extractCustomColorToneMapping(customColorGroups: CustomColorGrou
 }
 
 
-export function createCssVarMap<T extends Record<string, Color>>(
-  colorScheme: T,
-  modifyColorValue: (value: Color) => Color = (v) => v,
-): CSSColorScheme {
+export function createCssVarMap(colorScheme: ColorScheme): CSSColorScheme {
   return Object.fromEntries(
     Object.entries(colorScheme).map(([key, value]) => [
       formatCssVarName(key),
-      modifyColorValue(value)
+      toHex(value)
     ]),
   );
 }
@@ -150,4 +147,16 @@ export function serializeCssVars(colorScheme: CSSColorScheme, selector?: string)
     .map(([key, value]) => `${key}: ${value};`)
     .join('\n');
   return selector ? `${selector} {\n${cssText}\n}` : cssText;
+}
+
+/**
+ * Generates a CSS string with variables based on a color scheme.
+ * @param colorScheme - The color scheme to generate CSS variables from.
+ * @param options - Optional parameters to modify the CSS variable generation.
+ * @returns The generated CSS string.
+ */
+export function createCssText(colorScheme: ColorScheme, options?: { selector?: string }): string {
+  const {selector} = options || {};
+  const cssVars = createCssVarMap(colorScheme);
+  return serializeCssVars(cssVars, selector);
 }

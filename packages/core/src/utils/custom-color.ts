@@ -9,7 +9,7 @@ import {createPalette} from "./palette.ts";
  * Generate a custom color group from source and target color
  *
  * @param source Source color
- * @param color Static color
+ * @param color Custom color
  * @return Custom color group
  *
  * @link https://m3.material.io/styles/color/the-color-system/color-roles
@@ -22,7 +22,7 @@ export function createCustomColorGroup(source: Color, color: CustomColorOptions)
   })
 }
 
-function generateCustomColorPalettes(customColorGroups: CustomColorGroup[]): Record<string, Record<number, Color>> {
+export function createCustomColorPalettes(customColorGroups: CustomColorGroup[]): Record<string, Record<number, Color>> {
   return Object.fromEntries(
     customColorGroups.map(customColor => [
       formatTokenName(customColor.color.name),

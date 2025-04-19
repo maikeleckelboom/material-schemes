@@ -137,20 +137,15 @@ export class DynamicColorScheme extends DynamicScheme {
     return Object.fromEntries(MATERIAL_COLOR_ROLES.map((k) => [k, this[k]]));
   }
 
-  public toCssVars(options?: ColorSchemeOptions): CSSColorScheme {
+  public toCssVariables(options?: ColorSchemeOptions): CSSColorScheme {
     const baseScheme = this.toJSON();
     const modifiedScheme = options?.modifyColorScheme ? options.modifyColorScheme(baseScheme) : baseScheme;
     return createCssVarMap(modifiedScheme);
   }
 
   public toCssText(options?: ColorSchemeOptions & toCSSVarOptions): string {
-    const cssVarMapping = this.toCssVars(options);
-    return serializeCssVars(cssVarMapping, options?.selector);
-    // const cssText = Object.entries(cssVarMapping)
-    //   .map(([name, value]) => `${name}: ${value};`)
-    //   .join('\n')
-    // return options?.selector
-    //   ? `${options.selector} {\n${cssText.split('\n').map(line => `  ${line}`).join('\n')}\n}`
-    //   : cssText;
+    const {selector, modifyColorScheme} = options || {};
+    const cssVarMapping = this.toCssVariables({modifyColorScheme});
+    return serializeCssVars(cssVarMapping, selector);
   }
 }

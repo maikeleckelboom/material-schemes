@@ -3,13 +3,13 @@ import type {
   ColorSchemeOptions,
   ColorSchemeReturnType,
   CustomColorOptions,
-  MaterialThemeOptions
+  MaterialThemeOptions,
+  toCSSVarOptions
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
 import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createCssVarMap, createCustomColorGroup, generateColorScheme, isColor, serializeCssVars} from "../utils";
-
+import {createCustomColorGroup, formatCustomColor, isColor, toColorScheme, createCssText} from "../utils";
 
 export class MaterialTheme {
   public readonly sourceColor: Color;
@@ -36,8 +36,23 @@ export class MaterialTheme {
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorOptions[]
   ) {
-    const opts = this.resolveArguments(sourceOrOptions, optionsOrStaticColors);
-    const {customColors = [], style = PaletteStyle.TonalSpot, ...config} = opts;
+    const options = (() => {
+      if (isColor(sourceOrOptions)) {
+        if (Array.isArray(optionsOrStaticColors)) {
+          return {
+            sourceColor: sourceOrOptions,
+            customColors: optionsOrStaticColors
+          };
+        }
+        return {
+          sourceColor: sourceOrOptions,
+          ...optionsOrStaticColors
+        };
+      }
+      return sourceOrOptions;
+    })();
+
+    const {customColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
 
     const createScheme = (isDark: boolean): DynamicColorScheme =>
       new DynamicColorScheme({...config, style, isDark});
@@ -65,8 +80,10 @@ export class MaterialTheme {
     );
   }
 
+
   /**
-   * Return theme as JSON.
+   * Converts the theme to a JSON representation.
+   * @returns The JSON representation of the theme.
    */
   public toJSON() {
     return {
@@ -77,18 +94,10 @@ export class MaterialTheme {
         light: this.schemes.light.toJSON(),
         dark: this.schemes.dark.toJSON(),
       },
-      palettes: {
-        primary: this.palettes.primary,
-        secondary: this.palettes.secondary,
-        tertiary: this.palettes.tertiary,
-        neutral: this.palettes.neutral,
-        neutralVariant: this.palettes.neutralVariant,
-        error: this.palettes.error,
-      },
-      customColors: this.customColors
+      palettes: this.palettes,
+      customColors: this.customColors.map(formatCustomColor),
     }
   }
-
 
   /**
    * Generates a color scheme based on the theme and optional parameters.
@@ -96,7 +105,7 @@ export class MaterialTheme {
    * @returns The generated color scheme.
    */
   public toColorScheme<V extends boolean>(options?: ColorSchemeOptions<V>): ColorSchemeReturnType<V> {
-    return generateColorScheme(this, options);
+    return toColorScheme(this, options);
   }
 
   /**
@@ -104,31 +113,9 @@ export class MaterialTheme {
    * @param options - Optional parameters to modify the CSS variable generation.
    * @returns The generated CSS variable map.
    */
-  public toCssText<V extends boolean>(options?: ColorSchemeOptions<V> & { selector?: string }): string {
+  public toCssText<V extends boolean>(options?: ColorSchemeOptions<V> & toCSSVarOptions): string {
     const {selector, ...colorSchemeOpts} = options || {};
     const colorScheme = this.toColorScheme(colorSchemeOpts);
-    const cssVars = createCssVarMap(colorScheme);
-    return serializeCssVars(cssVars, selector);
-  }
-
-  /** @internal */
-  private resolveArguments(
-    sourceOrOptions: Color | MaterialThemeOptions,
-    optionsOrCustomColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorOptions[]
-  ): MaterialThemeOptions {
-    if (isColor(sourceOrOptions)) {
-      if (Array.isArray(optionsOrCustomColors)) {
-        return {
-          sourceColor: sourceOrOptions,
-          customColors: optionsOrCustomColors
-        };
-      }
-      return {
-        sourceColor: sourceOrOptions,
-        ...optionsOrCustomColors
-      };
-    }
-
-    return sourceOrOptions;
+    return createCssText(colorScheme, {selector});
   }
 }

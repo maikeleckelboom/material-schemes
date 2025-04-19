@@ -2,6 +2,7 @@ import camelCase from 'camelcase';
 import camelcase from 'camelcase';
 import kebabCase from 'kebab-case';
 import type {KebabCase} from 'type-fest';
+import type {ColorGroup, CustomColorGroup} from "@material/material-color-utilities";
 
 /**
  * An interface for formatting options, allowing for optional prefix and suffix.
@@ -57,4 +58,22 @@ export function formatColorToken(pattern: string, name: string, suffix?: string)
  */
 export function formatCssVarName<T extends string>(key: T) {
   return `--${kebabCase(key)}` as KebabCase<`--${T}`>;
+}
+
+
+export function formatColorGroup(colorGroup: ColorGroup, colorName: string): Record<string, number> {
+  return Object.keys(colorGroup).reduce((acc, key) => {
+    const colorKey = formatColorToken(key, colorName);
+    acc[colorKey] = colorGroup[key as keyof ColorGroup];
+    return acc;
+  }, {} as Record<string, number>);
+}
+
+export function formatCustomColor(customColor: CustomColorGroup) {
+  return {
+    name: formatTokenName(customColor.color.name),
+    color: customColor.color,
+    light: formatColorGroup(customColor.light, customColor.color.name),
+    dark: formatColorGroup(customColor.dark, customColor.color.name),
+  };
 }

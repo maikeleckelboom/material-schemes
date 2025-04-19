@@ -58,6 +58,7 @@ describe('PaletteStyle', () => {
   });
 
   it('fromName should throw an error when given an invalid name', () => {
+    // @ts-expect-error argument of type 'string' is not assignable to parameter of type 'PaletteStyleName'
     expect(() => PaletteStyle.fromName("NonExisting")).toThrowError();
   });
 

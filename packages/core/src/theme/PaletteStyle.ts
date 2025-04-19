@@ -12,7 +12,18 @@ import {
 } from "@material/material-color-utilities";
 import {ContrastLevel} from "./ContrastLevel.ts";
 
-type SchemeVariant =
+export type PaletteStyleName =
+  | "Monochrome"
+  | "Neutral"
+  | "TonalSpot"
+  | "Vibrant"
+  | "Expressive"
+  | "Fidelity"
+  | "Content"
+  | "Rainbow"
+  | "FruitSalad";
+
+export type SchemeVariant =
   | SchemeContent
   | SchemeExpressive
   | SchemeFidelity
@@ -30,43 +41,38 @@ type SchemeConstructor = new (
 ) => SchemeVariant;
 
 /**
- * Represents different visual styles for color palette generation using
- * the 'typesafe enum pattern', each corresponding to specific Material Design theme variants.
+ * Defines visual styles for generating Material Design color palettes,
+ * each mapped to specific algorithmically generated theme variants.
+ *
+ * Implemented as a typesafe enum pattern with associated scheme constructors.
  */
 export class PaletteStyle {
-  /** Human-readable style name (e.g., "Vibrant", "Monochrome") */
+  /** Display-friendly style name (e.g., "Vibrant", "Monochrome") */
   public readonly name: string;
   /**
-   * Numeric index for ordering styles.
-   * @note Useful for maintaining consistent display order in UI controls
+   * Ordering index matching Material Design's internal variant order
+   * @remark Useful for maintaining consistent UI presentation order
    */
   public readonly value: number;
-  /**
-   * Constructor for the associated Material Design scheme class
-   * @internal Internal use only - accessed via dynamicScheme()
-   */
+  /** @internal Associated Material Design scheme constructor */
   private readonly schemeConstructor: SchemeConstructor;
 
-  /** @private Prevents arbitrary instance creation - use predefined static instances */
+  /** @private Restrict instantiation to predefined static instances */
   private constructor(
     name: string,
     value: number,
     schemeConstructor: SchemeConstructor
   ) {
-    // Variant name in pascalcase format
     this.name = name;
-    // Value is one-to-one mapped to the 'Variant' enum in Material Design
     this.value = value;
     this.schemeConstructor = schemeConstructor;
   }
 
   /**
-   * Creates a dynamic color scheme based on the provided source color.
-   *
-   * @param sourceColorHct Base color in HCT (Hue-Chroma-Tone) color space
-   * @param isDark Whether to generate a dark mode variant
-   * @param contrastLevel Contrast adjustment (0 = default, 1 = maximum)
-   * @returns Configured color scheme instance
+   * Generates a color scheme instance using this style's algorithm
+   * @param sourceColorHct Base color in HCT color space
+   * @param isDark Dark mode toggle (default: false)
+   * @param contrastLevel Contrast adjustment (0-1, default: 0)
    */
   dynamicScheme(
     sourceColorHct: Hct,
@@ -83,7 +89,7 @@ export class PaletteStyle {
     SchemeMonochrome
   );
 
-  /** Subtle, low-chroma colors with natural feel */
+  /** Subtle, low-chroma colors with a natural feel */
   public static readonly Neutral = new PaletteStyle(
     'Neutral',
     1,
@@ -153,16 +159,14 @@ export class PaletteStyle {
   ];
 
   /**
-   * Retrieves a PaletteStyle by its exact name
-   *
-   * @param name - Case-sensitive style name to lookup
-   * @returns Matching PaletteStyle instance
-   * @throws {Error} When no matching style exists
-   *
+   * Resolves a PaletteStyle by name or returns existing instance
+   * @param name Case-sensitive style name or existing instance
+   * @throws When name doesn't match any registered style
    * @example
    * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
+   * PaletteStyle.fromName(PaletteStyle.Neutral) // Returns Neutral
    */
-  static fromName(name: PaletteStyle | string): PaletteStyle {
+  static fromName(name: PaletteStyle | PaletteStyleName): PaletteStyle {
     if (name instanceof PaletteStyle) return name;
     const style = PaletteStyle.values.find(s => s.name === name);
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)

@@ -98,7 +98,7 @@ describe('DynamicScheme', () => {
     expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
     expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
   });
-  describe('toCssText', () => {
+  describe('createCssText', () => {
     const baseTheme = new DynamicColorScheme(
       0xFF6200EE,
       {
