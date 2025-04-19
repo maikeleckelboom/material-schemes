@@ -1,5 +1,12 @@
 import type {CustomColorGroup, DynamicScheme, TonalPalette} from '@material/material-color-utilities';
-import type {Color, ColorScheme, ColorSchemeOptions, ColorSchemeReturnType, CSSColorScheme} from '../types';
+import type {
+  Color,
+  ColorRoleKey,
+  ColorScheme,
+  ColorSchemeOptions,
+  ColorSchemeReturnType,
+  CSSColorScheme
+} from '../types';
 import {createPalette, formatColorToken, formatCssVarName, formatTokenName, toHex} from '../utils';
 import {DEFAULT_PALETTE_TONES, MATERIAL_COLOR_ROLES} from "../constants";
 import {MaterialTheme} from "../theme";
@@ -142,9 +149,9 @@ export function createCssVarMap(colorScheme: ColorScheme): CSSColorScheme {
   );
 }
 
-export function serializeCssVars(colorScheme: CSSColorScheme, selector?: string): string {
+export function serializeCssVars(colorScheme: ColorScheme, selector?: string): string {
   const cssText = Object.entries(colorScheme)
-    .map(([key, value]) => `${key}: ${value};`)
+    .map(([key, value]) => `--${key}: ${value};`)
     .join('\n');
   return selector ? `${selector} {\n${cssText}\n}` : cssText;
 }

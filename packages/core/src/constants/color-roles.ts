@@ -16,7 +16,7 @@ export const MATERIAL_KEY_COLOR_ROLES = [
  * @constant {ReadonlyArray<string>} MATERIAL_COLOR_ROLES
  * @see {@link https://m3.material.io/styles/color/overview Material Design 3 Color-system}
  * @example
- * // Iterate through entries Material Design 3 color roles.
+ * // Iterate through values Material Design 3 color roles.
  * MATERIAL_COLOR_ROLES.forEach(role => {
  *   console.log('Supported color role:', role);
  * });

@@ -1,15 +1,17 @@
 import {DynamicScheme} from "@material/material-color-utilities";
 import {
   type Color,
+  type ColorScheme,
   type ColorSchemeOptions,
+  type ColorSchemeReturnType,
   ContrastLevel,
-  createCssVarMap,
   createPalette,
-  type CSSColorScheme,
   isColor,
   MATERIAL_COLOR_ROLES,
   PaletteStyle,
+  type PaletteStyleName,
   serializeCssVars,
+  toColorScheme,
   type toCSSVarOptions,
   toHct,
 } from "../";
@@ -46,7 +48,7 @@ export interface DynamicColorSchemeConfig {
   /** Neutral variant color override */
   neutralVariant?: Color;
   /** Visual style variant (default: TonalSpot) */
-  style?: PaletteStyle | string;
+  style?: PaletteStyle | PaletteStyleName;
   /** Contrast adjustment (0-1, default: 0) */
   contrastLevel?: number;
   /** Dark mode flag (default: false) */
@@ -133,19 +135,17 @@ export class DynamicColorScheme extends DynamicScheme {
     });
   }
 
-  public toJSON(): Record<string, number> {
-    return Object.fromEntries(MATERIAL_COLOR_ROLES.map((k) => [k, this[k]]));
+  public toJSON(): ColorScheme {
+    return Object.fromEntries(MATERIAL_COLOR_ROLES.map((k) => [k, this[k]])) as ColorScheme;
   }
 
-  public toCssVariables(options?: ColorSchemeOptions): CSSColorScheme {
-    const baseScheme = this.toJSON();
-    const modifiedScheme = options?.modifyColorScheme ? options.modifyColorScheme(baseScheme) : baseScheme;
-    return createCssVarMap(modifiedScheme);
+  public toColorScheme(options: ColorSchemeOptions): ColorSchemeReturnType {
+    return toColorScheme(this, options);
   }
 
   public toCssText(options?: ColorSchemeOptions & toCSSVarOptions): string {
     const {selector, modifyColorScheme} = options || {};
-    const cssVarMapping = this.toCssVariables({modifyColorScheme});
+    const cssVarMapping = this.toColorScheme({modifyColorScheme});
     return serializeCssVars(cssVarMapping, selector);
   }
 }

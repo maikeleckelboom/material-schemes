@@ -2,7 +2,7 @@ import camelCase from 'camelcase';
 import camelcase from 'camelcase';
 import kebabCase from 'kebab-case';
 import type {KebabCase} from 'type-fest';
-import type {ColorGroup, CustomColorGroup} from "@material/material-color-utilities";
+import type {ColorGroup, CustomColor, CustomColorGroup} from "@material/material-color-utilities";
 
 /**
  * An interface for formatting options, allowing for optional prefix and suffix.
@@ -68,6 +68,7 @@ export function formatColorGroup(colorGroup: ColorGroup, colorName: string): Rec
     return acc;
   }, {} as Record<string, number>);
 }
+  
 
 export function formatCustomColor(customColor: CustomColorGroup) {
   return {

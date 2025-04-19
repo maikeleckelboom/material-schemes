@@ -26,7 +26,7 @@ export class ContrastLevel {
    * Complete list of available contrast levels in ascending order
    * @example Useful for generating UI controls to select contrast levels
    */
-  public static readonly entries: readonly ContrastLevel[] = [
+  public static readonly values: readonly ContrastLevel[] = [
     ContrastLevel.Reduced,
     ContrastLevel.Default,
     ContrastLevel.Medium,
@@ -49,7 +49,7 @@ export class ContrastLevel {
   public static findClosest(value: number): ContrastLevel {
     if (value < 0) return ContrastLevel.Reduced;
 
-    const levels = ContrastLevel.entries
+    const levels = ContrastLevel.values
       .filter((l) => l.value >= 0)
       .sort((a, b) => b.value - a.value);
 

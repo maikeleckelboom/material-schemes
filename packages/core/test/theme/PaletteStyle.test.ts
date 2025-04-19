@@ -31,7 +31,7 @@ describe('PaletteStyle', () => {
     expect(PaletteStyle.FruitSalad.value).toBe(8);
   });
 
-  it('should have entries in the declared order', () => {
+  it('should have values in the declared order', () => {
     expect(PaletteStyle.values).toEqual([
       PaletteStyle.Monochrome,
       PaletteStyle.Neutral,

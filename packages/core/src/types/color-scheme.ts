@@ -44,15 +44,15 @@ export interface SchemeColorSchemeOptions {
   modifyColorScheme?: ModifyFn;
 }
 
-export interface ThemeColorSchemeOptions<V extends boolean = false> {
+export interface ThemeColorSchemeOptions {
   /** true = force dark mode */
   dark?: boolean;
   /** palette: true = full tones; or pass specific tone indices */
   paletteTones?: boolean | number[];
   /** if true, returns a full light+dark merged scheme */
-  brightnessVariants?: V;
+  brightnessVariants?: boolean;
   /** tweak the generated scheme */
-  modifyColorScheme?: ModifyFn<V>;
+  modifyColorScheme?: ModifyFn;
 }
 
 export interface ColorSchemeOptions<V extends boolean = false> {
