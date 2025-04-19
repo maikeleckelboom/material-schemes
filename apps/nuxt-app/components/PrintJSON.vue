@@ -15,12 +15,17 @@ const {
   data?: JSONDataType,
   options?: ExtractPropTypes<typeof VueJsonPretty.props>
 }>()
+
+const slots = defineSlots<{
+  default: () => VNode
+}>();
 </script>
 
 <template>
     <VueJsonPretty
       :data="data"
       :virtual="true"
-      v-bind="options"
-    />
+      v-bind="options">
+      <slot></slot>
+    </VueJsonPretty>
 </template>

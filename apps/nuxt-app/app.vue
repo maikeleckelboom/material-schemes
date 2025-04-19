@@ -1,19 +1,15 @@
 <script lang="ts" setup>
-
+const routes = useRouter().options.routes;
 </script>
 
 <template>
-  <div class=" bg-(--background) text-(--on-background)">
+  <div class="bg-(--background) text-(--on-background)">
     <nav>
       <ul class="flex gap-4">
-        <li>
-          <NuxtLink to="/">Dynamic Scheme</NuxtLink>
-        </li>
-        <li>
-          <NuxtLink to="/dynamic-color">Dynamic Colors</NuxtLink>
-        </li>
-        <li>
-          <NuxtLink to="/themes">Material Themes</NuxtLink>
+        <li v-for="route in routes" :key="route.path">
+          <NuxtLink :to="route.path" class="text-(--on-background)">
+            {{ route.name }}
+          </NuxtLink>
         </li>
       </ul>
     </nav>
