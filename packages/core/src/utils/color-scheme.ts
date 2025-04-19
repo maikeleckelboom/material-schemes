@@ -34,7 +34,7 @@ export function extractSchemeFromTheme(theme: MaterialTheme, options: ColorSchem
   Object.assign(
     scheme,
     createSchemeTokens(baseScheme),
-    createCustomColorSchemeTokens(theme.customColors, options),
+    deriveCustomColorTokens(theme.customColors, options),
   );
 
   if (brightnessVariants) {
@@ -55,7 +55,7 @@ function extractSchemeFromDynamic(
   return options?.modifyColorScheme?.(createSchemeTokens(scheme)) ?? createSchemeTokens(scheme);
 }
 
-export function createCustomColorSchemeTokens(
+export function deriveCustomColorTokens(
   customColorGroups: CustomColorGroup[],
   options: ColorSchemeOptions = {},
 ): ColorScheme {
@@ -96,20 +96,20 @@ function createSchemeTokens(scheme: DynamicScheme, suffix?: string): ColorScheme
 function extractTonalPalettesFromTheme(theme: MaterialTheme, tones?: number[]) {
   const tonalColors: Record<string, string> = {};
   for (const [paletteName, palette] of Object.entries(theme.palettes)) {
-    const paletteColors = generateToneMapFromPalette(palette, tones);
+    const paletteColors = deriveToneMapFromPalette(palette, tones);
     Object.assign(tonalColors, generateTonalPaletteTokens(paletteName, paletteColors));
   }
   for (const customColor of theme.customColors) {
     const palette = createPalette(customColor.value);
     if (palette) {
-      const paletteColors = generateToneMapFromPalette(palette, tones);
+      const paletteColors = deriveToneMapFromPalette(palette, tones);
       Object.assign(tonalColors, generateTonalPaletteTokens(customColor.color.name, paletteColors));
     }
   }
   return tonalColors;
 }
 
-export function generateToneMapFromPalette(palette: TonalPalette, tones?: number[]): Record<number, Color> {
+export function deriveToneMapFromPalette(palette: TonalPalette, tones?: number[]): Record<number, number> {
   const paletteTones = tones ?? DEFAULT_PALETTE_TONES;
   return Object.fromEntries(paletteTones.map((tone) => [tone, palette.tone(tone)]));
 }
@@ -123,11 +123,11 @@ export function generateTonalPaletteTokens(paletteName: string, paletteColors: R
   return tonalKeys;
 }
 
-export function extractToneMapping(customColorGroups: CustomColorGroup[] = []) {
+export function extractCustomColorToneMapping(customColorGroups: CustomColorGroup[] = []) {
   return Object.fromEntries(
     customColorGroups.map(customColor => [
       formatTokenName(customColor.color.name),
-      generateToneMapFromPalette(createPalette(customColor.value)),
+      deriveToneMapFromPalette(createPalette(customColor.value)),
     ])
   );
 }
@@ -143,4 +143,11 @@ export function createCssVarMap<T extends Record<string, Color>>(
       modifyColorValue(value)
     ]),
   );
+}
+
+export function serializeCssVars(colorScheme: CSSColorScheme, selector?: string): string {
+  const cssText = Object.entries(colorScheme)
+    .map(([key, value]) => `${key}: ${value};`)
+    .join('\n');
+  return selector ? `${selector} {\n${cssText}\n}` : cssText;
 }

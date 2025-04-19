@@ -162,7 +162,8 @@ export class PaletteStyle {
    * @example
    * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
    */
-  static fromName(name: string): PaletteStyle {
+  static fromName(name: PaletteStyle | string): PaletteStyle {
+    if (name instanceof PaletteStyle) return name;
     const style = PaletteStyle.values.find(s => s.name === name);
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)
     return style;

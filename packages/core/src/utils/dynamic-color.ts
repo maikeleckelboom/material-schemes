@@ -15,20 +15,20 @@ export function getDynamicColors(dynamicScheme: DynamicScheme) {
   return result;
 }
 
-export function contrastColorRole(role: string, scheme: DynamicScheme): string {
+export function contrastColorRole(role: string, dynamicScheme: DynamicScheme): string {
   const color = getColorDefinition(role);
 
   if (color.isBackground) {
-    return getOnColorForBackground(role, scheme)
-      ?? getContrastFallback(color, scheme);
+    return getOnColorForBackground(role, dynamicScheme)
+      ?? getContrastFallback(color, dynamicScheme);
   }
 
   if (isOnRole(role)) {
-    return getBackgroundForOnRole(role, scheme)
-      ?? getContrastFallback(color, scheme);
+    return getBackgroundForOnRole(role, dynamicScheme)
+      ?? getContrastFallback(color, dynamicScheme);
   }
 
-  return getContrastFallback(color, scheme);
+  return getContrastFallback(color, dynamicScheme);
 }
 
 // Internal Helper Functions

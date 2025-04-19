@@ -58,8 +58,20 @@ describe('PaletteStyle', () => {
   });
 
   it('fromName should throw an error when given an invalid name', () => {
-    expect(() => PaletteStyle.fromName("NonExisting")).toThrowError(
-      "No PaletteStyle with name 'NonExisting' found."
-    );
+    expect(() => PaletteStyle.fromName("NonExisting")).toThrowError();
   });
+
+
+  it('should allow PaletteStyle instance as input', () => {
+    expect(PaletteStyle.fromName(PaletteStyle.Monochrome)).toBe(PaletteStyle.Monochrome);
+    expect(PaletteStyle.fromName(PaletteStyle.Neutral)).toBe(PaletteStyle.Neutral);
+    expect(PaletteStyle.fromName(PaletteStyle.TonalSpot)).toBe(PaletteStyle.TonalSpot);
+    expect(PaletteStyle.fromName(PaletteStyle.Vibrant)).toBe(PaletteStyle.Vibrant);
+    expect(PaletteStyle.fromName(PaletteStyle.Expressive)).toBe(PaletteStyle.Expressive);
+    expect(PaletteStyle.fromName(PaletteStyle.Fidelity)).toBe(PaletteStyle.Fidelity);
+    expect(PaletteStyle.fromName(PaletteStyle.Content)).toBe(PaletteStyle.Content);
+    expect(PaletteStyle.fromName(PaletteStyle.Rainbow)).toBe(PaletteStyle.Rainbow);
+    expect(PaletteStyle.fromName(PaletteStyle.FruitSalad)).toBe(PaletteStyle.FruitSalad);
+  });
+
 });

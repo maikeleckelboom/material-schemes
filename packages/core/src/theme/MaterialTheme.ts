@@ -8,18 +8,9 @@ import type {
 import {DynamicColorScheme} from "./DynamicColorScheme";
 import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {
-  createCustomColorGroup,
-  extractToneMapping,
-  generateColorScheme,
-  generateToneMapFromPalette,
-  isColor
-} from "../utils";
+import {createCssVarMap, createCustomColorGroup, generateColorScheme, isColor, serializeCssVars} from "../utils";
 
-/**
- * MaterialTheme encapsulates theme generation for both light and dark color schemes.
- * It includes palette extraction, custom colors handling, and JSON transformation.
- */
+
 export class MaterialTheme {
   public readonly sourceColor: Color;
   public readonly contrastLevel: number;
@@ -45,7 +36,7 @@ export class MaterialTheme {
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorOptions[]
   ) {
-    const opts = this.normalizeOptions(sourceOrOptions, optionsOrStaticColors);
+    const opts = this.resolveArguments(sourceOrOptions, optionsOrStaticColors);
     const {customColors = [], style = PaletteStyle.TonalSpot, ...config} = opts;
 
     const createScheme = (isDark: boolean): DynamicColorScheme =>
@@ -58,7 +49,7 @@ export class MaterialTheme {
 
     this.sourceColor = this.schemes.light.sourceColorArgb;
     this.contrastLevel = this.schemes.light.contrastLevel;
-    this.style = style;
+    this.style = PaletteStyle.fromName(style);
 
     this.palettes = {
       primary: this.schemes.light.primaryPalette,
@@ -75,9 +66,7 @@ export class MaterialTheme {
   }
 
   /**
-   * Converts the theme instance to a JSON object.
-   * This method extracts key color values fromName the palettes.
-   * @returns A JSON representation of the theme.
+   * Return theme as JSON.
    */
   public toJSON() {
     return {
@@ -89,13 +78,12 @@ export class MaterialTheme {
         dark: this.schemes.dark.toJSON(),
       },
       palettes: {
-        primary: generateToneMapFromPalette(this.palettes.primary),
-        secondary: generateToneMapFromPalette(this.palettes.secondary),
-        tertiary: generateToneMapFromPalette(this.palettes.tertiary),
-        neutral: generateToneMapFromPalette(this.palettes.neutral),
-        neutralVariant: generateToneMapFromPalette(this.palettes.neutralVariant),
-        error: generateToneMapFromPalette(this.palettes.error),
-        ...extractToneMapping(this.customColors),
+        primary: this.palettes.primary,
+        secondary: this.palettes.secondary,
+        tertiary: this.palettes.tertiary,
+        neutral: this.palettes.neutral,
+        neutralVariant: this.palettes.neutralVariant,
+        error: this.palettes.error,
       },
       customColors: this.customColors
     }
@@ -104,15 +92,27 @@ export class MaterialTheme {
 
   /**
    * Generates a color scheme based on the theme and optional parameters.
-   * @param opts - Optional parameters to modify the color scheme generation.
+   * @param options - Optional parameters to modify the color scheme generation.
    * @returns The generated color scheme.
    */
-  public toColorScheme<V extends boolean>(opts?: ColorSchemeOptions<V>): ColorSchemeReturnType<V> {
-    return generateColorScheme(this, opts);
+  public toColorScheme<V extends boolean>(options?: ColorSchemeOptions<V>): ColorSchemeReturnType<V> {
+    return generateColorScheme(this, options);
   }
 
+  /**
+   * Generates a CSS variable map based on the theme and optional parameters.
+   * @param options - Optional parameters to modify the CSS variable generation.
+   * @returns The generated CSS variable map.
+   */
+  public toCssText<V extends boolean>(options?: ColorSchemeOptions<V> & { selector?: string }): string {
+    const {selector, ...colorSchemeOpts} = options || {};
+    const colorScheme = this.toColorScheme(colorSchemeOpts);
+    const cssVars = createCssVarMap(colorScheme);
+    return serializeCssVars(cssVars, selector);
+  }
 
-  private normalizeOptions(
+  /** @internal */
+  private resolveArguments(
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrCustomColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorOptions[]
   ): MaterialThemeOptions {

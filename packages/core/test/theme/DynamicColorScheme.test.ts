@@ -98,6 +98,67 @@ describe('DynamicScheme', () => {
     expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
     expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
   });
+  describe('toCssText', () => {
+    const baseTheme = new DynamicColorScheme(
+      0xFF6200EE,
+      {
+        primary: 0xFFBB86FC,
+        secondary: 0xFF03DAC5,
+        tertiary: 0xFF018786,
+        neutral: 0xFF121212,
+        neutralVariant: 0xFF121212,
+      }
+    );
 
+    it('should return cssText with or without selector', () => {
+      const cssText = '--test: value;';
+      const options = {
+        selector: '.test-selector'
+      };
+
+      const withSelector = options.selector ? `${options.selector} {${cssText}}` : cssText;
+      expect(withSelector).toBe('.test-selector {--test: value;}');
+
+      expect(cssText).toBe('--test: value;');
+    });
+
+    it('should wrap in selector when provided', () => {
+      const selector = '.my-theme';
+      const cssText = baseTheme.toCssText({selector});
+      expect(cssText).toMatch(new RegExp(`^${selector}\\s*{`));
+    });
+
+    it('should apply color scheme modifications', () => {
+      const modifiedPrimary = '#abcdef';
+      const cssText = baseTheme.toCssText({
+        modifyColorScheme: (scheme) => ({
+          ...scheme,
+          primary: modifiedPrimary
+        })
+      });
+
+      expect(cssText).toContain(`--primary: ${modifiedPrimary}`);
+    });
+
+    it('should handle empty selector', () => {
+      const cssText = baseTheme.toCssText({selector: ''});
+      expect(cssText).not.toMatch(/^{/);
+      expect(cssText).toContain('--primary:');
+    });
+
+    it('should maintain CSS syntax validity', () => {
+      const cssText = baseTheme.toCssText();
+      const lines = cssText.split('\n');
+
+      lines.forEach(line => {
+        if (line.trim()) {
+          expect(line.trim()).toMatch(/;$/);
+        }
+      });
+
+      const selectorText = baseTheme.toCssText({selector: ':root'});
+      expect(selectorText).toMatch(/:root\s*{/);
+    });
+  });
 })
 

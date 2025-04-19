@@ -1,16 +1,17 @@
 import {DynamicScheme} from "@material/material-color-utilities";
 import {
   type Color,
-  type ColorScheme,
-  ContrastLevel, createCssVarMap,
+  type ColorSchemeOptions,
+  ContrastLevel,
+  createCssVarMap,
   createPalette,
   type CSSColorScheme,
-  formatCssVarName,
   isColor,
   MATERIAL_COLOR_ROLES,
   PaletteStyle,
+  serializeCssVars,
+  type toCSSVarOptions,
   toHct,
-  toHex
 } from "../";
 
 
@@ -45,7 +46,7 @@ export interface DynamicColorSchemeConfig {
   /** Neutral variant color override */
   neutralVariant?: Color;
   /** Visual style variant (default: TonalSpot) */
-  style?: PaletteStyle;
+  style?: PaletteStyle | string;
   /** Contrast adjustment (0-1, default: 0) */
   contrastLevel?: number;
   /** Dark mode flag (default: false) */
@@ -119,8 +120,8 @@ export class DynamicColorScheme extends DynamicScheme {
       contrastLevel = ContrastLevel.Default.value
     } = opts;
 
-    const sourceColorHct = toHct(Number(sourceColor ?? primary));
-    const scheme = style.dynamicScheme(sourceColorHct, isDark, contrastLevel);
+    const sourceColorHct = toHct(sourceColor ?? primary ?? 0);
+    const scheme = PaletteStyle.fromName(style).dynamicScheme(sourceColorHct, isDark, contrastLevel);
 
     super({
       ...scheme,
@@ -136,22 +137,20 @@ export class DynamicColorScheme extends DynamicScheme {
     return Object.fromEntries(MATERIAL_COLOR_ROLES.map((k) => [k, this[k]]));
   }
 
-  public toCssVars(options?: { modifyColorScheme?: (colorScheme: ColorScheme) => ColorScheme }): CSSColorScheme {
+  public toCssVars(options?: ColorSchemeOptions): CSSColorScheme {
     const baseScheme = this.toJSON();
     const modifiedScheme = options?.modifyColorScheme ? options.modifyColorScheme(baseScheme) : baseScheme;
-    return createCssVarMap(modifiedScheme, toHex);
+    return createCssVarMap(modifiedScheme);
   }
 
-  public toCssText(options?: {
-    modifyColorScheme?: (colorScheme: ColorScheme) => ColorScheme;
-    selector?: string
-  }): string {
+  public toCssText(options?: ColorSchemeOptions & toCSSVarOptions): string {
     const cssVarMapping = this.toCssVars(options);
-    const cssText = Object.entries(cssVarMapping)
-      .map(([name, value]) => `${name}: ${value};`)
-      .join('\n')
-    return options?.selector
-      ? `${options.selector} {\n${cssText}\n}`
-      : cssText;
+    return serializeCssVars(cssVarMapping, options?.selector);
+    // const cssText = Object.entries(cssVarMapping)
+    //   .map(([name, value]) => `${name}: ${value};`)
+    //   .join('\n')
+    // return options?.selector
+    //   ? `${options.selector} {\n${cssText.split('\n').map(line => `  ${line}`).join('\n')}\n}`
+    //   : cssText;
   }
 }

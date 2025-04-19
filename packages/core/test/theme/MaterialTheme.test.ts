@@ -19,7 +19,7 @@ describe('MaterialTheme', () => {
     const theme = new MaterialTheme({
       ...BASE_OPTIONS,
       contrastLevel: ContrastLevel.Medium.value,
-      style: PaletteStyle.TonalSpot,
+      style: 'TonalSpot',
     });
 
     expect(theme.sourceColor).toBe(BASE_OPTIONS.sourceColor);
@@ -164,5 +164,6 @@ describe('MaterialTheme', () => {
     expect(themeJSON.schemes.light.primaryPaletteKeyColor).toBeDefined();
     expect(themeJSON.schemes.dark.primaryPaletteKeyColor).toBeDefined();
   });
+
 
 });
