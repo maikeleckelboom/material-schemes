@@ -1,6 +1,7 @@
 import {MaterialDynamicScheme} from "../theme";
 import type {Color, DynamicSchemeOptions} from "../types";
-import {isColor} from "../utils";
+
+import {isColor} from '../utils/color';
 
 export function createDynamicScheme(
   source: Color | DynamicSchemeOptions,

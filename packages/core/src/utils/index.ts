@@ -1,3 +1,4 @@
+export * from './color';
 export * from './conversion';
 export * from './custom-color';
 export * from './formatting';
@@ -8,5 +9,6 @@ export * from './dislike';
 export * from './palette';
 export * from './scoring';
 export * from './theme';
-export * from './color';
 export * from './dynamic-color'
+export * from './extended-color';
+

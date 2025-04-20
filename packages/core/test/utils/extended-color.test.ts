@@ -1,11 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {createExtendedColor, type ExtendedColor} from '../../src/types/extended-color';
-import {MaterialDynamicScheme} from '../../src/theme';
-import {harmonize} from '../../src/utils';
+import type {ExtendedColor} from '../../src/types/extended-color';
 
-// Mock dependencies
-vi.mock('../../src/utils', () => ({
-  harmonize: vi.fn((color, source) => color + 1), // Simple mock implementation
+// Mock modules first
+vi.mock('../../src/utils/blend', () => ({
+  harmonize: vi.fn().mockReturnValue(0xff0001) // Return 16711681 (0xff0001 in hex)
 }));
 
 vi.mock('../../src/theme', () => {
@@ -16,9 +14,19 @@ vi.mock('../../src/theme', () => {
   return {
     MaterialDynamicScheme: vi.fn().mockImplementation(() => ({
       primaryPalette: mockTonalPalette,
+      secondaryPalette: mockTonalPalette,
+      tertiaryPalette: mockTonalPalette,
+      neutralPalette: mockTonalPalette,
+      neutralVariantPalette: mockTonalPalette,
+      errorPalette: mockTonalPalette,
     })),
   };
 });
+
+// Import after mocks
+import {createExtendedColor} from "../../src/utils/extended-color";
+import {MaterialDynamicScheme} from '../../src/theme';
+import {harmonize} from '../../src/utils/blend';
 
 describe('createExtendedColor', () => {
   const sourceColor = 0x6200ee;
@@ -109,9 +117,12 @@ describe('createExtendedColor', () => {
       blend: true,
     };
 
+    // Clear previous calls
+    vi.mocked(harmonize).mockClear();
+
     const result = createExtendedColor(sourceColor, testColor);
 
-    // Our harmonized mock adds 1 to the color value
+    // Our harmonized mock returns 0xff0001
     expect(result.value).toBe(0xff0001);
     expect(harmonize).toHaveBeenCalledWith(testColor.value, sourceColor);
   });
@@ -136,6 +147,9 @@ describe('createExtendedColor', () => {
       blend: false,
     };
 
+    // Clear any previous calls
+    vi.mocked(harmonize).mockClear();
+
     const result = createExtendedColor(sourceColor, testColor);
 
     // Should use original value
@@ -150,6 +164,9 @@ describe('createExtendedColor', () => {
       name: 'test color',
       value: 0xff0000,
     };
+
+    // Clear any previous calls
+    vi.mocked(harmonize).mockClear();
 
     const result = createExtendedColor(sourceColor, testColor);
 

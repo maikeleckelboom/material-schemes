@@ -1,15 +1,16 @@
-import type {
-  Color,
-  ColorSchemeConfig,
-  ModeledColorScheme,
-  ColorSchemeStylesConfig,
-  ExtendedColor,
-  MaterialThemeOptions,
+import {
+  type Color,
+  type ColorSchemeConfig,
+  type ModeledColorScheme,
+  type ColorSchemeStylesConfig,
+  type ExtendedColor,
+  type MaterialThemeOptions,
+  type ExtendedColorGroup,
 } from "../types";
 import {MaterialDynamicScheme} from "./material-dynamic-scheme.ts";
 import {PaletteStyle} from "./palette-style.ts";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup} from "../utils";
+import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup, createExtendedColor} from "../utils";
 import {resolveOptions} from "../fn/create-material-theme.ts";
 
 export class MaterialTheme {
@@ -28,8 +29,7 @@ export class MaterialTheme {
     neutralVariant: TonalPalette;
     error: TonalPalette;
   }>;
-  // todo: maybe change back to customColors because of backward compatibility
-  // public readonly customColors: CustomColorGroup[];
+  public readonly staticColors: ExtendedColorGroup[];
   public readonly extendedColors: CustomColorGroup[];
 
   constructor(sourceColor: Color, extendedColors?: ExtendedColor[]);
@@ -59,6 +59,9 @@ export class MaterialTheme {
     };
     this.extendedColors = extendedColors.map(color =>
       createCustomColorGroup(this.sourceColorArgb, color)
+    );
+    this.staticColors = extendedColors.map(color =>
+      createExtendedColor(this.sourceColorArgb, color)
     );
   }
 

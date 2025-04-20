@@ -1,9 +1,6 @@
-import {describe, it, expect} from 'vitest';
-import {createMaterialTheme} from '../../src/fn/create-material-theme';
-import {MaterialTheme} from '../../src/theme';
-import {PaletteStyle} from '../../src/theme';
-import type {ExtendedColor} from '../../src/types';
-import {toArgb} from "../../src";
+import {describe, expect, it} from 'vitest';
+import type {ExtendedColor} from '../../src';
+import {createMaterialTheme, MaterialTheme, PaletteStyle, toArgb} from '../../src';
 
 describe('createMaterialTheme', () => {
   it('should create a theme with just a source color', () => {
