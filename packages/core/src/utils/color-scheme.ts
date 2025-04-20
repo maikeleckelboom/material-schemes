@@ -18,7 +18,7 @@ export function createColorScheme<V extends boolean>(
 ): AdaptiveColorScheme<V>;
 export function createColorScheme<V extends boolean = false>(
   dynamicScheme: DynamicScheme,
-  options?: ColorSchemeConfig,
+  options?: ColorSchemeConfig<V>,
 ): AdaptiveColorScheme<V>;
 export function createColorScheme(
   dynamicSchemeOrTheme: MaterialTheme | DynamicScheme,
@@ -58,7 +58,7 @@ export function buildColorScheme(theme: MaterialTheme, options: FullColorSchemeC
   return modifyColorScheme?.(colorScheme) ?? colorScheme;
 }
 
-function buildDynamicColorScheme(scheme: DynamicScheme, options?: ColorSchemeConfig): ColorScheme {
+function buildDynamicColorScheme(scheme: DynamicScheme, options?: ColorSchemeConfig<false>): ColorScheme {
   const dynamicSchemeColors = createDynamicSchemeColors(scheme);
   return options?.modifyColorScheme?.(dynamicSchemeColors) ?? dynamicSchemeColors;
 }

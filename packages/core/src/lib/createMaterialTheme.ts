@@ -5,7 +5,7 @@ export function createMaterialTheme(opts: MaterialThemeOptions) {
   return new MaterialTheme(opts);
 }
 
-const t = createMaterialTheme({
+const theme = createMaterialTheme({
   sourceColor: '#88ff85',
   style: 'TonalSpot',
   contrastLevel: 0.5,
@@ -16,18 +16,22 @@ const t = createMaterialTheme({
 })
 
 
-console.log(
-  t.schemes.light.toColorScheme({
-    paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],
-    modifyColorScheme: (scheme) => ({
-      ...scheme,
-      custom1: '#FF4081',
-      custom2: '#FF4081'
-    }),
-  })
-)
+theme.schemes.light.toColorScheme({
+  paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+  modifyColorScheme: (scheme) => ({
+    ...scheme,
+    custom1: '#FF4081',
+    custom2: '#FF4081'
+  }),
+})
 
-t.toColorScheme({
+
+theme.schemes.dark.toColorScheme({
+  paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+})
+
+
+theme.toColorScheme({
   dark: true,
   brightnessVariants: true,
   paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],

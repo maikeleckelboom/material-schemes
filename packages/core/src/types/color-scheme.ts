@@ -36,13 +36,13 @@ export type AdaptiveColorScheme<
 /**
  * A modifier that takes and returns a (possibly extended) scheme.
  */
-export type ModifyFn<
+export type ModifyColorSchemeFn<
   V extends boolean = false,
   R = AdaptiveColorScheme<V> & Partial<ColorScheme>
 > = (scheme: AdaptiveColorScheme<V>) => R;
 
 
-export interface ColorSchemeConfig<WithVariants extends boolean = false> {
+export interface ColorSchemeConfig<V extends boolean = boolean> {
   /**
    * Palette: true = full tones; or pass specific tone indices
    */
@@ -50,7 +50,7 @@ export interface ColorSchemeConfig<WithVariants extends boolean = false> {
   /**
    * Tweak the generated scheme, considering variants if present
    */
-  modifyColorScheme?: ModifyFn<WithVariants>;
+  modifyColorScheme?: ModifyColorSchemeFn<V>;
 }
 
 export interface FullColorSchemeConfig<V extends boolean = false> extends ColorSchemeConfig<V> {

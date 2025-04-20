@@ -90,7 +90,7 @@ export class DynamicColorScheme extends DynamicScheme {
     }, {} as MaterialColorScheme);
   }
 
-  public toColorScheme(options: ColorSchemeConfig = {}): AdaptiveColorScheme {
+  public toColorScheme(options: ColorSchemeConfig<false> = {}): AdaptiveColorScheme {
     return createColorScheme(this, options);
   }
 

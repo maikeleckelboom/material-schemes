@@ -2,7 +2,7 @@ import type {
   Color,
   AdaptiveColorScheme,
   FullColorSchemeConfig, ColorSchemeStylesConfig,
-  CustomColorOptions,
+  CustomColorInput,
   MaterialThemeOptions,
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
@@ -28,12 +28,12 @@ export class MaterialTheme {
   }>;
   public readonly customColors: CustomColorGroup[];
 
-  constructor(sourceColor: Color, customColors?: CustomColorOptions[]);
+  constructor(sourceColor: Color, customColors?: CustomColorInput[]);
   constructor(sourceColor: Color, options?: Omit<MaterialThemeOptions, 'sourceColor'>);
   constructor(options: MaterialThemeOptions);
   constructor(
     sourceOrOptions: Color | MaterialThemeOptions,
-    optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorOptions[]
+    optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorInput[]
   ) {
     const options = (() => {
       if (isColor(sourceOrOptions)) {
@@ -90,9 +90,9 @@ export class MaterialTheme {
     return createColorScheme(this, options);
   }
 
-  public toCssVars(options: ColorSchemeStylesConfig = {}): string {
+  public toCssVars<V extends boolean = false>(options: ColorSchemeStylesConfig<V> = {}): string {
     const {selector, minify, ...opts} = options || {};
-    const colorScheme = this.toColorScheme(opts);
+    const colorScheme = this.toColorScheme<V>(opts);
     return createCssVarsText(colorScheme, {selector, minify});
   }
 }

@@ -1,6 +1,6 @@
 import {customColor, type CustomColorGroup} from "@material/material-color-utilities";
 import {toArgb} from "./conversion.ts";
-import type {Color, CustomColorOptions} from "../types";
+import type {Color, CustomColorInput} from "../types";
 import {formatTokenName} from "./formatting.ts";
 import {createTonalMapping} from "./color-scheme.ts";
 import {createTonalPalette} from "./palette.ts";
@@ -14,7 +14,7 @@ import {createTonalPalette} from "./palette.ts";
  *
  * @link https://m3.material.io/styles/color/the-color-system/color-roles
  */
-export function createCustomColorGroup(source: Color, color: CustomColorOptions): CustomColorGroup {
+export function createCustomColorGroup(source: Color, color: CustomColorInput): CustomColorGroup {
   return customColor(toArgb(source), {
     name: color.name,
     value: toArgb(color.value),
