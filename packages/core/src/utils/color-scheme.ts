@@ -2,8 +2,8 @@ import type {CustomColorGroup, DynamicScheme, TonalPalette} from '@material/mate
 import type {
   ColorScheme,
   SharedColorSchemeConfig,
-  ColorSchemeReturnType,
-  CssVarsConfig,
+  ModeledColorScheme,
+  SerializeCssVarsConfig,
   ColorSchemeConfig,
 } from '../types';
 import {createTonalPalette, formatColorToken, formatCssVarName, formatTokenName, toHex} from '../utils';
@@ -14,11 +14,11 @@ import {MaterialDynamicScheme, MaterialTheme} from "../theme";
 function createColorScheme<V extends boolean>(
   theme: MaterialTheme,
   options?: ColorSchemeConfig<V>,
-): ColorSchemeReturnType<V>;
+): ModeledColorScheme<V>;
 function createColorScheme<V extends boolean = false>(
   dynamicScheme: DynamicScheme | MaterialDynamicScheme,
   options?: SharedColorSchemeConfig<V>,
-): ColorSchemeReturnType<V>;
+): ModeledColorScheme<V>;
 function createColorScheme(
   dynamicSchemeOrTheme: MaterialTheme | DynamicScheme | MaterialDynamicScheme,
   options?: ColorSchemeConfig,
@@ -155,7 +155,7 @@ function valuesToTokens(name: string, colors: Record<number, string | number>) {
   ) as ColorScheme;
 }
 
-function cssVarsToString(colorScheme: Record<string, string | number>, options?: CssVarsConfig): string {
+function cssVarsToString(colorScheme: Record<string, string | number>, options?: SerializeCssVarsConfig): string {
   const {selector, minify = true} = options || {};
   let css = entriesToCssDecls(colorScheme);
 
@@ -188,7 +188,7 @@ function tokensToCssVarMap(colorScheme: Record<string, string | number>) {
   );
 }
 
-function colorSchemeToCssVars(colorScheme: Record<string, string | number>, options?: CssVarsConfig): string {
+function colorSchemeToCssVars(colorScheme: Record<string, string | number>, options?: SerializeCssVarsConfig): string {
   return cssVarsToString(tokensToCssVarMap(colorScheme), options);
 }
 

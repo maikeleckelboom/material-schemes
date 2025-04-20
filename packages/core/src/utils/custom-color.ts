@@ -18,3 +18,6 @@ export function createCustomColorGroup(source: Color, color: ExtendedColor): Cus
     blend: !!color.blend,
   })
 }
+
+// TODO: Make a new interface named `ExtendedColorGroup`
+//  with formatted names and color roles

@@ -19,7 +19,7 @@ export type ColorRoleKey = (typeof MATERIAL_COLOR_ROLES)[number];
  * @see Color for the value type.
  */
 export type MaterialColorScheme = {
-  [K in ColorRoleKey]: Color;
+  [key in ColorRoleKey]: Color;
 };
 
 /**
@@ -38,3 +38,38 @@ export interface ColorScheme extends MaterialColorScheme {
   /** Allows for additional, non-standard color roles (e.g., custom brand colors). */
   [key: string]: Color;
 }
+
+/**
+ * A generic type that creates a color scheme object where the standard Material Design
+ * color role keys are transformed by appending a specified `Suffix`.
+ *
+ * For example, given `ColorRoleKey` 'primary' and `Suffix` 'Light', it creates a key 'primaryLight'.
+ * Used to generate theme-specific variants (e.g., light and dark modes) with distinct key names.
+ *
+ * @template Suffix The string suffix to append to each standard color role key (e.g., "Light", "Dark").
+ * @see ColorRoleKey for the base keys being transformed.
+ * @see LightColorScheme for an example usage with "Light".
+ * @see DarkColorScheme for an example usage with "Dark".
+ */
+type SuffixedColorScheme<Suffix extends string> = {
+  [K in ColorRoleKey as `${K}${Suffix}`]: Color;
+};
+
+/**
+ * A conditional type determining the structure of a generated color scheme object
+ * based on whether brightness variants (light/dark suffixed keys) are included.
+ *
+ * @template V A boolean indicating if brightness variants (`LightColorScheme`, `DarkColorScheme`) are generated (`true`) or not (`false`). Defaults to `false`.
+ *
+ * @returns If `AllowV` is `true`, returns an intersection type containing the base `ColorScheme`
+ * (standard + custom roles) merged with `LightColorScheme` and `DarkColorScheme` (suffixed roles).
+ * @returns If `AllowV` is `false`, returns just the base `ColorScheme`.
+ *
+ * @see ColorScheme for the base scheme structure.
+ * @see LightColorScheme for the light variant structure.
+ * @see DarkColorScheme for the dark variant structure.
+ */
+export type ModeledColorScheme<V extends boolean = false> =
+  V extends true
+    ? ColorScheme & SuffixedColorScheme<"Light"> & SuffixedColorScheme<"Dark">
+    : ColorScheme

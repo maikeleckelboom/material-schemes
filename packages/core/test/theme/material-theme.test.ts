@@ -104,16 +104,18 @@ describe('MaterialTheme', () => {
       ]
     });
 
-    const themeColorScheme = theme.toColorScheme({
+    const colorScheme = theme.toColorScheme({
       brightnessVariants: true,
       paletteTones: true,
       modifyColorScheme: (scheme) => ({
         ...scheme,
         tertiary: scheme.primaryDark,
+        test: '#000000',
       })
     });
 
-    expect(themeColorScheme.tertiary).toBe(themeColorScheme.primaryDark);
+    expect(colorScheme.tertiary).toBe(colorScheme.primaryDark);
+    expect(colorScheme.test).toBe('#000000');
 
     const assertColorProperties = (colorName: string) => {
       const baseKeys = [
@@ -124,14 +126,14 @@ describe('MaterialTheme', () => {
       ];
 
       DEFAULT_PALETTE_TONES.forEach(tone => {
-        expect(themeColorScheme[`${colorName}${tone}`]).toBeDefined();
-        expect(themeColorScheme[`brand${tone}`]).toBeDefined();
-        expect(themeColorScheme[`quaternary${tone}`]).toBeDefined();
+        expect(colorScheme[`${colorName}${tone}`]).toBeDefined();
+        expect(colorScheme[`brand${tone}`]).toBeDefined();
+        expect(colorScheme[`quaternary${tone}`]).toBeDefined();
       })
 
       baseKeys.forEach(baseKey => {
         ['Light', 'Dark'].forEach(variant => {
-          expect(themeColorScheme[`${baseKey}${variant}`]).toBeDefined();
+          expect(colorScheme[`${baseKey}${variant}`]).toBeDefined();
         });
       });
     };

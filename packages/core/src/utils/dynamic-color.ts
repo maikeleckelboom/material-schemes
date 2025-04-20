@@ -1,8 +1,8 @@
-import {contrastColor} from "./contrast.ts";
+import {getContrastColor} from "./contrast.ts";
 import {toHex} from "./conversion.ts";
 import {DynamicColor, type DynamicScheme, MaterialDynamicColors} from "@material/material-color-utilities";
 
-export function getDynamicColors(dynamicScheme: DynamicScheme) {
+export function getMaterialDynamicColors(dynamicScheme: DynamicScheme) {
   const result: Record<string, number> = {};
   const dynamicKeys = Object.keys(MaterialDynamicColors);
   for (let i = 0, len = dynamicKeys.length; i < len; i++) {
@@ -15,7 +15,7 @@ export function getDynamicColors(dynamicScheme: DynamicScheme) {
   return result;
 }
 
-export function contrastColorRole(role: string, dynamicScheme: DynamicScheme): string {
+export function getContrastColorRole(role: string, dynamicScheme: DynamicScheme): string {
   const color = getColorDefinition(role);
 
   if (color.isBackground) {
@@ -63,7 +63,7 @@ function getBackgroundRoleFromOnRole(onRole: string): string {
 }
 
 function getContrastFallback(color: DynamicColor, scheme: DynamicScheme): string {
-  return toHex(contrastColor(color.getArgb(scheme)));
+  return toHex(getContrastColor(color.getArgb(scheme)));
 }
 
 function isOnRole(role: string): boolean {

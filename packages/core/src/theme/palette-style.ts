@@ -11,13 +11,13 @@ import {
   SchemeVibrant
 } from "@material/material-color-utilities";
 import {ContrastLevel} from "./contrast-level.ts";
-import type {PaletteStyleName, PaletteStyleSchemeVariant} from "../types";
+import type {PaletteStyleName, PaletteStyleScheme} from "../types";
 
 type SchemeConstructor = new (
   sourceColor: Hct,
   isDark: boolean,
   contrastLevel: number
-) => PaletteStyleSchemeVariant;
+) => PaletteStyleScheme;
 
 /**
  * Defines visual styles for generating Material Design color palettes,
@@ -57,7 +57,7 @@ export class PaletteStyle {
     sourceColorHct: Hct,
     isDark: boolean = false,
     contrastLevel: number = ContrastLevel.Default.value
-  ): PaletteStyleSchemeVariant {
+  ): PaletteStyleScheme {
     return new this.schemeConstructor(sourceColorHct, isDark, contrastLevel);
   }
 

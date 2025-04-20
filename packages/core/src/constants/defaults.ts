@@ -62,4 +62,4 @@ export const DEFAULT_SCORE_OPTIONS = {
  * Quantization is a process that reduces the number of colors in an image
  * to simplify analysis and color extraction.
  */
-export const DEFAULT_QUANTIZE_MAX_COLORS = 128;
+export const DEFAULT_QUANTIZE_MAX_COLORS = 200;

@@ -27,7 +27,7 @@ export type PaletteStyleName = typeof PALETTE_STYLE_NAMES[number];
  * A type union encompassing all specific, concrete implementations of Material Design 3
  * dynamic color schemes (like SchemeContent, SchemeExpressive, etc.).
  */
-export type PaletteStyleSchemeVariant =
+export type PaletteStyleScheme =
   | SchemeContent
   | SchemeExpressive
   | SchemeFidelity

@@ -1,6 +1,7 @@
 import {PaletteStyle} from "../theme";
 import type {PaletteStyleName} from "./palette-style.ts";
 import type {Color} from "./color.ts";
+import type {ExtendedColor} from "./extended-color.ts";
 
 /**
  * Options for generating a dynamic color scheme based on Material Design 3 principles.
@@ -8,7 +9,7 @@ import type {Color} from "./color.ts";
  *
  * @see https://m3.material.io/styles/color/dynamic-color/overview
  */
-export interface MaterialDynamicSchemeOptions {
+export interface DynamicSchemeOptions {
   /**
    * The single seed color used to generate all tonal palettes.
    * If primary, secondary, etc. are provided, they override the generated palettes.
@@ -78,29 +79,13 @@ export interface MaterialDynamicSchemeOptions {
   neutralVariant?: Color;
 }
 
-/**
- * Represents an extended color object that includes additional metadata
- * about a color.
- *
- * @interface ExtendedColor
- * @property {string} name - The name of the color.
- * @property {Color} value - The base color value, typically represented as a predefined color object or value.
- * @property {boolean} [blend] - An optional property indicating whether the color can be blended with others.
- * @property {string} [description] - An optional property that provides a human-readable description of the color.
- */
-export interface ExtendedColor {
-  name: string;
-  value: Color;
-  blend?: boolean;
-  description?: string;
-}
 
 /**
  * Configuration options for creating a complete Material Theme, potentially including custom colors.
- * This builds upon `MaterialDynamicSchemeOptions` but excludes the `isDark` property,
+ * This builds upon `DynamicSchemeOptions` but excludes the `isDark` property,
  * as light/dark modes might be handled separately or through a different mechanism.
  */
-export type MaterialThemeOptions = Omit<MaterialDynamicSchemeOptions, 'isDark'> & {
+export type MaterialThemeOptions = Omit<DynamicSchemeOptions, 'isDark'> & {
   /**
    * An array of additional, custom color roles beyond the standard
    * Material Design palettes (primary, secondary, tertiary, etc.).
@@ -108,5 +93,4 @@ export type MaterialThemeOptions = Omit<MaterialDynamicSchemeOptions, 'isDark'> 
    */
   extendedColors?: ExtendedColor[];
 };
-
 

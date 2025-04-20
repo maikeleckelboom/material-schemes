@@ -1,15 +1,16 @@
 import type {
-  ColorSchemeReturnType,
   Color,
+  ColorSchemeConfig,
+  ModeledColorScheme,
   ColorSchemeStylesConfig,
   ExtendedColor,
-  ColorSchemeConfig,
   MaterialThemeOptions,
 } from "../types";
 import {MaterialDynamicScheme} from "./material-dynamic-scheme.ts";
 import {PaletteStyle} from "./palette-style.ts";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createColorScheme, createCustomColorGroup, colorSchemeToCssVars, isColor} from "../utils";
+import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup} from "../utils";
+import {resolveOptions} from "../fn/create-material-theme.ts";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
@@ -27,6 +28,8 @@ export class MaterialTheme {
     neutralVariant: TonalPalette;
     error: TonalPalette;
   }>;
+  // todo: maybe change back to customColors because of backward compatibility
+  // public readonly customColors: CustomColorGroup[];
   public readonly extendedColors: CustomColorGroup[];
 
   constructor(sourceColor: Color, extendedColors?: ExtendedColor[]);
@@ -36,21 +39,7 @@ export class MaterialTheme {
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
   ) {
-    const options = (() => {
-      if (isColor(sourceOrOptions)) {
-        if (Array.isArray(optionsOrColors)) {
-          return {
-            sourceColor: sourceOrOptions,
-            extendedColors: optionsOrColors
-          };
-        }
-        return {
-          sourceColor: sourceOrOptions,
-          ...optionsOrColors
-        };
-      }
-      return sourceOrOptions;
-    })();
+    const options = resolveOptions(sourceOrOptions, optionsOrColors);
     const {extendedColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
     const createScheme = (isDark: boolean) => new MaterialDynamicScheme({...config, style, isDark});
     this.schemes = {
@@ -73,7 +62,7 @@ export class MaterialTheme {
     );
   }
 
-  public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): ColorSchemeReturnType<V> {
+  public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): ModeledColorScheme<V> {
     return createColorScheme(this, options);
   }
 

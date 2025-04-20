@@ -2,13 +2,13 @@ import {DynamicScheme, type TonalPalette} from "@material/material-color-utiliti
 import {
   type Color,
   type SharedColorSchemeConfig,
-  type ColorSchemeReturnType,
+  type ModeledColorScheme,
   type ColorSchemeStylesConfig,
   ContrastLevel,
   createColorScheme,
   createTonalPalette,
   colorSchemeToCssVars,
-  type MaterialDynamicSchemeOptions,
+  type DynamicSchemeOptions,
   isColor,
   PaletteStyle,
   toHct,
@@ -19,10 +19,10 @@ import {
  * @extends DynamicScheme
  */
 export class MaterialDynamicScheme extends DynamicScheme {
-  constructor(sourceColor: Color, options?: Omit<MaterialDynamicSchemeOptions, 'sourceColor'>);
-  constructor(options: MaterialDynamicSchemeOptions);
-  constructor(source: Color | MaterialDynamicSchemeOptions, options?: Omit<MaterialDynamicSchemeOptions, 'sourceColor'>) {
-    const opts: MaterialDynamicSchemeOptions = isColor(source) ? {sourceColor: source, ...options} : source;
+  constructor(sourceColor: Color, options?: Omit<DynamicSchemeOptions, 'sourceColor'>);
+  constructor(options: DynamicSchemeOptions);
+  constructor(source: Color | DynamicSchemeOptions, options?: Omit<DynamicSchemeOptions, 'sourceColor'>) {
+    const opts: DynamicSchemeOptions = isColor(source) ? {sourceColor: source, ...options} : source;
 
     const {
       primary,
@@ -56,7 +56,7 @@ export class MaterialDynamicScheme extends DynamicScheme {
     return color ? createTonalPalette(color) : defaultPalette;
   }
 
-  public toColorScheme<V extends boolean = false>(options?: SharedColorSchemeConfig<V>): ColorSchemeReturnType {
+  public toColorScheme<V extends boolean = false>(options?: SharedColorSchemeConfig<V>): ModeledColorScheme {
     return createColorScheme(this, options);
   }
 

@@ -1,5 +1,6 @@
 import type {Color, ExtendedColor, MaterialThemeOptions} from "../types";
 import {MaterialTheme} from "../theme";
+import {isColor} from "../utils";
 
 export function createMaterialTheme(
   sourceColor: Color,
@@ -8,8 +9,27 @@ export function createMaterialTheme(
 export function createMaterialTheme(options: MaterialThemeOptions): MaterialTheme;
 export function createMaterialTheme(
   sourceOrOptions: Color | MaterialThemeOptions,
-  optionsOrExtendedColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+  optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
 ): MaterialTheme {
-  // @ts-ignore let the class constructor handle the overloads
-  return new MaterialTheme(sourceOrOptions, optionsOrExtendedColors);
+  const options = resolveOptions(sourceOrOptions, optionsOrColors);
+  return new MaterialTheme(options);
+}
+
+export function resolveOptions(
+  sourceOrOptions: Color | MaterialThemeOptions,
+  optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+): MaterialThemeOptions {
+  if (isColor(sourceOrOptions)) {
+    if (Array.isArray(optionsOrColors)) {
+      return {
+        sourceColor: sourceOrOptions,
+        extendedColors: optionsOrColors
+      };
+    }
+    return {
+      sourceColor: sourceOrOptions,
+      ...optionsOrColors
+    };
+  }
+  return sourceOrOptions;
 }

@@ -1,11 +1,14 @@
 import {MaterialDynamicScheme} from "../theme";
-import type {Color, MaterialDynamicSchemeOptions} from "../types";
+import type {Color, DynamicSchemeOptions} from "../types";
 import {isColor} from "../utils";
 
 export function createDynamicScheme(
-  source: Color | MaterialDynamicSchemeOptions,
-  options?: Omit<MaterialDynamicSchemeOptions, 'sourceColor'>,
+  source: Color | DynamicSchemeOptions,
+  options?: Omit<DynamicSchemeOptions, 'sourceColor'>,
 ): MaterialDynamicScheme {
+  if (isColor(source) && source == null) {
+    throw new Error('Invalid argument: source must be a Color or DynamicSchemeOptions');
+  }
   if (isColor(source)) {
     return new MaterialDynamicScheme(source, options);
   }
@@ -13,5 +16,5 @@ export function createDynamicScheme(
     return new MaterialDynamicScheme(source);
   }
 
-  throw new Error('Invalid argument: source must be a Color or MaterialDynamicSchemeOptions');
+  throw new Error('Invalid argument: source must be a Color or DynamicSchemeOptions');
 }
