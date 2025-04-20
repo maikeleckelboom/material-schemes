@@ -1,41 +1,30 @@
-import type {MaterialThemeOptions} from "../types";
+import type {Color, ExtendedColor, MaterialThemeOptions} from "../types";
 import {MaterialTheme} from "../theme";
+import {isColor} from "../utils";
 
-export function createMaterialTheme(opts: MaterialThemeOptions) {
-  return new MaterialTheme(opts);
+export function createMaterialTheme(
+  sourceColor: Color,
+  options?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+): MaterialTheme;
+export function createMaterialTheme(options: MaterialThemeOptions): MaterialTheme;
+export function createMaterialTheme(
+  sourceOrOptions: Color | MaterialThemeOptions,
+  optionsOrCustomColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+): MaterialTheme {
+  const options = (() => {
+    if (isColor(sourceOrOptions)) {
+      if (Array.isArray(optionsOrCustomColors)) {
+        return {
+          sourceColor: sourceOrOptions,
+          customColors: optionsOrCustomColors
+        };
+      }
+      return {
+        sourceColor: sourceOrOptions,
+        ...optionsOrCustomColors
+      };
+    }
+    return sourceOrOptions;
+  })();
+  return new MaterialTheme(options);
 }
-
-const theme = createMaterialTheme({
-  sourceColor: '#88ff85',
-  style: 'TonalSpot',
-  contrastLevel: 0.5,
-  customColors: [
-    {name: 'custom1', value: '#FF4081'},
-    {name: 'custom2', value: '#FF4081', blend: true}
-  ]
-})
-
-theme.schemes.light.toColorScheme({
-  paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],
-  modifyColorScheme: (scheme) => ({
-    ...scheme,
-    custom1: '#FF4081',
-    custom2: '#FF4081'
-  }),
-})
-
-
-theme.schemes.dark.toColorScheme({
-  paletteTones: true
-})
-
-theme.toColorScheme({
-  dark: true,
-  brightnessVariants: true,
-  paletteTones: false,
-  modifyColorScheme: (scheme) => ({
-    ...scheme,
-    custom1: 0xFF4081,
-    custom2: 0xFF4081
-  })
-})

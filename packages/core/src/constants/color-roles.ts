@@ -2,7 +2,7 @@
  * Palette key color roles for Material Design 3.
  * These roles are used to define the five core key colors.
  */
-export const MATERIAL_KEY_COLOR_ROLES = [
+export const MATERIAL_PALETTE_KEY_COLORS = [
   'primaryPaletteKeyColor',
   'secondaryPaletteKeyColor',
   'tertiaryPaletteKeyColor',
@@ -29,7 +29,7 @@ export const MATERIAL_KEY_COLOR_ROLES = [
  * The array is frozen to ensure the integrity of the design system by preventing any modifications.
  */
 export const MATERIAL_COLOR_ROLES = [
-  ...MATERIAL_KEY_COLOR_ROLES,
+  ...MATERIAL_PALETTE_KEY_COLORS,
   'background',
   'onBackground',
   'surface',

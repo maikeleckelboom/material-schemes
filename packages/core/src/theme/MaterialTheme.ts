@@ -2,14 +2,14 @@ import type {
   AdaptiveColorScheme,
   Color,
   ColorSchemeStylesConfig,
-  CustomColorInput,
+  ExtendedColor,
   FullColorSchemeConfig,
   MaterialThemeOptions,
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
 import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createCustomColorGroup, cssVarMapToText, formatCustomColor, isColor, createColorScheme} from "../utils";
+import {createColorScheme, createCustomColorGroup, cssVarMapToText, formatCustomColor, isColor} from "../utils";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
@@ -29,12 +29,12 @@ export class MaterialTheme {
   }>;
   public readonly customColors: CustomColorGroup[];
 
-  constructor(sourceColor: Color, customColors?: CustomColorInput[]);
+  constructor(sourceColor: Color, customColors?: ExtendedColor[]);
   constructor(sourceColor: Color, options?: Omit<MaterialThemeOptions, 'sourceColor'>);
   constructor(options: MaterialThemeOptions);
   constructor(
     sourceOrOptions: Color | MaterialThemeOptions,
-    optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | CustomColorInput[]
+    optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
   ) {
     const options = (() => {
       if (isColor(sourceOrOptions)) {
@@ -87,11 +87,11 @@ export class MaterialTheme {
     }
   }
 
-  public toColorScheme<V extends boolean>(options: FullColorSchemeConfig<V> = {}): AdaptiveColorScheme<V> {
+  public toColorScheme<V extends boolean>(options?: FullColorSchemeConfig<V>): AdaptiveColorScheme<V> {
     return createColorScheme(this, options);
   }
 
-  public toCssVars<V extends boolean = false>(options: ColorSchemeStylesConfig<V> = {}): string {
+  public toCssVars<V extends boolean = false>(options?: ColorSchemeStylesConfig<V>): string {
     const {selector, minify, ...opts} = options || {};
     const colorScheme = this.toColorScheme<V>(opts);
     return cssVarMapToText(colorScheme, {selector, minify});

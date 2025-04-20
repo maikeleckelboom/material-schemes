@@ -57,8 +57,7 @@ export function formatColorToken(pattern: string, name: string, suffix?: string)
  * formatCssVarName('primaryColor'); // '--primary-color'
  */
 export function formatCssVarName<T extends string>(key: T) {
-  key.startsWith('--') && key.slice(2);
-  return `--${kebabCase(key)}` as KebabCase<`--${T}`>;
+  return key.startsWith('--') ? key : `--${kebabCase(key)}` as KebabCase<`--${T}`>;
 }
 
 

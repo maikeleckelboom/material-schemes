@@ -2,7 +2,7 @@ import {type PaletteStyle, type PaletteStyleName} from "../theme";
 
 export type Color = number | string;
 
-export interface CustomColorInput {
+export interface ExtendedColor {
   name: string;
   value: Color;
   blend?: boolean;
@@ -22,7 +22,7 @@ export interface DynamicColorSchemeOptions {
   /** Neutral variant color override */
   neutralVariant?: Color;
   /** Visual style variant (default: TonalSpot) */
-  style?: PaletteStyle | PaletteStyleName | string;
+  style?: PaletteStyle | (PaletteStyleName | (string & {}));
   /** Contrast adjustment (0-1, default: 0) */
   contrastLevel?: number;
   /** Dark mode flag (default: false) */
@@ -30,6 +30,6 @@ export interface DynamicColorSchemeOptions {
 }
 
 export type MaterialThemeOptions = DynamicColorSchemeOptions & {
-  customColors?: CustomColorInput[];
+  customColors?: ExtendedColor[];
 };
 

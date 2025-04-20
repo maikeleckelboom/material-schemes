@@ -171,7 +171,7 @@ export class PaletteStyle {
    */
   static fromName(name: PaletteStyle | PaletteStyleName | string): PaletteStyle {
     if (name instanceof PaletteStyle) return name;
-    const style = PaletteStyle.values.find(s => s.name === name);
+    const style = PaletteStyle.values.find(s => s.name.toLowerCase() === name.toLowerCase());
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)
     return style;
   }

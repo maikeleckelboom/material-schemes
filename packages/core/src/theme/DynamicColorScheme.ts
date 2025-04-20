@@ -5,6 +5,7 @@ import {
   type ColorSchemeConfig,
   type ColorSchemeStylesConfig,
   ContrastLevel,
+  createColorScheme,
   createTonalPalette,
   cssVarMapToText,
   type DynamicColorSchemeOptions,
@@ -12,7 +13,6 @@ import {
   MATERIAL_COLOR_ROLES,
   type MaterialColorScheme,
   PaletteStyle,
-  createColorScheme,
   toHct,
 } from "../";
 
@@ -52,10 +52,7 @@ export class DynamicColorScheme extends DynamicScheme {
   }
 
   /** @internal */
-  private static createPaletteOverride(
-    color: Color | undefined,
-    defaultPalette: TonalPalette
-  ): TonalPalette {
+  private static createPaletteOverride(color: Color | undefined, defaultPalette: TonalPalette): TonalPalette {
     if (color && !isColor(color)) {
       color = 0x00000000;
     }
@@ -69,11 +66,11 @@ export class DynamicColorScheme extends DynamicScheme {
     }, {} as MaterialColorScheme);
   }
 
-  public toColorScheme(options: ColorSchemeConfig<false> = {}): AdaptiveColorScheme {
+  public toColorScheme<V extends boolean = false>(options?: ColorSchemeConfig<V>): AdaptiveColorScheme {
     return createColorScheme(this, options);
   }
 
-  public toCssVars(options: ColorSchemeStylesConfig = {}): string {
+  public toCssVars(options?: ColorSchemeStylesConfig): string {
     const {selector, ...opts} = options || {};
     const colorScheme = this.toColorScheme(opts);
     return cssVarMapToText(colorScheme, {selector});

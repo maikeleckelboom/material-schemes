@@ -1,6 +1,5 @@
 import {MATERIAL_COLOR_ROLES} from "../constants";
 import type {Color} from "./theme.ts";
-import type {KebabCase} from "type-fest";
 
 export type ColorRoleKey = (typeof MATERIAL_COLOR_ROLES)[number];
 
@@ -8,13 +7,9 @@ export type MaterialColorScheme = {
   [K in ColorRoleKey]: Color;
 };
 
-export interface ColorScheme extends Partial<MaterialColorScheme> {
-  [key: string]: number | Color | undefined;
+export interface ColorScheme extends MaterialColorScheme {
+  [key: string]: Color;
 }
-
-// export interface CssVariableMap extends Record<KebabCase<string>, Color> {
-//   [key: `--${KebabCase<ColorRoleKey | string>}`]: string;
-// }
 
 type SuffixedColorScheme<Suffix extends string> = {
   [K in ColorRoleKey as `${K}${Suffix}`]: Color;
@@ -64,7 +59,7 @@ export interface FullColorSchemeConfig<V extends boolean = false> extends ColorS
   brightnessVariants?: V;
 }
 
-export interface CssOutputConfig {
+export interface StylesheetConfig {
   /**
    * CSS selector under which to emit vars
    */
@@ -76,7 +71,5 @@ export interface CssOutputConfig {
 }
 
 export interface ColorSchemeStylesConfig<WithVariants extends boolean = false>
-  extends FullColorSchemeConfig<WithVariants>, CssOutputConfig {
+  extends FullColorSchemeConfig<WithVariants>, StylesheetConfig {
 }
-
-export type TonalMapping = Record<number, number>;
