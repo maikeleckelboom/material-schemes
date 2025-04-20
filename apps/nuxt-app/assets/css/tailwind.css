@@ -1,134 +1,21 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-primary-palette-key-color: var(--primary-palette-key-color);
-  --color-secondary-palette-key-color: var(--secondary-palette-key-color);
-  --color-tertiary-palette-key-color: var(--tertiary-palette-key-color);
-  --color-neutral-palette-key-color: var(--neutral-palette-key-color);
-  --color-neutral-variant-palette-key-color: var(--neutral-variant-palette-key-color);
-  --color-background: var(--background);
-  --color-on-background: var(--on-background);
-  --color-surface: var(--surface);
-  --color-surface-dim: var(--surface-dim);
-  --color-surface-bright: var(--surface-bright);
-  --color-surface-container-lowest: var(--surface-container-lowest);
-  --color-surface-container-low: var(--surface-container-low);
-  --color-surface-container: var(--surface-container);
-  --color-surface-container-high: var(--surface-container-high);
-  --color-surface-container-highest: var(--surface-container-highest);
-  --color-on-surface: var(--on-surface);
-  --color-surface-variant: var(--surface-variant);
-  --color-on-surface-variant: var(--on-surface-variant);
-  --color-inverse-surface: var(--inverse-surface);
-  --color-inverse-on-surface: var(--inverse-on-surface);
-  --color-outline: var(--outline);
-  --color-outline-variant: var(--outline-variant);
-  --color-shadow: var(--shadow);
-  --color-scrim: var(--scrim);
-  --color-surface-tint: var(--surface-tint);
-  --color-primary: var(--primary);
-  --color-on-primary: var(--on-primary);
-  --color-primary-container: var(--primary-container);
-  --color-on-primary-container: var(--on-primary-container);
-  --color-inverse-primary: var(--inverse-primary);
-  --color-secondary: var(--secondary);
-  --color-on-secondary: var(--on-secondary);
-  --color-secondary-container: var(--secondary-container);
-  --color-on-secondary-container: var(--on-secondary-container);
-  --color-tertiary: var(--tertiary);
-  --color-on-tertiary: var(--on-tertiary);
-  --color-tertiary-container: var(--tertiary-container);
-  --color-on-tertiary-container: var(--on-tertiary-container);
-  --color-error: var(--error);
-  --color-on-error: var(--on-error);
-  --color-error-container: var(--error-container);
-  --color-on-error-container: var(--on-error-container);
-}
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 2.5rem;
+  height: 2.5rem;
 
-@layer base {
-  :root {
-    --primary-palette-key-color: oklch(69.21% 0.1079 261.32);
-    --secondary-palette-key-color: oklch(65.58% 0.0269 265.49);
-    --tertiary-palette-key-color: oklch(66.05% 0.0529 321.81);
-    --neutral-palette-key-color: oklch(65.51% 0.0045 301.38);
-    --neutral-variant-palette-key-color: oklch(65.42% 0.012 274.8);
-
-    --background: oklch(98.32% 0.0068 247.9);
-    --on-background: oklch(22.36% 0.0084 240.3);
-    --surface: oklch(98.32% 0.0068 247.9);
-    --surface-dim: oklch(88.75% 0.0076 260.7);
-    --surface-bright: oklch(98.32% 0.0068 247.9);
-    --surface-container-lowest: oklch(100% 0 none);
-    --surface-container-low: oklch(96.53% 0.0069 247.9);
-    --surface-container: oklch(94.83% 0.0075 260.7);
-    --surface-container-high: oklch(93.01% 0.0075 260.7);
-    --surface-container-highest: oklch(91.39% 0.007 247.9);
-    --on-surface: oklch(22.36% 0.0084 240.3);
-    --surface-variant: oklch(91.33% 0.0115 252.1);
-    --on-surface-variant: oklch(39.71% 0.0125 238.8);
-    --inverse-surface: oklch(30.95% 0.0088 234);
-    --inverse-on-surface: oklch(95.65% 0.008 253.9);
-    --outline: oklch(56.88% 0.0125 243.8);
-    --outline-variant: oklch(82.71% 0.0118 252.1);
-    --shadow: oklch(0% 0 none);
-    --scrim: oklch(0% 0 none);
-    --surface-tint: oklch(48% 0.0868 234.2);
-    --primary: oklch(48% 0.0868 234.2);
-    --on-primary: oklch(100% 0 none);
-    --primary-container: oklch(91.11% 0.0486 238.8);
-    --on-primary-container: oklch(39.21% 0.0814 233.4);
-    --inverse-primary: oklch(82.39% 0.0832 237.2);
-    --secondary: oklch(48.14% 0.0301 236);
-    --on-secondary: oklch(100% 0 none);
-    --secondary-container: oklch(91.23% 0.0289 241.6);
-    --on-secondary-container: oklch(39.5% 0.0305 237.7);
-    --tertiary: oklch(48.64% 0.0563 296);
-    --on-tertiary: oklch(100% 0 none);
-    --tertiary-container: oklch(91.78% 0.0454 298);
-    --on-tertiary-container: oklch(40.13% 0.0554 294.9);
-    --error: oklch(50.6% 0.1927 27.7);
-    --on-error: oklch(100% 0 none);
-    --error-container: oklch(91.83% 0.0418 25.23);
-    --on-error-container: oklch(41.71% 0.1702 27.38);
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 0.25rem;
   }
 
-  .dark {
-    --background: oklch(18.89% 0.0062 236.9);
-    --on-background: oklch(91.29% 0.0042 271.4);
-    --surface: oklch(18.89% 0.0062 236.9);
-    --surface-dim: oklch(18.89% 0.0062 236.9);
-    --surface-bright: oklch(34.34% 0.0044 248);
-    --surface-container-lowest: oklch(16.55% 0.0053 219.8);
-    --surface-container-low: oklch(22.41% 0.006 236.8);
-    --surface-container: oklch(24.12% 0.0059 236.8);
-    --surface-container-high: oklch(28.38% 0.0047 248);
-    --surface-container-highest: oklch(32.68% 0.0055 236.7);
-    --on-surface: oklch(91.29% 0.0042 271.4);
-    --surface-variant: oklch(39.71% 0.0125 238.8);
-    --on-surface-variant: oklch(82.71% 0.0118 252.1);
-    --inverse-surface: oklch(91.29% 0.0042 271.4);
-    --inverse-on-surface: oklch(31.1% 0.0055 236.7);
-    --outline: oklch(65.4% 0.0125 252.1);
-    --outline-variant: oklch(39.71% 0.0125 238.8);
-    --shadow: oklch(0% 0 none);
-    --scrim: oklch(0% 0 none);
-    --surface-tint: oklch(82.31% 0.1035 235.4);
-    --primary: oklch(82.31% 0.1035 235.4);
-    --on-primary: oklch(30.6% 0.0635 233.4);
-    --primary-container: oklch(39.21% 0.0814 233.4);
-    --on-primary-container: oklch(91.11% 0.0486 238.8);
-    --inverse-primary: oklch(47.74% 0.0997 233.8);
-    --secondary: oklch(82.27% 0.1041 235.1);
-    --on-secondary: oklch(30.6% 0.0635 233.4);
-    --secondary-container: oklch(39.21% 0.0814 233.4);
-    --on-secondary-container: oklch(91.05% 0.0493 238.1);
-    --tertiary: oklch(83.43% 0.0926 295.4);
-    --on-tertiary: oklch(32.43% 0.1354 288.5);
-    --tertiary-container: oklch(40.9% 0.1321 290.4);
-    --on-tertiary-container: oklch(91.86% 0.0456 299.3);
-    --error: oklch(83.83% 0.0891 26.76);
-    --on-error: oklch(32.75% 0.1336 27.32);
-    --error-container: oklch(41.71% 0.1702 27.38);
-    --on-error-container: oklch(91.83% 0.0418 25.23);
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
   }
 }

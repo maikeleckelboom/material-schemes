@@ -2,19 +2,14 @@
 import { DynamicColorScheme } from "@chromavert/material";
 import PrintJSON from "~/components/PrintJSON.vue";
 
-const scheme = computed(() => new DynamicColorScheme("#54B6FF"));
+const sourceColor = ref<string>("#54B6FF");
+const dynamicScheme = computed(() => new DynamicColorScheme(sourceColor.value));
 
 useHead({
   style: [
     {
       textContent: computed(() =>
-        scheme.value.toCssText({
-          selector: ":root",
-          modifyColorScheme: (scheme) => ({
-            ...scheme,
-            fruitBanana: "#fff100",
-          }),
-        }),
+        dynamicScheme.value.toCssVars({ selector: ":root" }),
       ),
     },
   ],
@@ -22,9 +17,22 @@ useHead({
 </script>
 
 <template>
-  <div class="grid grid-cols-2">
-    <div class="size-24 m-4 bg-(--fruit-banana)"></div>
-    <PrintJSON :data="scheme.toJSON()" />
-    <PrintJSON :data="scheme.toCssVars()" />
+  <div class="grid grid-cols-[auto_1fr_1fr]">
+    <div>
+      <label for="sourceColor">Source Color</label>
+      <input
+        id="sourceColor"
+        v-model="sourceColor"
+        class="border p-2 rounded-sm"
+        type="color"
+      />
+    </div>
+    <PrintJSON :data="dynamicScheme.toColorScheme()" />
+    <pre>{{
+      dynamicScheme.toCssVars({
+        selector: ".dark",
+        minify: false,
+      })
+    }}</pre>
   </div>
 </template>

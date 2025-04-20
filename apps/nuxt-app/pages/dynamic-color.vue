@@ -8,8 +8,9 @@ import {
 } from "@chromavert/material";
 
 const sourceColor = Hct.fromInt(0xff6750a4);
+
 const paletteStyle = PaletteStyle.fromName("FruitSalad");
-const dynamicScheme = paletteStyle.dynamicScheme(sourceColor, false, 0.0);
+const dynamicScheme = paletteStyle.dynamicScheme(sourceColor);
 </script>
 
 <template>
@@ -23,9 +24,7 @@ const dynamicScheme = paletteStyle.dynamicScheme(sourceColor, false, 0.0);
       }"
       class="p-2 rounded-sm"
     >
-      <div>
-        {{ role }}
-      </div>
+      <div>{{ role }}</div>
     </div>
   </div>
 </template>

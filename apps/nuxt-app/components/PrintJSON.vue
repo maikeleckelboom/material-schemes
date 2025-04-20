@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import VueJsonPretty from 'vue-json-pretty';
-import 'vue-json-pretty/lib/styles.css';
-import type {JSONDataType,} from "vue-json-pretty/types/utils";
+import VueJsonPretty from "vue-json-pretty";
+import "vue-json-pretty/lib/styles.css";
+import type { JSONDataType } from "vue-json-pretty/types/utils";
 
 const {
   data,
@@ -10,22 +10,19 @@ const {
     deep: 2,
     showLength: true,
     collapsedOnClickBrackets: true,
-  }
+  },
 } = defineProps<{
-  data?: JSONDataType,
-  options?: ExtractPropTypes<typeof VueJsonPretty.props>
-}>()
+  data?: JSONDataType;
+  options?: ExtractPropTypes<typeof VueJsonPretty.props>;
+}>();
 
 const slots = defineSlots<{
-  default: () => VNode
+  default: () => VNode;
 }>();
 </script>
 
 <template>
-    <VueJsonPretty
-      :data="data"
-      :virtual="true"
-      v-bind="options">
-      <slot></slot>
-    </VueJsonPretty>
+  <VueJsonPretty :data="data" v-bind="options">
+    <slot></slot>
+  </VueJsonPretty>
 </template>
