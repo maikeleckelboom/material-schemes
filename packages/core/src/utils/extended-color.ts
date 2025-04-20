@@ -1,12 +1,12 @@
 import {harmonize} from "./blend.ts";
-import {MaterialDynamicScheme} from "../theme";
+import {DynamicColorScheme} from "../theme";
 import camelCase from "camelcase";
-import type {ExtendedColor, ExtendedColorGroup} from "../types";
+import type {ExtendedColor, ExtendedColorGroup, ExtendedColorScheme} from "../types";
 
 export function createExtendedColor<C extends ExtendedColor>(
   source: number,
   color: C
-): ExtendedColorGroup {
+): ExtendedColorGroup<C> {
   let value = color.value;
   const name = color.name;
   const blend = color.blend ?? false;
@@ -16,7 +16,7 @@ export function createExtendedColor<C extends ExtendedColor>(
     value = harmonize(source, value)
   }
 
-  const {primaryPalette: palette} = new MaterialDynamicScheme(source);
+  const {primaryPalette: palette} = new DynamicColorScheme(source);
   const nameKey = camelCase(name);
   const pascalName = camelCase(name, {pascalCase: true});
 
@@ -25,14 +25,14 @@ export function createExtendedColor<C extends ExtendedColor>(
     [`on${pascalName}`]: palette.tone(100),
     [`${nameKey}Container`]: palette.tone(90),
     [`on${pascalName}Container`]: palette.tone(10),
-  };
+  } as ExtendedColorScheme<C['name']>;
 
   const dark = {
     [nameKey]: palette.tone(80),
     [`on${pascalName}`]: palette.tone(20),
     [`${nameKey}Container`]: palette.tone(30),
     [`on${pascalName}Container`]: palette.tone(90),
-  };
+  } as ExtendedColorScheme<C['name']>;
 
   return {
     value,
@@ -41,7 +41,7 @@ export function createExtendedColor<C extends ExtendedColor>(
       value,
       description,
       blend,
-    },
+    } as Required<C>,
     palette,
     light,
     dark,

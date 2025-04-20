@@ -1,13 +1,14 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import type {ExtendedColor} from "../../src";
-import {createExtendedColor} from "../../src";
 
-// Mock dependencies
-vi.mock("../../src/utils/blend", () => ({
-  harmonize: vi.fn().mockReturnValue(0xff00ee)
-}));
+// Setup mocks
+vi.mock("../../src/utils/blend.ts", () => {
+  return {
+    harmonize: vi.fn().mockReturnValue(0xff00ee)
+  };
+});
 
 vi.mock("../../src/theme", () => {
+  // Define the mock tonal palette inside the mock function
   const mockTonalPalette = {
     tone: vi.fn((tone) => tone)
   };
@@ -26,7 +27,7 @@ vi.mock("../../src/theme", () => {
   };
 
   return {
-    MaterialDynamicScheme: vi.fn().mockImplementation((sourceColor) => ({
+    DynamicColorScheme: vi.fn().mockImplementation((sourceColor) => ({
       primaryPalette: getPaletteForName("primary"),
       secondaryPalette: getPaletteForName("secondary"),
       tertiaryPalette: getPaletteForName("tertiary"),
@@ -37,12 +38,17 @@ vi.mock("../../src/theme", () => {
   };
 });
 
+import type {ExtendedColor} from "../../src";
+// Now import the modules after mocking
+import {createExtendedColor} from "../../src";
+
+// Reset mocks before each test
+beforeEach(() => {
+  vi.clearAllMocks();
+});
+
 describe("createExtendedColor", () => {
   const sourceColor = 0x6200ee;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   it("should successfully create an extended color for 'test'", () => {
     const testColor: ExtendedColor = {

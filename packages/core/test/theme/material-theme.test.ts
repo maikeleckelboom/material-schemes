@@ -2,7 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {TonalPalette} from '@material/material-color-utilities';
 import {
   ContrastLevel,
-  MaterialDynamicScheme,
+  DynamicColorScheme,
   MaterialTheme,
   type MaterialThemeOptions,
   PaletteStyle,
@@ -23,7 +23,7 @@ describe('MaterialTheme', () => {
       style: 'TonalSpot',
     });
 
-    expect(theme.sourceColorArgb).toBe(BASE_OPTIONS.sourceColor);
+    expect(theme.source).toBe(BASE_OPTIONS.sourceColor);
     expect(theme.contrastLevel).toBe(0.5);
     expect(theme.style.name).toBe(PaletteStyle.TonalSpot.name);
     expect(theme.customColors).toHaveLength(0);
@@ -32,8 +32,8 @@ describe('MaterialTheme', () => {
   it('should create light and dark schemes', () => {
     const theme = new MaterialTheme(BASE_OPTIONS);
 
-    expect(theme.schemes.light).toBeInstanceOf(MaterialDynamicScheme);
-    expect(theme.schemes.dark).toBeInstanceOf(MaterialDynamicScheme);
+    expect(theme.schemes.light).toBeInstanceOf(DynamicColorScheme);
+    expect(theme.schemes.dark).toBeInstanceOf(DynamicColorScheme);
     expect(theme.schemes.light.isDark).toBe(false);
     expect(theme.schemes.dark.isDark).toBe(true);
   });

@@ -1,4 +1,4 @@
-import type {ModeledColorScheme, ColorScheme} from "./color-scheme-types.ts";
+import type {StructuredColorScheme, ColorScheme} from "./color-scheme-types.ts";
 
 /**
  * Defines the signature for a function used to modify a generated color scheme
@@ -13,13 +13,13 @@ import type {ModeledColorScheme, ColorScheme} from "./color-scheme-types.ts";
  * @param colorScheme The generated color scheme object (potentially including variants) to be modified.
  * @returns The modified color scheme object.
  *
- * @see ModeledColorScheme for the structure of the `scheme` parameter and default return type `R`.
+ * @see StructuredColorScheme for the structure of the `scheme` parameter and default return type `R`.
  * @see SharedColorSchemeConfig where this function type is typically used.
  */
 type ModifyColorSchemeFn<
   V extends boolean = false,
-  R = ModeledColorScheme<V> & Partial<ColorScheme>
-> = (colorScheme: ModeledColorScheme<V>) => R;
+  R = StructuredColorScheme<V> & Partial<ColorScheme>
+> = (colorScheme: StructuredColorScheme<V>) => R;
 
 /**
  * Configuration options specifically related to the generation and modification

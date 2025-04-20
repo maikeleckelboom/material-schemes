@@ -1,8 +1,10 @@
 export * from './theme'
 export * from './utils'
 export * from './constants'
-export * from './fn/create-dynamic-scheme'
-export * from './fn/create-material-theme'
+
+export {dynamicMaterialTheme} from './fn/dynamic-material-theme'
+export {dynamicColorScheme} from './fn/dynamic-color-scheme.ts'
+
 export type * from './types'
 
 

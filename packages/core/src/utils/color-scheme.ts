@@ -2,25 +2,25 @@ import type {CustomColorGroup, DynamicScheme, TonalPalette} from '@material/mate
 import type {
   ColorScheme,
   SharedColorSchemeConfig,
-  ModeledColorScheme,
+  StructuredColorScheme,
   SerializeCssVarsConfig,
   ColorSchemeConfig,
 } from '../types';
 import {createTonalPalette, formatColorToken, formatCssVarName, formatTokenName, toHex} from '../utils';
 import {MATERIAL_COLOR_ROLES} from "../constants/color-roles";
 import {DEFAULT_PALETTE_TONES} from "../constants/defaults";
-import {MaterialDynamicScheme, MaterialTheme} from "../theme";
+import {DynamicColorScheme, MaterialTheme} from "../theme";
 
 function createColorScheme<V extends boolean>(
   theme: MaterialTheme,
   options?: ColorSchemeConfig<V>,
-): ModeledColorScheme<V>;
+): StructuredColorScheme<V>;
 function createColorScheme<V extends boolean = false>(
-  dynamicScheme: DynamicScheme | MaterialDynamicScheme,
+  dynamicScheme: DynamicScheme | DynamicColorScheme,
   options?: SharedColorSchemeConfig<V>,
-): ModeledColorScheme<V>;
+): StructuredColorScheme<V>;
 function createColorScheme(
-  dynamicSchemeOrTheme: MaterialTheme | DynamicScheme | MaterialDynamicScheme,
+  dynamicSchemeOrTheme: MaterialTheme | DynamicScheme | DynamicColorScheme,
   options?: ColorSchemeConfig,
 ): ColorScheme {
   return 'schemes' in dynamicSchemeOrTheme

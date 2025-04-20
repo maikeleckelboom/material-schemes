@@ -3,23 +3,22 @@ import {
   type ColorSchemeConfig,
   type ColorSchemeStylesConfig,
   type ExtendedColor,
-  type ExtendedColorGroup,
   type MaterialThemeOptions,
-  type ModeledColorScheme,
+  type StructuredColorScheme,
 } from "../types";
-import {MaterialDynamicScheme} from "./material-dynamic-scheme.ts";
+import {DynamicColorScheme} from "./dynamic-color-scheme.ts";
 import {PaletteStyle} from "./palette-style.ts";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup, createExtendedColor} from "../utils";
-import {resolveThemeOptions} from "../fn/create-material-theme.ts";
+import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup} from "../utils";
+import {normalizeThemeOptions} from "../fn/internals.ts";
 
 export class MaterialTheme {
-  public readonly sourceColorArgb: number;
+  public readonly source: number;
   public readonly contrastLevel: number;
   public readonly style: PaletteStyle;
   public readonly schemes: Readonly<{
-    light: MaterialDynamicScheme;
-    dark: MaterialDynamicScheme;
+    light: DynamicColorScheme;
+    dark: DynamicColorScheme;
   }>;
   public readonly palettes: Readonly<{
     primary: TonalPalette;
@@ -38,14 +37,14 @@ export class MaterialTheme {
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
   ) {
-    const options = resolveThemeOptions(sourceOrOptions, optionsOrColors);
+    const options = normalizeThemeOptions(sourceOrOptions, optionsOrColors);
     const {extendedColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
-    const createScheme = (isDark: boolean) => new MaterialDynamicScheme({...config, style, isDark});
+    const createScheme = (isDark: boolean) => new DynamicColorScheme({...config, style, isDark});
     this.schemes = {
       light: createScheme(false),
       dark: createScheme(true),
     };
-    this.sourceColorArgb = this.schemes.light.sourceColorArgb;
+    this.source = this.schemes.light.sourceColorArgb;
     this.contrastLevel = this.schemes.light.contrastLevel;
     this.style = PaletteStyle.from(style);
     this.palettes = {
@@ -56,11 +55,10 @@ export class MaterialTheme {
       neutralVariant: this.schemes.light.neutralVariantPalette,
       error: this.schemes.light.errorPalette,
     };
-    // this.customColors = extendedColors.map(color => createExtendedColor(this.sourceColorArgb, color));
-    this.customColors = extendedColors.map(color => createCustomColorGroup(this.sourceColorArgb, color));
+    this.customColors = extendedColors.map(color => createCustomColorGroup(this.source, color));
   }
 
-  public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): ModeledColorScheme<V> {
+  public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): StructuredColorScheme<V> {
     return createColorScheme(this, options);
   }
 

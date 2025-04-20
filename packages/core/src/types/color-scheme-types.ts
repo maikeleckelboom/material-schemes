@@ -69,7 +69,7 @@ type SuffixedColorScheme<Suffix extends string> = {
  * @see LightColorScheme for the light variant structure.
  * @see DarkColorScheme for the dark variant structure.
  */
-export type ModeledColorScheme<V extends boolean = false> =
+export type StructuredColorScheme<V extends boolean = false> =
   V extends true
     ? ColorScheme & SuffixedColorScheme<"Light"> & SuffixedColorScheme<"Dark">
     : ColorScheme

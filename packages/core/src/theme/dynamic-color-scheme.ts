@@ -2,7 +2,7 @@ import {DynamicScheme, type TonalPalette} from "@material/material-color-utiliti
 import {
   type Color,
   type SharedColorSchemeConfig,
-  type ModeledColorScheme,
+  type StructuredColorScheme,
   type ColorSchemeStylesConfig,
   ContrastLevel,
   createColorScheme,
@@ -18,7 +18,7 @@ import {
  * A customizable dynamic color scheme generator that extends Material Design's DynamicScheme.
  * @extends DynamicScheme
  */
-export class MaterialDynamicScheme extends DynamicScheme {
+export class DynamicColorScheme extends DynamicScheme {
   constructor(sourceColor: Color, options?: Omit<DynamicSchemeOptions, 'sourceColor'>);
   constructor(options: DynamicSchemeOptions);
   constructor(source: Color | DynamicSchemeOptions, options?: Omit<DynamicSchemeOptions, 'sourceColor'>) {
@@ -40,11 +40,11 @@ export class MaterialDynamicScheme extends DynamicScheme {
 
     super({
       ...scheme,
-      primaryPalette: MaterialDynamicScheme.createPaletteOverride(primary, scheme.primaryPalette),
-      secondaryPalette: MaterialDynamicScheme.createPaletteOverride(secondary, scheme.secondaryPalette),
-      tertiaryPalette: MaterialDynamicScheme.createPaletteOverride(tertiary, scheme.tertiaryPalette),
-      neutralPalette: MaterialDynamicScheme.createPaletteOverride(neutral, scheme.neutralPalette),
-      neutralVariantPalette: MaterialDynamicScheme.createPaletteOverride(neutralVariant, scheme.neutralVariantPalette),
+      primaryPalette: DynamicColorScheme.createPaletteOverride(primary, scheme.primaryPalette),
+      secondaryPalette: DynamicColorScheme.createPaletteOverride(secondary, scheme.secondaryPalette),
+      tertiaryPalette: DynamicColorScheme.createPaletteOverride(tertiary, scheme.tertiaryPalette),
+      neutralPalette: DynamicColorScheme.createPaletteOverride(neutral, scheme.neutralPalette),
+      neutralVariantPalette: DynamicColorScheme.createPaletteOverride(neutralVariant, scheme.neutralVariantPalette),
     });
   }
 
@@ -56,7 +56,7 @@ export class MaterialDynamicScheme extends DynamicScheme {
     return color ? createTonalPalette(color) : defaultPalette;
   }
 
-  public toColorScheme<V extends boolean = false>(options?: SharedColorSchemeConfig<V>): ModeledColorScheme {
+  public toColorScheme<V extends boolean = false>(options?: SharedColorSchemeConfig<V>): StructuredColorScheme {
     return createColorScheme(this, options);
   }
 

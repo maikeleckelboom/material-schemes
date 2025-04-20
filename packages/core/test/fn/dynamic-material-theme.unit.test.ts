@@ -1,11 +1,11 @@
-import {describe, expect, it} from 'vitest';
+import {describe, expect, vi, it} from 'vitest';
 import type {ExtendedColor} from '../../src';
-import {createMaterialTheme, MaterialTheme, PaletteStyle, toArgb} from '../../src';
+import {dynamicMaterialTheme, MaterialTheme, PaletteStyle, toArgb} from '../../src';
 
-describe('createMaterialTheme', () => {
+describe('dynamicMaterialTheme', () => {
   it('should create a theme with just a source color', () => {
     const sourceColor = '#6750A4';
-    const theme = createMaterialTheme(sourceColor);
+    const theme = dynamicMaterialTheme(sourceColor);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
     expect(theme.style).toEqual(PaletteStyle.TonalSpot);
@@ -19,7 +19,7 @@ describe('createMaterialTheme', () => {
       style: 'Vibrant',
       contrastLevel: 0.5,
     } as const;
-    const theme = createMaterialTheme(sourceColor, options);
+    const theme = dynamicMaterialTheme(sourceColor, options);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
     expect(theme.style).toEqual(PaletteStyle.Vibrant);
@@ -36,7 +36,7 @@ describe('createMaterialTheme', () => {
         description: 'Custom red color'
       }
     ];
-    const theme = createMaterialTheme(sourceColor, extendedColors);
+    const theme = dynamicMaterialTheme(sourceColor, extendedColors);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
     expect(theme.customColors).toHaveLength(1);
@@ -44,7 +44,7 @@ describe('createMaterialTheme', () => {
   });
 
   it('should create a theme with a MaterialThemeOptions object', () => {
-    const theme = createMaterialTheme({
+    const theme = dynamicMaterialTheme({
       sourceColor: '#6750A4',
       style: 'Expressive',
       contrastLevel: 0.2,
@@ -69,11 +69,11 @@ describe('createMaterialTheme', () => {
 
   it('should respect hexadecimal number format for source color', () => {
     const sourceColor = 0xFF6750A4; // Hexadecimal number representation
-    const theme = createMaterialTheme(sourceColor);
+    const theme = dynamicMaterialTheme(sourceColor);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
-    // The sourceColorArgb property should contain the same value
-    expect(theme.sourceColorArgb).toEqual(toArgb(sourceColor));
+    // The source property should contain the same value
+    expect(theme.source).toEqual(toArgb(sourceColor));
   });
 
   it('should handle different palette configurations', () => {
@@ -85,7 +85,7 @@ describe('createMaterialTheme', () => {
       neutral: '#CCCCCC',
       neutralVariant: '#999999'
     };
-    const theme = createMaterialTheme(options);
+    const theme = dynamicMaterialTheme(options);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
     // Verify that palettes are properly set

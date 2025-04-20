@@ -1,10 +1,10 @@
 import {beforeAll, describe, expect, it} from "vitest";
-import {createColorScheme, MaterialDynamicScheme} from "../../src";
+import {createColorScheme, DynamicColorScheme} from "../../src";
 
-let dynamicScheme: MaterialDynamicScheme
+let dynamicScheme: DynamicColorScheme
 
 beforeAll(() => {
-  dynamicScheme = new MaterialDynamicScheme(0xFF6200EE);
+  dynamicScheme = new DynamicColorScheme(0xFF6200EE);
 })
 
 describe('Exposed Utilities', () => {

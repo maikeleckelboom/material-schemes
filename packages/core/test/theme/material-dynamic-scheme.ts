@@ -1,11 +1,11 @@
-import {ContrastLevel, MaterialDynamicScheme, PaletteStyle, toArgb} from "../../src";
+import {ContrastLevel, DynamicColorScheme, PaletteStyle, toArgb} from "../../src";
 import {describe, expect, it, test} from "vitest";
 
-describe('MaterialDynamicScheme', () => {
+describe('DynamicColorScheme', () => {
 
   it('should have the same palettes in light and dark', () => {
-    const lightScheme = new MaterialDynamicScheme(0xFF6200EE);
-    const darkScheme = new MaterialDynamicScheme(0xFF6200EE, {isDark: true});
+    const lightScheme = new DynamicColorScheme(0xFF6200EE);
+    const darkScheme = new DynamicColorScheme(0xFF6200EE, {isDark: true});
     expect(lightScheme.primaryPalette).toEqual(darkScheme.primaryPalette);
     expect(lightScheme.secondaryPalette).toEqual(darkScheme.secondaryPalette);
     expect(lightScheme.tertiaryPalette).toEqual(darkScheme.tertiaryPalette);
@@ -16,7 +16,7 @@ describe('MaterialDynamicScheme', () => {
 
   it('should initialize with default parameters when only sourceColor is provided', () => {
     const sourceColor = 0xFF6200EE;
-    const scheme = new MaterialDynamicScheme({sourceColor});
+    const scheme = new DynamicColorScheme({sourceColor});
 
     expect(scheme.sourceColorArgb).toBe(sourceColor);
     expect(scheme.isDark).toBe(false);
@@ -25,7 +25,7 @@ describe('MaterialDynamicScheme', () => {
   });
 
   test('should accept PaletteStyle name from style option', () => {
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       style: PaletteStyle.Fidelity,
     });
@@ -33,7 +33,7 @@ describe('MaterialDynamicScheme', () => {
   });
 
   test('should set isDark to true when provided', () => {
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       isDark: true
     });
@@ -42,7 +42,7 @@ describe('MaterialDynamicScheme', () => {
 
   test('should use provided contrastLevel', () => {
     const contrastLevel = 0.7;
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       contrastLevel
     });
@@ -50,7 +50,7 @@ describe('MaterialDynamicScheme', () => {
   });
 
   test('should default contrastLevel to ContrastLevel.Default.value', () => {
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000
     });
     expect(scheme.contrastLevel).toBe(ContrastLevel.Default.value);
@@ -58,7 +58,7 @@ describe('MaterialDynamicScheme', () => {
 
 
   it('should accept sourceColor and options separately', () => {
-    const scheme = new MaterialDynamicScheme(0xFF0000, {
+    const scheme = new DynamicColorScheme(0xFF0000, {
       primary: 0xFF00FF,
       secondary: 0xFFFF00,
       tertiary: 0x00FFFF,
@@ -70,7 +70,7 @@ describe('MaterialDynamicScheme', () => {
   })
 
   it('should accept options object', () => {
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       primary: 0xFF00FF,
       secondary: 0xFFFF00,
@@ -82,7 +82,7 @@ describe('MaterialDynamicScheme', () => {
   })
 
   it('should return a ColorScheme object with correct properties', () => {
-    const scheme = new MaterialDynamicScheme({
+    const scheme = new DynamicColorScheme({
       sourceColor: 0xFF0000,
       primary: 0xFF00FF,
       secondary: 0xFFFF00,
@@ -99,7 +99,7 @@ describe('MaterialDynamicScheme', () => {
     expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
   });
   describe('createCssVarsText', () => {
-    const dynamicScheme = new MaterialDynamicScheme(
+    const dynamicScheme = new DynamicColorScheme(
       0xFF6200EE,
       {
         primary: 0xFFBB86FC,
