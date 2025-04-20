@@ -9,22 +9,8 @@ export function createMaterialTheme(
 export function createMaterialTheme(options: MaterialThemeOptions): MaterialTheme;
 export function createMaterialTheme(
   sourceOrOptions: Color | MaterialThemeOptions,
-  optionsOrCustomColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+  optionsOrExtendedColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
 ): MaterialTheme {
-  const options = (() => {
-    if (isColor(sourceOrOptions)) {
-      if (Array.isArray(optionsOrCustomColors)) {
-        return {
-          sourceColor: sourceOrOptions,
-          customColors: optionsOrCustomColors
-        };
-      }
-      return {
-        sourceColor: sourceOrOptions,
-        ...optionsOrCustomColors
-      };
-    }
-    return sourceOrOptions;
-  })();
-  return new MaterialTheme(options);
+  // @ts-ignore let the class constructor handle the overloads
+  return new MaterialTheme(sourceOrOptions, optionsOrExtendedColors);
 }

@@ -1,15 +1,15 @@
 import type {
-  AdaptiveColorScheme,
+  ColorSchemeReturnType,
   Color,
   ColorSchemeStylesConfig,
   ExtendedColor,
-  FullColorSchemeConfig,
+  ThemeColorSchemeConfig,
   MaterialThemeOptions,
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
 import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createColorScheme, createCustomColorGroup, cssVarMapToText, formatCustomColor, isColor} from "../utils";
+import {createColorScheme, createCustomColorGroup, colorSchemeToCssVars, formatCustomColor, isColor} from "../utils";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
@@ -27,31 +27,31 @@ export class MaterialTheme {
     neutralVariant: TonalPalette;
     error: TonalPalette;
   }>;
-  public readonly customColors: CustomColorGroup[];
+  public readonly extendedColors: CustomColorGroup[];
 
-  constructor(sourceColor: Color, customColors?: ExtendedColor[]);
+  constructor(sourceColor: Color, extendedColors?: ExtendedColor[]);
   constructor(sourceColor: Color, options?: Omit<MaterialThemeOptions, 'sourceColor'>);
   constructor(options: MaterialThemeOptions);
   constructor(
     sourceOrOptions: Color | MaterialThemeOptions,
-    optionsOrStaticColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
+    optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
   ) {
     const options = (() => {
       if (isColor(sourceOrOptions)) {
-        if (Array.isArray(optionsOrStaticColors)) {
+        if (Array.isArray(optionsOrColors)) {
           return {
             sourceColor: sourceOrOptions,
-            customColors: optionsOrStaticColors
+            extendedColors: optionsOrColors
           };
         }
         return {
           sourceColor: sourceOrOptions,
-          ...optionsOrStaticColors
+          ...optionsOrColors
         };
       }
       return sourceOrOptions;
     })();
-    const {customColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
+    const {extendedColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
     const createScheme = (isDark: boolean) => new DynamicColorScheme({...config, style, isDark});
     this.schemes = {
       light: createScheme(false),
@@ -68,32 +68,18 @@ export class MaterialTheme {
       neutralVariant: this.schemes.light.neutralVariantPalette,
       error: this.schemes.light.errorPalette,
     };
-    this.customColors = customColors.map(customColor =>
-      createCustomColorGroup(this.sourceColorArgb, customColor)
+    this.extendedColors = extendedColors.map(color =>
+      createCustomColorGroup(this.sourceColorArgb, color)
     );
   }
 
-  public toJSON() {
-    return {
-      sourceColor: this.sourceColorArgb,
-      contrastLevel: this.contrastLevel,
-      style: this.style.name,
-      schemes: {
-        light: this.schemes.light.toJSON(),
-        dark: this.schemes.dark.toJSON(),
-      },
-      palettes: this.palettes,
-      customColors: this.customColors.map(formatCustomColor),
-    }
-  }
-
-  public toColorScheme<V extends boolean>(options?: FullColorSchemeConfig<V>): AdaptiveColorScheme<V> {
+  public toColorScheme<V extends boolean>(options?: ThemeColorSchemeConfig<V>): ColorSchemeReturnType<V> {
     return createColorScheme(this, options);
   }
 
   public toCssVars<V extends boolean = false>(options?: ColorSchemeStylesConfig<V>): string {
     const {selector, minify, ...opts} = options || {};
     const colorScheme = this.toColorScheme<V>(opts);
-    return cssVarMapToText(colorScheme, {selector, minify});
+    return colorSchemeToCssVars(colorScheme, {selector, minify});
   }
 }

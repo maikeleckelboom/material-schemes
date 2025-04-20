@@ -91,7 +91,7 @@ describe('DynamicScheme', () => {
       neutralVariant: 0x000000,
     });
 
-    const colorScheme = scheme.toJSON();
+    const colorScheme = scheme.toColorScheme();
     expect(colorScheme).toHaveProperty('primaryPaletteKeyColor');
     expect(colorScheme).toHaveProperty('secondaryPaletteKeyColor');
     expect(colorScheme).toHaveProperty('tertiaryPaletteKeyColor');

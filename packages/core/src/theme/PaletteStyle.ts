@@ -11,31 +11,7 @@ import {
   SchemeVibrant
 } from "@material/material-color-utilities";
 import {ContrastLevel} from "./ContrastLevel.ts";
-
-const PALETTE_STYLE_NAMES = [
-  "Monochrome",
-  "Neutral",
-  "TonalSpot",
-  "Vibrant",
-  "Expressive",
-  "Fidelity",
-  "Content",
-  "Rainbow",
-  "FruitSalad",
-] as const;
-
-export type PaletteStyleName = typeof PALETTE_STYLE_NAMES[number];
-
-export type SchemeVariant =
-  | SchemeContent
-  | SchemeExpressive
-  | SchemeFidelity
-  | SchemeFruitSalad
-  | SchemeMonochrome
-  | SchemeNeutral
-  | SchemeRainbow
-  | SchemeTonalSpot
-  | SchemeVibrant;
+import type {PaletteStyleName, SchemeVariant} from "../types";
 
 type SchemeConstructor = new (
   sourceColor: Hct,
@@ -169,7 +145,7 @@ export class PaletteStyle {
    * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
    * PaletteStyle.fromName(PaletteStyle.Neutral) // Returns Neutral
    */
-  static fromName(name: PaletteStyle | PaletteStyleName | string): PaletteStyle {
+  static fromName(name: PaletteStyle | PaletteStyleName): PaletteStyle {
     if (name instanceof PaletteStyle) return name;
     const style = PaletteStyle.values.find(s => s.name.toLowerCase() === name.toLowerCase());
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)

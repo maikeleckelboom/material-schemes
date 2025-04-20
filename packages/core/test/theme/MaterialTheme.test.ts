@@ -6,7 +6,7 @@ import {
   DynamicColorScheme,
   MaterialTheme,
   type MaterialThemeOptions,
-  PaletteStyle
+  PaletteStyle, toArgb
 } from "../../src";
 
 describe('MaterialTheme', () => {
@@ -26,7 +26,7 @@ describe('MaterialTheme', () => {
     expect(theme.sourceColorArgb).toBe(BASE_OPTIONS.sourceColor);
     expect(theme.contrastLevel).toBe(0.5);
     expect(theme.style.name).toBe(PaletteStyle.TonalSpot.name);
-    expect(theme.customColors).toHaveLength(0);
+    expect(theme.extendedColors).toHaveLength(0);
   });
 
   it('should create light and dark schemes', () => {
@@ -52,7 +52,7 @@ describe('MaterialTheme', () => {
   it('should handle custom colors', () => {
     const theme = new MaterialTheme({
       ...BASE_OPTIONS,
-      customColors: [
+      extendedColors: [
         {
           name: 'brand',
           value: 0x00ff00ff,
@@ -61,9 +61,9 @@ describe('MaterialTheme', () => {
       ]
     });
 
-    expect(theme.customColors).toHaveLength(1);
-    expect(theme.customColors[0]?.color.name).toBe('brand');
-    expect(theme.customColors[0]?.color.value).toBe(0x00ff00ff);
+    expect(theme.extendedColors).toHaveLength(1);
+    expect(theme.extendedColors[0]?.color.name).toBe('brand');
+    expect(theme.extendedColors[0]?.color.value).toBe(0x00ff00ff);
   });
 
 
@@ -80,8 +80,8 @@ describe('MaterialTheme', () => {
 
   it('should handle createColorScheme', () => {
     const theme = new MaterialTheme(BASE_OPTIONS);
-    const lightScheme = theme.schemes.light.toJSON();
-    const darkScheme = theme.schemes.dark.toJSON();
+    const lightScheme = theme.schemes.light.toColorScheme();
+    const darkScheme = theme.schemes.dark.toColorScheme();
 
     expect(lightScheme?.primaryPaletteKeyColor).toEqual(darkScheme?.primaryPaletteKeyColor);
     expect(lightScheme?.secondaryPaletteKeyColor).toEqual(darkScheme?.secondaryPaletteKeyColor);
@@ -98,7 +98,7 @@ describe('MaterialTheme', () => {
   it('should serialize to JSON with custom colors', () => {
     const theme = new MaterialTheme({
       ...BASE_OPTIONS,
-      customColors: [
+      extendedColors: [
         {name: 'brand', value: 0x00ff00ff},
         {name: 'quaternary', value: 0xffffffff}
       ]
@@ -136,36 +136,8 @@ describe('MaterialTheme', () => {
       });
     };
 
-
-    theme.customColors.forEach(color => {
+    theme.extendedColors.forEach(color => {
       assertColorProperties(color.color.name);
     });
   });
-
-  it('should serialize to JSON with palettes', () => {
-    const theme = new MaterialTheme({
-      ...BASE_OPTIONS,
-      customColors: [
-        {
-          name: 'brand-blended',
-          value: 0x00ff00ff,
-          blend: true,
-        },
-        {
-          name: 'brand-unblended',
-          value: 0x00ff00ff,
-        },
-      ]
-    });
-
-    const themeJSON = theme.toJSON();
-
-    expect(themeJSON.sourceColor).toBe(BASE_OPTIONS.sourceColor);
-    expect(themeJSON.contrastLevel).toBe(0.5);
-    expect(themeJSON.style).toBeOneOf([PaletteStyle.TonalSpot, 'TonalSpot']);
-    expect(themeJSON.schemes.light.primaryPaletteKeyColor).toBeDefined();
-    expect(themeJSON.schemes.dark.primaryPaletteKeyColor).toBeDefined();
-  });
-
-
 });

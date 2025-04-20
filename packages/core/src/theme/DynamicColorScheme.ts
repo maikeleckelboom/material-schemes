@@ -1,24 +1,21 @@
 import {DynamicScheme, type TonalPalette} from "@material/material-color-utilities";
 import {
-  type AdaptiveColorScheme,
   type Color,
   type ColorSchemeConfig,
+  type ColorSchemeReturnType,
   type ColorSchemeStylesConfig,
   ContrastLevel,
   createColorScheme,
   createTonalPalette,
-  cssVarMapToText,
+  colorSchemeToCssVars,
   type DynamicColorSchemeOptions,
   isColor,
-  MATERIAL_COLOR_ROLES,
-  type MaterialColorScheme,
   PaletteStyle,
   toHct,
 } from "../";
 
 /**
  * A customizable dynamic color scheme generator that extends Material Design's DynamicScheme.
- * It accepts either a source color (with an optional primary override) or a complete configuration object.
  * @extends DynamicScheme
  */
 export class DynamicColorScheme extends DynamicScheme {
@@ -59,20 +56,13 @@ export class DynamicColorScheme extends DynamicScheme {
     return color ? createTonalPalette(color) : defaultPalette;
   }
 
-  public toJSON(): MaterialColorScheme {
-    return MATERIAL_COLOR_ROLES.reduce((acc, role) => {
-      acc[role] = this[role];
-      return acc;
-    }, {} as MaterialColorScheme);
-  }
-
-  public toColorScheme<V extends boolean = false>(options?: ColorSchemeConfig<V>): AdaptiveColorScheme {
+  public toColorScheme<V extends boolean = false>(options?: ColorSchemeConfig<V>): ColorSchemeReturnType {
     return createColorScheme(this, options);
   }
 
-  public toCssVars(options?: ColorSchemeStylesConfig): string {
-    const {selector, ...opts} = options || {};
+  public toCssVars(options?: ColorSchemeStylesConfig<false, false>): string {
+    const {selector, minify, ...opts} = options || {};
     const colorScheme = this.toColorScheme(opts);
-    return cssVarMapToText(colorScheme, {selector});
+    return colorSchemeToCssVars(colorScheme, {selector, minify});
   }
 }

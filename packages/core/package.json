@@ -40,7 +40,8 @@
     "test": "vitest",
     "test:browser": "vitest --browser",
     "dev": "vitest --watch",
-    "build": "tsup"
+    "build": "tsup",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/bun": "latest",
