@@ -24,7 +24,7 @@ export class ContrastThreshold {
   public static readonly WCAG_AAA_LARGE_TEXT = new ContrastThreshold("WCAG_AAA_LARGE_TEXT", 4.5);
 
   /** All available contrast thresholds in recommended evaluation order */
-  public static readonly values: readonly ContrastThreshold[] = [
+  public static readonly Values: readonly ContrastThreshold[] = [
     ContrastThreshold.WCAG_AA_NORMAL_TEXT,
     ContrastThreshold.WCAG_AA_LARGE_TEXT,
     ContrastThreshold.WCAG_AAA_NORMAL_TEXT,
@@ -39,7 +39,7 @@ export class ContrastThreshold {
    * @throws {Error} For invalid/unrecognized threshold names
    */
   static fromName(name: string): ContrastThreshold {
-    const threshold = ContrastThreshold.values.find(t => t.name === name);
+    const threshold = ContrastThreshold.Values.find(t => t.name === name);
     if (!threshold) {
       throw new Error(`Invalid ContrastThreshold: ${name}`);
     }
@@ -59,7 +59,7 @@ export class ContrastThreshold {
    * ContrastThreshold.findClosest(4.6) // Returns WCAG_AAA_LARGE_TEXT
    */
   static findClosest(targetValue: number): ContrastThreshold {
-    const thresholds = this.values;
+    const thresholds = this.Values;
     let currentMax = -Infinity;
     let currentCandidate: ContrastThreshold | null = null;
 

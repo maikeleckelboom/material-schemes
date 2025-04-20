@@ -1,6 +1,5 @@
 import type {Color, ExtendedColor, MaterialThemeOptions} from "../types";
 import {MaterialTheme} from "../theme";
-import {isColor} from "../utils";
 
 export function createMaterialTheme(
   sourceColor: Color,

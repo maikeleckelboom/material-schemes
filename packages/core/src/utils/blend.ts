@@ -18,13 +18,13 @@ export function harmonize(designColor: Color, sourceColor: Color): number {
 }
 
 /**
- * Blends hue fromName one color into another. The chroma and tone of
+ * Blends hue from one color into another. The chroma and tone of
  * the original color are maintained.
  *
  * @param from ARGB or HEX representation of color
  * @param to ARGB or HEX representation of color
  * @param amount how much blending to perform; 0.0 >= and <= 1.0
- * @return fromName, with a hue blended towards to. Chroma and tone
+ * @return from, with a hue blended towards to. Chroma and tone
  * are constant.
  */
 export function blendHue(from: Color, to: Color, amount: number): number {
@@ -38,7 +38,7 @@ export function blendHue(from: Color, to: Color, amount: number): number {
  * @param from ARGB or HEX representation of color
  * @param to ARGB or HEX representation of color
  * @param amount how much blending to perform; 0.0 >= and <= 1.0
- * @return fromName, blended towards to. Hue, chroma, and tone will
+ * @return from, blended towards to. Hue, chroma, and tone will
  * change.
  */
 export function blendCam(from: Color, to: Color, amount: number): number {

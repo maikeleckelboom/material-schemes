@@ -1,5 +1,5 @@
 import {QuantizerCelebi} from '@material/material-color-utilities';
-import {DEFAULT_QUANTIZE_MAX_COLORS} from '../constants';
+import {DEFAULT_QUANTIZE_MAX_COLORS} from "../constants/defaults.ts";
 
 /**
  * Quantize an image into a set of colors.
@@ -7,7 +7,7 @@ import {DEFAULT_QUANTIZE_MAX_COLORS} from '../constants';
  * @param pixelArray Colors in ARGB format.
  * @param maxColors The number of colors to divide the image into.
  * A lower number of colors may be returned.
- * @return Map with keys of colors in ARGB format, and values of number of
+ * @return Map with keys of colors in ARGB format, and Values of number of
  *     pixels in the original image that correspond to the color in the
  *     quantized image.
  */

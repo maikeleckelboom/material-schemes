@@ -1,2 +1,6 @@
-export type * from './color-scheme'
-export type * from './theme'
+export type * from './color-scheme-config'
+export type * from './color-scheme-types'
+export type * from './color-scheme-variants'
+export type * from './theme-options.ts'
+export type * from './palette-style.ts'
+export type * from './color.ts'

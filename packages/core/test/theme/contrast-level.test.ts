@@ -22,7 +22,7 @@ describe('ContrastLevel', () => {
       });
     });
 
-    it('should return "Reduced" for values just below zero', () => {
+    it('should return "Reduced" for Values just below zero', () => {
       const result = ContrastLevel.findClosest(-0.1);
       expect(result).toBe(ContrastLevel.Reduced);
     });
@@ -32,7 +32,7 @@ describe('ContrastLevel', () => {
       expect(result).toBe(ContrastLevel.Default);
     });
 
-    it('should return "High" for values beyond the highest threshold', () => {
+    it('should return "High" for Values beyond the highest threshold', () => {
       const result = ContrastLevel.findClosest(1.5);
       expect(result).toBe(ContrastLevel.High);
     });
@@ -44,7 +44,7 @@ describe('ContrastLevel', () => {
       expect(ContrastLevel.findClosest(1).name).toBe('High');
     });
 
-    it('should correctly classify values between defined levels', () => {
+    it('should correctly classify Values between defined levels', () => {
       expect(ContrastLevel.findClosest(0.15).name).toBe('Default');
       expect(ContrastLevel.findClosest(0.3).name).toBe('Default');
       expect(ContrastLevel.findClosest(0.8).name).toBe('Medium');

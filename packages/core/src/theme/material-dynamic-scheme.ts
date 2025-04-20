@@ -1,14 +1,14 @@
 import {DynamicScheme, type TonalPalette} from "@material/material-color-utilities";
 import {
   type Color,
-  type ColorSchemeConfig,
+  type SharedColorSchemeConfig,
   type ColorSchemeReturnType,
   type ColorSchemeStylesConfig,
   ContrastLevel,
   createColorScheme,
   createTonalPalette,
   colorSchemeToCssVars,
-  type DynamicColorSchemeOptions,
+  type MaterialDynamicSchemeOptions,
   isColor,
   PaletteStyle,
   toHct,
@@ -18,11 +18,11 @@ import {
  * A customizable dynamic color scheme generator that extends Material Design's DynamicScheme.
  * @extends DynamicScheme
  */
-export class DynamicColorScheme extends DynamicScheme {
-  constructor(sourceColor: Color, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>);
-  constructor(options: DynamicColorSchemeOptions);
-  constructor(source: Color | DynamicColorSchemeOptions, options?: Omit<DynamicColorSchemeOptions, 'sourceColor'>) {
-    const opts: DynamicColorSchemeOptions = isColor(source) ? {sourceColor: source, ...options} : source;
+export class MaterialDynamicScheme extends DynamicScheme {
+  constructor(sourceColor: Color, options?: Omit<MaterialDynamicSchemeOptions, 'sourceColor'>);
+  constructor(options: MaterialDynamicSchemeOptions);
+  constructor(source: Color | MaterialDynamicSchemeOptions, options?: Omit<MaterialDynamicSchemeOptions, 'sourceColor'>) {
+    const opts: MaterialDynamicSchemeOptions = isColor(source) ? {sourceColor: source, ...options} : source;
 
     const {
       primary,
@@ -36,15 +36,15 @@ export class DynamicColorScheme extends DynamicScheme {
     } = opts;
 
     const sourceColor = toHct(opts?.sourceColor ?? primary ?? 0);
-    const scheme = PaletteStyle.fromName(style).dynamicScheme(sourceColor, isDark, contrastLevel);
+    const scheme = PaletteStyle.from(style).dynamicScheme(sourceColor, isDark, contrastLevel);
 
     super({
       ...scheme,
-      primaryPalette: DynamicColorScheme.createPaletteOverride(primary, scheme.primaryPalette),
-      secondaryPalette: DynamicColorScheme.createPaletteOverride(secondary, scheme.secondaryPalette),
-      tertiaryPalette: DynamicColorScheme.createPaletteOverride(tertiary, scheme.tertiaryPalette),
-      neutralPalette: DynamicColorScheme.createPaletteOverride(neutral, scheme.neutralPalette),
-      neutralVariantPalette: DynamicColorScheme.createPaletteOverride(neutralVariant, scheme.neutralVariantPalette),
+      primaryPalette: MaterialDynamicScheme.createPaletteOverride(primary, scheme.primaryPalette),
+      secondaryPalette: MaterialDynamicScheme.createPaletteOverride(secondary, scheme.secondaryPalette),
+      tertiaryPalette: MaterialDynamicScheme.createPaletteOverride(tertiary, scheme.tertiaryPalette),
+      neutralPalette: MaterialDynamicScheme.createPaletteOverride(neutral, scheme.neutralPalette),
+      neutralVariantPalette: MaterialDynamicScheme.createPaletteOverride(neutralVariant, scheme.neutralVariantPalette),
     });
   }
 
@@ -56,7 +56,7 @@ export class DynamicColorScheme extends DynamicScheme {
     return color ? createTonalPalette(color) : defaultPalette;
   }
 
-  public toColorScheme<V extends boolean = false>(options?: ColorSchemeConfig<V>): ColorSchemeReturnType {
+  public toColorScheme<V extends boolean = false>(options?: SharedColorSchemeConfig<V>): ColorSchemeReturnType {
     return createColorScheme(this, options);
   }
 

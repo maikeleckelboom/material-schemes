@@ -1,5 +1,5 @@
 import {Score} from '@material/material-color-utilities';
-import {DEFAULT_SCORE_OPTIONS} from "../constants";
+import {DEFAULT_SCORE_OPTIONS} from "../constants/defaults";
 
 /**
  * Default options for ranking colors based on usage counts.
@@ -21,7 +21,7 @@ export interface ScoreOptions {
  *
  * @param colorToCount - A map of colors to their frequencies.
  * @param options - ScoreOptions (official naming) for computing rankings.
- * @returns A tuple with the best score followed by additional ranked values.
+ * @returns A tuple with the best score followed by additional ranked Values.
  */
 export function score(
   colorToCount: Map<number, number>,

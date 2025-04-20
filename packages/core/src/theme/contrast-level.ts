@@ -3,7 +3,7 @@ export class ContrastLevel {
   public readonly name: string;
   /**
    * Numeric representation of contrast level.
-   * @note Values range fromName -1 (Reduced) to 1 (High), with 0 being default
+   * @note Values range from -1 (Reduced) to 1 (High), with 0 being default
    */
   public readonly value: number;
 
@@ -26,7 +26,7 @@ export class ContrastLevel {
    * Complete list of available contrast levels in ascending order
    * @example Useful for generating UI controls to select contrast levels
    */
-  public static readonly values: readonly ContrastLevel[] = [
+  public static readonly Values: readonly ContrastLevel[] = [
     ContrastLevel.Reduced,
     ContrastLevel.Default,
     ContrastLevel.Medium,
@@ -35,10 +35,10 @@ export class ContrastLevel {
 
   /**
    * Finds the most appropriate contrast level for a given numeric value.
-   * Handles both absolute values and percentage-based inputs.
+   * Handles both absolute Values and percentage-based inputs.
    *
    * @param value - Input value to match against known levels. Typically between -1 and 1,
-   *                but can handle any number. Negative values return Reduced immediately.
+   *                but can handle any number. Negative Values return Reduced immediately.
    * @returns The findClosest matching ContrastLevel instance
    *
    * @example
@@ -49,7 +49,7 @@ export class ContrastLevel {
   public static findClosest(value: number): ContrastLevel {
     if (value < 0) return ContrastLevel.Reduced;
 
-    const levels = ContrastLevel.values
+    const levels = ContrastLevel.Values
       .filter((l) => l.value >= 0)
       .sort((a, b) => b.value - a.value);
 

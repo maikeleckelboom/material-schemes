@@ -10,14 +10,14 @@ import {
   SchemeTonalSpot,
   SchemeVibrant
 } from "@material/material-color-utilities";
-import {ContrastLevel} from "./ContrastLevel.ts";
-import type {PaletteStyleName, SchemeVariant} from "../types";
+import {ContrastLevel} from "./contrast-level.ts";
+import type {PaletteStyleName, PaletteStyleSchemeVariant} from "../types";
 
 type SchemeConstructor = new (
   sourceColor: Hct,
   isDark: boolean,
   contrastLevel: number
-) => SchemeVariant;
+) => PaletteStyleSchemeVariant;
 
 /**
  * Defines visual styles for generating Material Design color palettes,
@@ -57,7 +57,7 @@ export class PaletteStyle {
     sourceColorHct: Hct,
     isDark: boolean = false,
     contrastLevel: number = ContrastLevel.Default.value
-  ): SchemeVariant {
+  ): PaletteStyleSchemeVariant {
     return new this.schemeConstructor(sourceColorHct, isDark, contrastLevel);
   }
 
@@ -125,7 +125,7 @@ export class PaletteStyle {
   );
 
   /** Complete list of available palette styles in value order */
-  public static readonly values: readonly PaletteStyle[] = [
+  public static readonly Values: readonly PaletteStyle[] = [
     PaletteStyle.Monochrome,
     PaletteStyle.Neutral,
     PaletteStyle.TonalSpot,
@@ -142,12 +142,12 @@ export class PaletteStyle {
    * @param name Case-sensitive style name or existing instance
    * @throws When name doesn't match any registered style
    * @example
-   * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
-   * PaletteStyle.fromName(PaletteStyle.Neutral) // Returns Neutral
+   * PaletteStyle.from("Vibrant") // Returns Vibrant instance
+   * PaletteStyle.from(PaletteStyle.Neutral) // Returns Neutral
    */
-  static fromName(name: PaletteStyle | PaletteStyleName): PaletteStyle {
+  static from(name: PaletteStyle | PaletteStyleName): PaletteStyle {
     if (name instanceof PaletteStyle) return name;
-    const style = PaletteStyle.values.find(s => s.name.toLowerCase() === name.toLowerCase());
+    const style = PaletteStyle.Values.find(s => s.name.toLowerCase() === name.toLowerCase());
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)
     return style;
   }

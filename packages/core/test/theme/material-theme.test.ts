@@ -2,12 +2,12 @@ import {describe, expect, it} from 'vitest';
 import {TonalPalette} from '@material/material-color-utilities';
 import {
   ContrastLevel,
-  DEFAULT_PALETTE_TONES,
-  DynamicColorScheme,
+  MaterialDynamicScheme,
   MaterialTheme,
   type MaterialThemeOptions,
-  PaletteStyle, toArgb
+  PaletteStyle,
 } from "../../src";
+import {DEFAULT_PALETTE_TONES} from "../../src/constants/defaults.ts";
 
 describe('MaterialTheme', () => {
   const BASE_OPTIONS = {
@@ -16,7 +16,7 @@ describe('MaterialTheme', () => {
     style: 'TonalSpot' // Add default style
   } satisfies MaterialThemeOptions;
 
-  it('should initialize with default values', () => {
+  it('should initialize with default Values', () => {
     const theme = new MaterialTheme({
       ...BASE_OPTIONS,
       contrastLevel: ContrastLevel.Medium.value,
@@ -32,8 +32,8 @@ describe('MaterialTheme', () => {
   it('should create light and dark schemes', () => {
     const theme = new MaterialTheme(BASE_OPTIONS);
 
-    expect(theme.schemes.light).toBeInstanceOf(DynamicColorScheme);
-    expect(theme.schemes.dark).toBeInstanceOf(DynamicColorScheme);
+    expect(theme.schemes.light).toBeInstanceOf(MaterialDynamicScheme);
+    expect(theme.schemes.dark).toBeInstanceOf(MaterialDynamicScheme);
     expect(theme.schemes.light.isDark).toBe(false);
     expect(theme.schemes.dark.isDark).toBe(true);
   });

@@ -3,21 +3,21 @@ import type {
   Color,
   ColorSchemeStylesConfig,
   ExtendedColor,
-  ThemeColorSchemeConfig,
+  ColorSchemeConfig,
   MaterialThemeOptions,
 } from "../types";
-import {DynamicColorScheme} from "./DynamicColorScheme";
-import {PaletteStyle} from "./PaletteStyle";
+import {MaterialDynamicScheme} from "./material-dynamic-scheme.ts";
+import {PaletteStyle} from "./palette-style.ts";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createColorScheme, createCustomColorGroup, colorSchemeToCssVars, formatCustomColor, isColor} from "../utils";
+import {createColorScheme, createCustomColorGroup, colorSchemeToCssVars, isColor} from "../utils";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
   public readonly contrastLevel: number;
   public readonly style: PaletteStyle;
   public readonly schemes: Readonly<{
-    light: DynamicColorScheme;
-    dark: DynamicColorScheme;
+    light: MaterialDynamicScheme;
+    dark: MaterialDynamicScheme;
   }>;
   public readonly palettes: Readonly<{
     primary: TonalPalette;
@@ -52,14 +52,14 @@ export class MaterialTheme {
       return sourceOrOptions;
     })();
     const {extendedColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
-    const createScheme = (isDark: boolean) => new DynamicColorScheme({...config, style, isDark});
+    const createScheme = (isDark: boolean) => new MaterialDynamicScheme({...config, style, isDark});
     this.schemes = {
       light: createScheme(false),
       dark: createScheme(true),
     };
     this.sourceColorArgb = this.schemes.light.sourceColorArgb;
     this.contrastLevel = this.schemes.light.contrastLevel;
-    this.style = PaletteStyle.fromName(style);
+    this.style = PaletteStyle.from(style);
     this.palettes = {
       primary: this.schemes.light.primaryPalette,
       secondary: this.schemes.light.secondaryPalette,
@@ -73,7 +73,7 @@ export class MaterialTheme {
     );
   }
 
-  public toColorScheme<V extends boolean>(options?: ThemeColorSchemeConfig<V>): ColorSchemeReturnType<V> {
+  public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): ColorSchemeReturnType<V> {
     return createColorScheme(this, options);
   }
 

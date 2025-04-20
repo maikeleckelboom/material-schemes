@@ -1,16 +1,7 @@
 import camelCase from 'camelcase';
 import camelcase from 'camelcase';
 import kebabCase from 'kebab-case';
-import type {KebabCase} from 'type-fest';
 import type {ColorGroup, CustomColorGroup} from "@material/material-color-utilities";
-
-/**
- * An interface for formatting options, allowing for optional prefix and suffix.
- */
-export interface TokenFormatterOptions {
-  prefix?: string;
-  suffix?: string;
-}
 
 /**
  * Formats a token name with optional prefix and suffix, ensuring camelCase output.
@@ -22,8 +13,8 @@ export interface TokenFormatterOptions {
  * @example
  * formatTokenName('button', { prefix: 'ui', suffix: 'large' }); // 'uiButtonLarge'
  */
-export function formatTokenName(name: string, options: TokenFormatterOptions = {}): string {
-  const {prefix, suffix} = options;
+export function formatTokenName(name: string, options?: { prefix?: string; suffix?: string; }): string {
+  const {prefix, suffix} = options || {};
   return camelCase(`${prefix ? `${prefix}-` : ''}${name}${suffix ? `-${suffix}` : ''}`);
 }
 
@@ -49,18 +40,27 @@ export function formatColorToken(pattern: string, name: string, suffix?: string)
 }
 
 /**
- * Formats a string as a CSS custom property name (kebab-case with -- prefix).
+ * Formats a CSS variable name, ensuring it starts with '--' and is in kebab-case.
  *
- * @param key - The name to convert to CSS variable format.
+ * @param key - The base name of the CSS variable.
+ * @returns The formatted CSS variable name in kebab-case.
  *
  * @example
- * formatCssVarName('primaryColor'); // '--primary-color'
+ * formatCssVarName('myVariable'); // '--my-variable'
+ * formatCssVarName('--myVariable'); // '--myVariable'
  */
 export function formatCssVarName<T extends string>(key: T) {
-  return key.startsWith('--') ? key : `--${kebabCase(key)}` as KebabCase<`--${T}`>;
+  return key.startsWith('--') ? key : `--${kebabCase(key)}`;
 }
 
 
+/**
+ * Formats a given color group by modifying its keys using the provided color name.
+ *
+ * @param {ColorGroup} colorGroup - The input object containing color-related key-value pairs.
+ * @param {string} colorName - The name of the color used to modify the keys in the color group.
+ * @return {Record<string, number>} A new object where the keys are formatted based on the color name, and the values remain unchanged.
+ */
 export function formatColorGroup(colorGroup: ColorGroup, colorName: string): Record<string, number> {
   return Object.keys(colorGroup).reduce((acc, key) => {
     const colorKey = formatColorToken(key, colorName);
@@ -70,7 +70,13 @@ export function formatColorGroup(colorGroup: ColorGroup, colorName: string): Rec
 }
 
 
-export function formatCustomColor(customColor: CustomColorGroup) {
+/**
+ * Formats a custom color object containing name, light, and dark color groups.
+ *
+ * @param {CustomColorGroup} customColor - The custom color group object including color, light, and dark properties.
+ * @return {Object} An object containing the formatted name, color, light, and dark color groups.
+ */
+export function formatCustomColorGroup(customColor: CustomColorGroup) {
   return {
     name: formatTokenName(customColor.color.name),
     color: customColor.color,

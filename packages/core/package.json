@@ -15,6 +15,16 @@
         "types": "./dist/index.d.cts",
         "require": "./dist/index.cjs"
       }
+    },
+    "./material-color-utilities": {
+      "import": {
+        "types": "./dist/material-color-utilities.d.ts",
+        "import": "./dist/material-color-utilities.js"
+      },
+      "require": {
+        "types": "./dist/material-color-utilities.d.cts",
+        "require": "./dist/material-color-utilities.cjs"
+      }
     }
   },
   "repository": {

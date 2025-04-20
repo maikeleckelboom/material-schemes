@@ -1,26 +1,27 @@
 import type {CustomColorGroup, DynamicScheme, TonalPalette} from '@material/material-color-utilities';
 import type {
   ColorScheme,
-  ColorSchemeConfig,
+  SharedColorSchemeConfig,
   ColorSchemeReturnType,
-  ThemeColorSchemeConfig,
-  StylesheetConfig,
+  CssVarsConfig,
+  ColorSchemeConfig,
 } from '../types';
 import {createTonalPalette, formatColorToken, formatCssVarName, formatTokenName, toHex} from '../utils';
-import {DEFAULT_PALETTE_TONES, MATERIAL_COLOR_ROLES} from "../constants";
-import {DynamicColorScheme, MaterialTheme} from "../theme";
+import {MATERIAL_COLOR_ROLES} from "../constants/color-roles";
+import {DEFAULT_PALETTE_TONES} from "../constants/defaults";
+import {MaterialDynamicScheme, MaterialTheme} from "../theme";
 
 function createColorScheme<V extends boolean>(
   theme: MaterialTheme,
-  options?: ThemeColorSchemeConfig<V>,
-): ColorSchemeReturnType<V>;
-function createColorScheme<V extends boolean = false>(
-  dynamicScheme: DynamicScheme | DynamicColorScheme,
   options?: ColorSchemeConfig<V>,
 ): ColorSchemeReturnType<V>;
+function createColorScheme<V extends boolean = false>(
+  dynamicScheme: DynamicScheme | MaterialDynamicScheme,
+  options?: SharedColorSchemeConfig<V>,
+): ColorSchemeReturnType<V>;
 function createColorScheme(
-  dynamicSchemeOrTheme: MaterialTheme | DynamicScheme | DynamicColorScheme,
-  options?: ThemeColorSchemeConfig,
+  dynamicSchemeOrTheme: MaterialTheme | DynamicScheme | MaterialDynamicScheme,
+  options?: ColorSchemeConfig,
 ): ColorScheme {
   return 'schemes' in dynamicSchemeOrTheme
     ? themeToTokens(dynamicSchemeOrTheme, options)
@@ -49,11 +50,11 @@ function rolesToTokens(scheme: DynamicScheme, suffix?: string) {
   }), {} as ColorScheme);
 }
 
-function customGroupsToScheme(customColorGroups: CustomColorGroup[], options: ThemeColorSchemeConfig = {}) {
+function customGroupsToScheme(customColorGroups: CustomColorGroup[], options: ColorSchemeConfig = {}) {
   return reduceToObject(customColorGroups, group => groupToTokens(group, options));
 }
 
-function themeToTokens(theme: MaterialTheme, options: ThemeColorSchemeConfig = {}): ColorScheme {
+function themeToTokens(theme: MaterialTheme, options: ColorSchemeConfig = {}): ColorScheme {
   const {dark = false, brightnessVariants = false, modifyColorScheme} = options;
   const baseScheme = dark ? theme.schemes.dark : theme.schemes.light;
 
@@ -88,7 +89,7 @@ function schemeToPalettes(scheme: DynamicScheme) {
 }
 
 
-function schemeToTokens(scheme: DynamicScheme, options?: ColorSchemeConfig) {
+function schemeToTokens(scheme: DynamicScheme, options?: SharedColorSchemeConfig) {
   const dynamicSchemeColors: ColorScheme = rolesToTokens(scheme);
 
   if (options?.paletteTones) {
@@ -101,7 +102,7 @@ function schemeToTokens(scheme: DynamicScheme, options?: ColorSchemeConfig) {
   return options?.modifyColorScheme?.(dynamicSchemeColors) ?? dynamicSchemeColors;
 }
 
-function groupToTokens(group: CustomColorGroup, options: ThemeColorSchemeConfig) {
+function groupToTokens(group: CustomColorGroup, options: ColorSchemeConfig) {
   const colorGroup: Record<string, string | number> = {};
   optionsToVariants(options).forEach(({type, suffix = ''}) => {
     Object.entries(group[type]).forEach(([pattern, value]) => {
@@ -111,7 +112,7 @@ function groupToTokens(group: CustomColorGroup, options: ThemeColorSchemeConfig)
   return colorGroup;
 }
 
-function optionsToVariants(options: ThemeColorSchemeConfig): { type: 'light' | 'dark', suffix?: string }[] {
+function optionsToVariants(options: ColorSchemeConfig): { type: 'light' | 'dark', suffix?: string }[] {
   const variants: { type: 'light' | 'dark', suffix?: string }[] = [{type: options.dark ? 'dark' : 'light'}];
   if (options.brightnessVariants) variants.push(
     {type: 'light', suffix: 'Light'},
@@ -154,7 +155,7 @@ function valuesToTokens(name: string, colors: Record<number, string | number>) {
   ) as ColorScheme;
 }
 
-function cssVarsToString(colorScheme: Record<string, string | number>, options?: StylesheetConfig): string {
+function cssVarsToString(colorScheme: Record<string, string | number>, options?: CssVarsConfig): string {
   const {selector, minify = true} = options || {};
   let css = entriesToCssDecls(colorScheme);
 
@@ -187,7 +188,7 @@ function tokensToCssVarMap(colorScheme: Record<string, string | number>) {
   );
 }
 
-function colorSchemeToCssVars(colorScheme: Record<string, string | number>, options?: StylesheetConfig): string {
+function colorSchemeToCssVars(colorScheme: Record<string, string | number>, options?: CssVarsConfig): string {
   return cssVarsToString(tokensToCssVarMap(colorScheme), options);
 }
 

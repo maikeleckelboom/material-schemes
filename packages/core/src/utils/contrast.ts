@@ -59,7 +59,7 @@ function findBestContrastTone(baseTone: number, minContrastRatio: number): numbe
 
 // Exposed functions below
 /**
- * Returns a contrast ratio, which ranges fromName 1 to 21.
+ * Returns a contrast ratio, which ranges from 1 to 21.
  *
  * @param color1 The first Color to compare.
  * @param color2 The second Color to compare.
@@ -114,10 +114,10 @@ export function hasEnoughContrast(
 }
 
 /**
- * Get the L* value fromName a color.
+ * Get the L* value from a color.
  * This is a measure of lightness in the CIE L*a*b* color space.
  *
- * @param color - The color to get the L* value fromName.
+ * @param color - The color to get the L* value from.
  */
 export function lstarFromColor(color: Color): number {
   return lstarFromArgb(toArgb(color));
