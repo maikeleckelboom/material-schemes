@@ -1,29 +1,27 @@
 <script lang="ts" setup>
-import { computed, shallowReactive } from "vue";
+import { computed, shallowReactive } from 'vue';
 import {
   ContrastLevel,
-  DynamicColorScheme,
-  type DynamicColorSchemeOptions,
-  PaletteStyle,
-} from "@chromavert/material";
+  MaterialDynamicScheme,
+  type DynamicSchemeOptions,
+  PaletteStyle
+} from '@chromavert/material';
 
-const options = shallowReactive<DynamicColorSchemeOptions>({
-  sourceColor: "#54B6FF",
+const options = shallowReactive<DynamicSchemeOptions>({
+  sourceColor: '#54B6FF',
   style: PaletteStyle.Expressive,
   contrastLevel: ContrastLevel.Medium.value,
-  isDark: false,
+  isDark: false
 });
 
-const dynamicScheme = computed(() => new DynamicColorScheme(options));
+const dynamicScheme = computed(() => new MaterialDynamicScheme(options));
 
 useHead({
   style: [
     {
-      textContent: computed(() =>
-        dynamicScheme.value.toCssVars({ selector: ":root" }),
-      ),
-    },
-  ],
+      textContent: computed(() => dynamicScheme.value.toCssVars({ selector: ':root' }))
+    }
+  ]
 });
 </script>
 
@@ -35,17 +33,13 @@ useHead({
         <input
           id="sourceColor"
           v-model="options.sourceColor"
-          type="color"
           class="border p-2 rounded-sm"
+          type="color"
         />
       </div>
       <div>
         <select v-model="options.style" class="border p-2 rounded-sm">
-          <option
-            v-for="style in PaletteStyle.values"
-            :key="style.name"
-            :value="style"
-          >
+          <option v-for="style in PaletteStyle.Values" :key="style.name" :value="style">
             {{ style.name }}
           </option>
         </select>
@@ -55,15 +49,15 @@ useHead({
         <input
           id="isDark"
           v-model="options.isDark"
-          type="checkbox"
           class="border p-2 rounded-sm"
+          type="checkbox"
         />
       </div>
       <div>
         <label for="contrastLevel">Contrast Level</label>
         <select v-model="options.contrastLevel" class="border p-2 rounded-sm">
           <option
-            v-for="level in ContrastLevel.values"
+            v-for="level in ContrastLevel.Values"
             :key="level.name"
             :value="level.value"
           >

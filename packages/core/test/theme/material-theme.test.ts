@@ -26,7 +26,7 @@ describe('MaterialTheme', () => {
     expect(theme.sourceColorArgb).toBe(BASE_OPTIONS.sourceColor);
     expect(theme.contrastLevel).toBe(0.5);
     expect(theme.style.name).toBe(PaletteStyle.TonalSpot.name);
-    expect(theme.extendedColors).toHaveLength(0);
+    expect(theme.customColors).toHaveLength(0);
   });
 
   it('should create light and dark schemes', () => {
@@ -61,9 +61,9 @@ describe('MaterialTheme', () => {
       ]
     });
 
-    expect(theme.extendedColors).toHaveLength(1);
-    expect(theme.extendedColors[0]?.color.name).toBe('brand');
-    expect(theme.extendedColors[0]?.color.value).toBe(0x00ff00ff);
+    expect(theme.customColors).toHaveLength(1);
+    expect(theme.customColors[0]?.color.name).toBe('brand');
+    expect(theme.customColors[0]?.color.value).toBe(0x00ff00ff);
   });
 
 
@@ -138,7 +138,7 @@ describe('MaterialTheme', () => {
       });
     };
 
-    theme.extendedColors.forEach(color => {
+    theme.customColors.forEach(color => {
       assertColorProperties(color.color.name);
     });
   });

@@ -10,7 +10,7 @@ describe('createMaterialTheme', () => {
     expect(theme).toBeInstanceOf(MaterialTheme);
     expect(theme.style).toEqual(PaletteStyle.TonalSpot);
     expect(theme.contrastLevel).toEqual(0);
-    expect(theme.extendedColors).toEqual([]);
+    expect(theme.customColors).toEqual([]);
   });
 
   it('should create a theme with a source color and options', () => {
@@ -39,8 +39,8 @@ describe('createMaterialTheme', () => {
     const theme = createMaterialTheme(sourceColor, extendedColors);
 
     expect(theme).toBeInstanceOf(MaterialTheme);
-    expect(theme.extendedColors).toHaveLength(1);
-    // expect(theme.extendedColors[0]!.color.name).toEqual('custom');
+    expect(theme.customColors).toHaveLength(1);
+    // expect(theme.customColors[0]!.color.name).toEqual('custom');
   });
 
   it('should create a theme with a MaterialThemeOptions object', () => {
@@ -63,8 +63,8 @@ describe('createMaterialTheme', () => {
     expect(theme).toBeInstanceOf(MaterialTheme);
     expect(theme.style).toEqual(PaletteStyle.Expressive);
     expect(theme.contrastLevel).toEqual(0.2);
-    expect(theme.extendedColors).toHaveLength(1);
-    expect(theme.extendedColors[0]!.color.name).toEqual('custom');
+    expect(theme.customColors).toHaveLength(1);
+    expect(theme.customColors[0]!.color.name).toEqual('custom');
   });
 
   it('should respect hexadecimal number format for source color', () => {

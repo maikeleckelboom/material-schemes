@@ -1,17 +1,17 @@
 import {
   type Color,
   type ColorSchemeConfig,
-  type ModeledColorScheme,
   type ColorSchemeStylesConfig,
   type ExtendedColor,
-  type MaterialThemeOptions,
   type ExtendedColorGroup,
+  type MaterialThemeOptions,
+  type ModeledColorScheme,
 } from "../types";
 import {MaterialDynamicScheme} from "./material-dynamic-scheme.ts";
 import {PaletteStyle} from "./palette-style.ts";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
 import {colorSchemeToCssVars, createColorScheme, createCustomColorGroup, createExtendedColor} from "../utils";
-import {resolveOptions} from "../fn/create-material-theme.ts";
+import {resolveThemeOptions} from "../fn/create-material-theme.ts";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
@@ -29,8 +29,7 @@ export class MaterialTheme {
     neutralVariant: TonalPalette;
     error: TonalPalette;
   }>;
-  public readonly staticColors: ExtendedColorGroup[];
-  public readonly extendedColors: CustomColorGroup[];
+  public readonly customColors: CustomColorGroup[];
 
   constructor(sourceColor: Color, extendedColors?: ExtendedColor[]);
   constructor(sourceColor: Color, options?: Omit<MaterialThemeOptions, 'sourceColor'>);
@@ -39,7 +38,7 @@ export class MaterialTheme {
     sourceOrOptions: Color | MaterialThemeOptions,
     optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
   ) {
-    const options = resolveOptions(sourceOrOptions, optionsOrColors);
+    const options = resolveThemeOptions(sourceOrOptions, optionsOrColors);
     const {extendedColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
     const createScheme = (isDark: boolean) => new MaterialDynamicScheme({...config, style, isDark});
     this.schemes = {
@@ -57,12 +56,8 @@ export class MaterialTheme {
       neutralVariant: this.schemes.light.neutralVariantPalette,
       error: this.schemes.light.errorPalette,
     };
-    this.extendedColors = extendedColors.map(color =>
-      createCustomColorGroup(this.sourceColorArgb, color)
-    );
-    this.staticColors = extendedColors.map(color =>
-      createExtendedColor(this.sourceColorArgb, color)
-    );
+    // this.customColors = extendedColors.map(color => createExtendedColor(this.sourceColorArgb, color));
+    this.customColors = extendedColors.map(color => createCustomColorGroup(this.sourceColorArgb, color));
   }
 
   public toColorScheme<V extends boolean>(options?: ColorSchemeConfig<V>): ModeledColorScheme<V> {

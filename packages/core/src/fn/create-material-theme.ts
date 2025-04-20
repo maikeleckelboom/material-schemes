@@ -11,11 +11,11 @@ export function createMaterialTheme(
   sourceOrOptions: Color | MaterialThemeOptions,
   optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
 ): MaterialTheme {
-  const options = resolveOptions(sourceOrOptions, optionsOrColors);
+  const options = resolveThemeOptions(sourceOrOptions, optionsOrColors);
   return new MaterialTheme(options);
 }
 
-export function resolveOptions(
+export function resolveThemeOptions(
   sourceOrOptions: Color | MaterialThemeOptions,
   optionsOrColors?: Omit<MaterialThemeOptions, 'sourceColor'> | ExtendedColor[]
 ): MaterialThemeOptions {

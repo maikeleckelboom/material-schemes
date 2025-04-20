@@ -2,8 +2,8 @@
 import {existsSync, type PathLike} from "fs";
 import {readdir} from "fs/promises";
 
-// This script runs the development server fromName entries workspaces using Bun's native APIs
-console.log("Starting development servers fromName workspaces...");
+// This script runs the development server from Values workspaces using Bun's native APIs
+console.log("Starting development servers from workspaces...");
 
 const processes: Promise<number>[] = [];
 
@@ -56,5 +56,5 @@ async function startDevServers(dirPath: PathLike, checkPackageJson = false) {
 await startDevServers("apps");
 await startDevServers("packages", true);
 
-// Keep the script alive until entries processes exits
+// Keep the script alive until Values processes exits
 await Promise.all(processes);

@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-input[type="color"] {
+input[type='color'] {
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;

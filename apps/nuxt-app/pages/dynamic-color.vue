@@ -1,26 +1,25 @@
 <script lang="ts" setup>
 import {
-  contrastColorRole,
-  getDynamicColors,
-  Hct,
+  getContrastColorRole,
+  getMaterialDynamicColors,
   PaletteStyle,
-  toHex,
-} from "@chromavert/material";
+  toHex
+} from '@chromavert/material';
+import { Hct } from '@chromavert/material/material-color-utilities';
 
 const sourceColor = Hct.fromInt(0xff6750a4);
-
-const paletteStyle = PaletteStyle.fromName("FruitSalad");
-const dynamicScheme = paletteStyle.dynamicScheme(sourceColor);
+const style = PaletteStyle.from('FruitSalad');
+const dynamicScheme = style.dynamicScheme(sourceColor);
 </script>
 
 <template>
   <div class="flex gap-0.5 flex-wrap">
     <div
-      v-for="(dynamicColor, role) in getDynamicColors(dynamicScheme)"
+      v-for="(dynamicColor, role) in getMaterialDynamicColors(dynamicScheme)"
       :key="role"
       :style="{
         backgroundColor: toHex(dynamicColor),
-        color: contrastColorRole(role, dynamicScheme),
+        color: getContrastColorRole(role, dynamicScheme)
       }"
       class="p-2 rounded-sm"
     >

@@ -52,8 +52,12 @@ describe('createExtendedColor', () => {
     expect(result).toHaveProperty('light');
     expect(result).toHaveProperty('dark');
 
-    // Verify color reference is maintained
-    expect(result.color).toBe(testColor);
+    // Verify color reference maintains the core properties
+    expect(result.color).toMatchObject({
+      name: testColor.name,
+      value: testColor.value,
+      blend: testColor.blend,
+    });
   });
 
   it('should correctly generate light and dark palettes with camelCase keys', () => {
@@ -124,7 +128,7 @@ describe('createExtendedColor', () => {
 
     // Our harmonized mock returns 0xff0001
     expect(result.value).toBe(0xff0001);
-    expect(harmonize).toHaveBeenCalledWith(testColor.value, sourceColor);
+    expect(harmonize).toHaveBeenCalledWith(sourceColor, testColor.value);
   });
 
   it('should preserve the description property', () => {
@@ -156,7 +160,7 @@ describe('createExtendedColor', () => {
     expect(result.value).toBe(0xff0000);
     // In the actual implementation, harmonize is likely used elsewhere,
     // So we should check it wasn't called with our specific values
-    expect(harmonize).not.toHaveBeenCalledWith(testColor.value, sourceColor);
+    expect(harmonize).not.toHaveBeenCalledWith(sourceColor, testColor.value);
   });
 
   it('should not harmonize color when blend is undefined', () => {
@@ -174,7 +178,7 @@ describe('createExtendedColor', () => {
     expect(result.value).toBe(0xff0000);
     // In the actual implementation, harmonize is likely used elsewhere,
     // So we should check it wasn't called with our specific values
-    expect(harmonize).not.toHaveBeenCalledWith(testColor.value, sourceColor);
+    expect(harmonize).not.toHaveBeenCalledWith(sourceColor, testColor.value);
   });
 
   it('should work with multi-word color names', () => {

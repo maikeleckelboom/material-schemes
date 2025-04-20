@@ -60,7 +60,7 @@ function themeToTokens(theme: MaterialTheme, options: ColorSchemeConfig = {}): C
 
   const colorSources: Record<string, string | number>[] = [
     rolesToTokens(baseScheme),
-    customGroupsToScheme(theme.extendedColors, options),
+    customGroupsToScheme(theme.customColors, options),
   ];
 
   if (options.paletteTones) {
@@ -124,7 +124,7 @@ function optionsToVariants(options: ColorSchemeConfig): { type: 'light' | 'dark'
 function themePalettesToSchemes(theme: MaterialTheme, tones: number[]) {
   return Object.assign(
     corePalettesToSchemes(theme.palettes, tones),
-    customPalettesToSchemes(theme.extendedColors, tones)
+    customPalettesToSchemes(theme.customColors, tones)
   );
 }
 

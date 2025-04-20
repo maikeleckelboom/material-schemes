@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import { DynamicColorScheme } from "@chromavert/material";
-import PrintJSON from "~/components/PrintJSON.vue";
+import { MaterialDynamicScheme } from '@chromavert/material';
 
-const sourceColor = ref<string>("#54B6FF");
-const dynamicScheme = computed(() => new DynamicColorScheme(sourceColor.value));
+const sourceColor = ref<string>('#54B6FF');
+const dynamicScheme = computed(() => new MaterialDynamicScheme(sourceColor.value));
 
 useHead({
   style: [
     {
-      textContent: computed(() =>
-        dynamicScheme.value.toCssVars({ selector: ":root" }),
-      ),
-    },
-  ],
+      textContent: computed(() => dynamicScheme.value.toCssVars({ selector: ':root' }))
+    }
+  ]
 });
 </script>
 
@@ -30,8 +27,8 @@ useHead({
     <PrintJSON :data="dynamicScheme.toColorScheme()" />
     <pre>{{
       dynamicScheme.toCssVars({
-        selector: ".dark",
-        minify: false,
+        selector: '.dark',
+        minify: false
       })
     }}</pre>
   </div>

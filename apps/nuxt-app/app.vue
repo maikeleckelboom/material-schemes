@@ -13,6 +13,6 @@ const routes = useRouter().options.routes;
         </li>
       </ul>
     </nav>
-    <NuxtPage/>
+    <NuxtPage />
   </div>
 </template>
