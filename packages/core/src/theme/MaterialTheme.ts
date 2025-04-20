@@ -1,14 +1,15 @@
 import type {
-  Color,
   AdaptiveColorScheme,
-  FullColorSchemeConfig, ColorSchemeStylesConfig,
+  Color,
+  ColorSchemeStylesConfig,
   CustomColorInput,
+  FullColorSchemeConfig,
   MaterialThemeOptions,
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
-import {PaletteStyle, type PaletteStyleName} from "./PaletteStyle";
+import {PaletteStyle} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createColorScheme, createCssVarsText, createCustomColorGroup, formatCustomColor, isColor} from "../utils";
+import {createCustomColorGroup, cssVarMapToText, formatCustomColor, isColor, createColorScheme} from "../utils";
 
 export class MaterialTheme {
   public readonly sourceColorArgb: number;
@@ -93,6 +94,6 @@ export class MaterialTheme {
   public toCssVars<V extends boolean = false>(options: ColorSchemeStylesConfig<V> = {}): string {
     const {selector, minify, ...opts} = options || {};
     const colorScheme = this.toColorScheme<V>(opts);
-    return createCssVarsText(colorScheme, {selector, minify});
+    return cssVarMapToText(colorScheme, {selector, minify});
   }
 }

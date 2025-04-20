@@ -109,7 +109,7 @@ describe('MaterialTheme', () => {
       paletteTones: true,
       modifyColorScheme: (scheme) => ({
         ...scheme,
-        tertiary: scheme.primaryDark
+        tertiary: scheme.primaryDark,
       })
     });
 

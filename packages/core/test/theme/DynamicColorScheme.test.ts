@@ -133,7 +133,8 @@ describe('DynamicScheme', () => {
       const cssText = dynamicScheme.toCssVars({
         modifyColorScheme: (scheme) => ({
           ...scheme,
-          primary: modifiedPrimary
+          primary: modifiedPrimary,
+          test: scheme.primary
         })
       });
 

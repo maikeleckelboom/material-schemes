@@ -5,14 +5,14 @@ import {
   type ColorSchemeConfig,
   type ColorSchemeStylesConfig,
   ContrastLevel,
-  createColorScheme,
-  createCssVarsText,
   createTonalPalette,
+  cssVarMapToText,
   type DynamicColorSchemeOptions,
   isColor,
   MATERIAL_COLOR_ROLES,
   type MaterialColorScheme,
   PaletteStyle,
+  createColorScheme,
   toHct,
 } from "../";
 
@@ -76,6 +76,6 @@ export class DynamicColorScheme extends DynamicScheme {
   public toCssVars(options: ColorSchemeStylesConfig = {}): string {
     const {selector, ...opts} = options || {};
     const colorScheme = this.toColorScheme(opts);
-    return createCssVarsText(colorScheme, {selector});
+    return cssVarMapToText(colorScheme, {selector});
   }
 }

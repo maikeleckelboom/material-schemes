@@ -5,16 +5,16 @@ import type {KebabCase} from "type-fest";
 export type ColorRoleKey = (typeof MATERIAL_COLOR_ROLES)[number];
 
 export type MaterialColorScheme = {
-  [K in ColorRoleKey | string]: Color;
+  [K in ColorRoleKey]: Color;
 };
 
-export interface ColorScheme extends MaterialColorScheme {
-  // [key: string]: string | number;
+export interface ColorScheme extends Partial<MaterialColorScheme> {
+  [key: string]: number | Color | undefined;
 }
 
-export interface CssVariableMap extends Record<KebabCase<ColorRoleKey | string>, Color> {
-  [key: `--${KebabCase<ColorRoleKey | string>}`]: string;
-}
+// export interface CssVariableMap extends Record<KebabCase<string>, Color> {
+//   [key: `--${KebabCase<ColorRoleKey | string>}`]: string;
+// }
 
 type SuffixedColorScheme<Suffix extends string> = {
   [K in ColorRoleKey as `${K}${Suffix}`]: Color;
@@ -27,11 +27,11 @@ export type DarkColorScheme = SuffixedColorScheme<"Dark">;
 /**
  * Return full ColorScheme when V=true, otherwise just the base.
  */
-export type AdaptiveColorScheme<
-  V extends boolean = false
-> = V extends true
-  ? ColorScheme & LightColorScheme & DarkColorScheme
-  : ColorScheme;
+export type AdaptiveColorScheme<V extends boolean = false> =
+  V extends true
+    ? ColorScheme & LightColorScheme & DarkColorScheme
+    : ColorScheme
+
 
 /**
  * A modifier that takes and returns a (possibly extended) scheme.
@@ -78,3 +78,5 @@ export interface CssOutputConfig {
 export interface ColorSchemeStylesConfig<WithVariants extends boolean = false>
   extends FullColorSchemeConfig<WithVariants>, CssOutputConfig {
 }
+
+export type TonalMapping = Record<number, number>;

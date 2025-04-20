@@ -10,7 +10,6 @@ beforeAll(() => {
 describe('Exposed Utilities', () => {
   it('should be able to use createColorScheme', () => {
     const colorScheme = createColorScheme(dynamicScheme, {
-      dark: true,
       modifyColorScheme: (colors) => ({
         ...colors,
         accent: colors.primary

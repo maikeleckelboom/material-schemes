@@ -2,7 +2,6 @@ import {customColor, type CustomColorGroup} from "@material/material-color-utili
 import {toArgb} from "./conversion.ts";
 import type {Color, CustomColorInput} from "../types";
 import {formatTokenName} from "./formatting.ts";
-import {createTonalMapping} from "./color-scheme.ts";
 import {createTonalPalette} from "./palette.ts";
 
 /**
@@ -22,11 +21,11 @@ export function createCustomColorGroup(source: Color, color: CustomColorInput): 
   })
 }
 
-export function createCustomColorPalettes(customColorGroups: CustomColorGroup[]): Record<string, Record<number, Color>> {
-  return Object.fromEntries(
-    customColorGroups.map(customColor => [
-      formatTokenName(customColor.color.name),
-      createTonalMapping(createTonalPalette(customColor.value)),
-    ])
-  );
-}
+// export function createCustomColorPalettes(customColorGroups: CustomColorGroup[]): Record<string, Record<number, Color>> {
+//   return Object.fromEntries(
+//     customColorGroups.map(customColor => [
+//       formatTokenName(customColor.color.name),
+//       createTonalPalette(customColor.value),
+//     ])
+//   );
+// }
