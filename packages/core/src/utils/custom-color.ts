@@ -2,8 +2,8 @@ import {customColor, type CustomColorGroup} from "@material/material-color-utili
 import {toArgb} from "./conversion.ts";
 import type {Color, CustomColorOptions} from "../types";
 import {formatTokenName} from "./formatting.ts";
-import {deriveToneMapFromPalette} from "./color-scheme.ts";
-import {createPalette} from "./palette.ts";
+import {createTonalMapping} from "./color-scheme.ts";
+import {createTonalPalette} from "./palette.ts";
 
 /**
  * Generate a custom color group from source and target color
@@ -26,7 +26,7 @@ export function createCustomColorPalettes(customColorGroups: CustomColorGroup[])
   return Object.fromEntries(
     customColorGroups.map(customColor => [
       formatTokenName(customColor.color.name),
-      deriveToneMapFromPalette(createPalette(customColor.value)),
+      createTonalMapping(createTonalPalette(customColor.value)),
     ])
   );
 }

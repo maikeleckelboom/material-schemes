@@ -1,4 +1,4 @@
-import {ContrastLevel, DynamicColorScheme, PaletteStyle} from "../../src";
+import {ContrastLevel, DynamicColorScheme, PaletteStyle, toArgb} from "../../src";
 import {describe, expect, it, test} from "vitest";
 
 describe('DynamicScheme', () => {
@@ -98,8 +98,8 @@ describe('DynamicScheme', () => {
     expect(colorScheme).toHaveProperty('neutralPaletteKeyColor');
     expect(colorScheme).toHaveProperty('neutralVariantPaletteKeyColor');
   });
-  describe('createCssText', () => {
-    const baseTheme = new DynamicColorScheme(
+  describe('createCssVarsText', () => {
+    const dynamicScheme = new DynamicColorScheme(
       0xFF6200EE,
       {
         primary: 0xFFBB86FC,
@@ -124,13 +124,13 @@ describe('DynamicScheme', () => {
 
     it('should wrap in selector when provided', () => {
       const selector = '.my-theme';
-      const cssText = baseTheme.toCssText({selector});
+      const cssText = dynamicScheme.toCssVars({selector});
       expect(cssText).toMatch(new RegExp(`^${selector}\\s*{`));
     });
 
     it('should apply color scheme modifications', () => {
       const modifiedPrimary = '#abcdef';
-      const cssText = baseTheme.toCssText({
+      const cssText = dynamicScheme.toCssVars({
         modifyColorScheme: (scheme) => ({
           ...scheme,
           primary: modifiedPrimary
@@ -141,13 +141,13 @@ describe('DynamicScheme', () => {
     });
 
     it('should handle empty selector', () => {
-      const cssText = baseTheme.toCssText({selector: ''});
+      const cssText = dynamicScheme.toCssVars({selector: ''});
       expect(cssText).not.toMatch(/^{/);
       expect(cssText).toContain('--primary:');
     });
 
     it('should maintain CSS syntax validity', () => {
-      const cssText = baseTheme.toCssText();
+      const cssText = dynamicScheme.toCssVars();
       const lines = cssText.split('\n');
 
       lines.forEach(line => {
@@ -156,7 +156,7 @@ describe('DynamicScheme', () => {
         }
       });
 
-      const selectorText = baseTheme.toCssText({selector: ':root'});
+      const selectorText = dynamicScheme.toCssVars({selector: ':root'});
       expect(selectorText).toMatch(/:root\s*{/);
     });
   });

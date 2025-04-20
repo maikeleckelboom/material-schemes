@@ -1,7 +1,6 @@
-import { TonalPalette } from '@material/material-color-utilities';
-import { toArgb } from '../utils';
-import { DEFAULT_PALETTE_TONES } from '../constants';
-import type { Color } from '../types';
+import {TonalPalette} from '@material/material-color-utilities';
+import {toArgb} from '../utils';
+import type {Color} from '../types';
 
 /**
  * Creates a TonalPalette, which is a convenience class for retrieving colors
@@ -9,7 +8,7 @@ import type { Color } from '../types';
  * @param color - The base color.
  * @returns A TonalPalette instance.
  */
-export function createPalette(color: Color): TonalPalette {
+export function createTonalPalette(color: Color): TonalPalette {
   return TonalPalette.fromInt(toArgb(color));
 }
 

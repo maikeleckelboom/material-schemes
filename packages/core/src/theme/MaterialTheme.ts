@@ -1,32 +1,31 @@
 import type {
   Color,
-  ColorSchemeOptions,
-  ColorSchemeReturnType,
+  AdaptiveColorScheme,
+  FullColorSchemeConfig, ColorSchemeStylesConfig,
   CustomColorOptions,
   MaterialThemeOptions,
-  toCSSVarOptions
 } from "../types";
 import {DynamicColorScheme} from "./DynamicColorScheme";
-import {PaletteStyle} from "./PaletteStyle";
+import {PaletteStyle, type PaletteStyleName} from "./PaletteStyle";
 import {type CustomColorGroup, TonalPalette} from "@material/material-color-utilities";
-import {createCustomColorGroup, formatCustomColor, isColor, toColorScheme, createCssText} from "../utils";
+import {createColorScheme, createCssVarsText, createCustomColorGroup, formatCustomColor, isColor} from "../utils";
 
 export class MaterialTheme {
-  public readonly sourceColor: Color;
+  public readonly sourceColorArgb: number;
   public readonly contrastLevel: number;
   public readonly style: PaletteStyle;
   public readonly schemes: Readonly<{
     light: DynamicColorScheme;
     dark: DynamicColorScheme;
   }>;
-  public readonly palettes: {
+  public readonly palettes: Readonly<{
     primary: TonalPalette;
     secondary: TonalPalette;
     tertiary: TonalPalette;
     neutral: TonalPalette;
     neutralVariant: TonalPalette;
     error: TonalPalette;
-  };
+  }>;
   public readonly customColors: CustomColorGroup[];
 
   constructor(sourceColor: Color, customColors?: CustomColorOptions[]);
@@ -51,21 +50,15 @@ export class MaterialTheme {
       }
       return sourceOrOptions;
     })();
-
     const {customColors = [], style = PaletteStyle.TonalSpot, ...config} = options;
-
-    const createScheme = (isDark: boolean): DynamicColorScheme =>
-      new DynamicColorScheme({...config, style, isDark});
-
+    const createScheme = (isDark: boolean) => new DynamicColorScheme({...config, style, isDark});
     this.schemes = {
       light: createScheme(false),
       dark: createScheme(true),
     };
-
-    this.sourceColor = this.schemes.light.sourceColorArgb;
+    this.sourceColorArgb = this.schemes.light.sourceColorArgb;
     this.contrastLevel = this.schemes.light.contrastLevel;
     this.style = PaletteStyle.fromName(style);
-
     this.palettes = {
       primary: this.schemes.light.primaryPalette,
       secondary: this.schemes.light.secondaryPalette,
@@ -74,20 +67,14 @@ export class MaterialTheme {
       neutralVariant: this.schemes.light.neutralVariantPalette,
       error: this.schemes.light.errorPalette,
     };
-
     this.customColors = customColors.map(customColor =>
-      createCustomColorGroup(this.sourceColor, customColor)
+      createCustomColorGroup(this.sourceColorArgb, customColor)
     );
   }
 
-
-  /**
-   * Converts the theme to a JSON representation.
-   * @returns The JSON representation of the theme.
-   */
   public toJSON() {
     return {
-      sourceColor: this.sourceColor,
+      sourceColor: this.sourceColorArgb,
       contrastLevel: this.contrastLevel,
       style: this.style.name,
       schemes: {
@@ -99,23 +86,13 @@ export class MaterialTheme {
     }
   }
 
-  /**
-   * Generates a color scheme based on the theme and optional parameters.
-   * @param options - Optional parameters to modify the color scheme generation.
-   * @returns The generated color scheme.
-   */
-  public toColorScheme<V extends boolean>(options?: ColorSchemeOptions<V>): ColorSchemeReturnType<V> {
-    return toColorScheme(this, options);
+  public toColorScheme<V extends boolean>(options: FullColorSchemeConfig<V> = {}): AdaptiveColorScheme<V> {
+    return createColorScheme(this, options);
   }
 
-  /**
-   * Generates a CSS variable map based on the theme and optional parameters.
-   * @param options - Optional parameters to modify the CSS variable generation.
-   * @returns The generated CSS variable map.
-   */
-  public toCssText<V extends boolean>(options?: ColorSchemeOptions<V> & toCSSVarOptions): string {
-    const {selector, ...colorSchemeOpts} = options || {};
-    const colorScheme = this.toColorScheme(colorSchemeOpts);
-    return createCssText(colorScheme, {selector});
+  public toCssVars(options: ColorSchemeStylesConfig = {}): string {
+    const {selector, minify, ...opts} = options || {};
+    const colorScheme = this.toColorScheme(opts);
+    return createCssVarsText(colorScheme, {selector, minify});
   }
 }

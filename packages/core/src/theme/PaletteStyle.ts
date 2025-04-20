@@ -12,16 +12,19 @@ import {
 } from "@material/material-color-utilities";
 import {ContrastLevel} from "./ContrastLevel.ts";
 
-export type PaletteStyleName =
-  | "Monochrome"
-  | "Neutral"
-  | "TonalSpot"
-  | "Vibrant"
-  | "Expressive"
-  | "Fidelity"
-  | "Content"
-  | "Rainbow"
-  | "FruitSalad";
+const PALETTE_STYLE_NAMES = [
+  "Monochrome",
+  "Neutral",
+  "TonalSpot",
+  "Vibrant",
+  "Expressive",
+  "Fidelity",
+  "Content",
+  "Rainbow",
+  "FruitSalad",
+] as const;
+
+export type PaletteStyleName = typeof PALETTE_STYLE_NAMES[number];
 
 export type SchemeVariant =
   | SchemeContent
@@ -166,7 +169,7 @@ export class PaletteStyle {
    * PaletteStyle.fromName("Vibrant") // Returns Vibrant instance
    * PaletteStyle.fromName(PaletteStyle.Neutral) // Returns Neutral
    */
-  static fromName(name: PaletteStyle | PaletteStyleName): PaletteStyle {
+  static fromName(name: PaletteStyle | PaletteStyleName | string): PaletteStyle {
     if (name instanceof PaletteStyle) return name;
     const style = PaletteStyle.values.find(s => s.name === name);
     if (!style) throw new Error(`No PaletteStyle with name '${name}' found.`)

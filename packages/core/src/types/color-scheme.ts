@@ -4,12 +4,16 @@ import type {KebabCase} from "type-fest";
 
 export type ColorRoleKey = (typeof MATERIAL_COLOR_ROLES)[number];
 
-export interface ColorScheme extends Record<ColorRoleKey | string, Color> {
-  [key: string]: Color;
+export type MaterialColorScheme = {
+  [K in ColorRoleKey | string]: Color;
+};
+
+export interface ColorScheme extends MaterialColorScheme {
+  // [key: string]: string | number;
 }
 
-export interface CSSColorScheme extends Record<KebabCase<ColorRoleKey | string>, Color> {
-  [key: `--${KebabCase<ColorRoleKey | string>}`]: Color;
+export interface CssVariableMap extends Record<KebabCase<ColorRoleKey | string>, Color> {
+  [key: `--${KebabCase<ColorRoleKey | string>}`]: string;
 }
 
 type SuffixedColorScheme<Suffix extends string> = {
@@ -23,7 +27,7 @@ export type DarkColorScheme = SuffixedColorScheme<"Dark">;
 /**
  * Return full ColorScheme when V=true, otherwise just the base.
  */
-export type ColorSchemeReturnType<
+export type AdaptiveColorScheme<
   V extends boolean = false
 > = V extends true
   ? ColorScheme & LightColorScheme & DarkColorScheme
@@ -34,40 +38,43 @@ export type ColorSchemeReturnType<
  */
 export type ModifyFn<
   V extends boolean = false,
-  R = ColorSchemeReturnType<V> & Partial<CSSColorScheme>
-> = (scheme: ColorSchemeReturnType<V>) => R;
+  R = AdaptiveColorScheme<V> & Partial<ColorScheme>
+> = (scheme: AdaptiveColorScheme<V>) => R;
 
-export interface SchemeColorSchemeOptions {
-  /** palette: true = full tones; or pass specific tone indices */
+
+export interface ColorSchemeConfig<WithVariants extends boolean = false> {
+  /**
+   * Palette: true = full tones; or pass specific tone indices
+   */
   paletteTones?: boolean | number[];
-  /** tweak the generated scheme */
-  modifyColorScheme?: ModifyFn;
+  /**
+   * Tweak the generated scheme, considering variants if present
+   */
+  modifyColorScheme?: ModifyFn<WithVariants>;
 }
 
-export interface ThemeColorSchemeOptions {
-  /** true = force dark mode */
+export interface FullColorSchemeConfig<V extends boolean = false> extends ColorSchemeConfig<V> {
+  /**
+   * Whether to generate light and dark color schemes
+   */
   dark?: boolean;
-  /** palette: true = full tones; or pass specific tone indices */
-  paletteTones?: boolean | number[];
-  /** if true, returns a full light+dark merged scheme */
-  brightnessVariants?: boolean;
-  /** tweak the generated scheme */
-  modifyColorScheme?: ModifyFn;
-}
-
-export interface ColorSchemeOptions<V extends boolean = false> {
-  /** true = force dark mode */
-  dark?: boolean;
-  /** palette: true = full tones; or pass specific tone indices */
-  paletteTones?: boolean | number[];
-  /** if true, returns the full light+dark merged scheme */
+  /**
+   * Enable brightness variants (links to V generic)
+   */
   brightnessVariants?: V;
-  /** tweak the generated scheme */
-  modifyColorScheme?: ModifyFn<V>;
 }
 
-export type toCSSVarOptions = {
-  /** CSS selector under which to emit vars */
+export interface CssOutputConfig {
+  /**
+   * CSS selector under which to emit vars
+   */
   selector?: string;
-};
+  /**
+   * Minify the output
+   */
+  minify?: boolean;
+}
 
+export interface ColorSchemeStylesConfig<WithVariants extends boolean = false>
+  extends FullColorSchemeConfig<WithVariants>, CssOutputConfig {
+}

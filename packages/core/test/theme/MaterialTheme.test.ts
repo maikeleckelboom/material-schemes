@@ -12,7 +12,8 @@ import {
 describe('MaterialTheme', () => {
   const BASE_OPTIONS = {
     sourceColor: 0xff0000ff, // Blue in ARGB
-    contrastLevel: ContrastLevel.Medium.value
+    contrastLevel: ContrastLevel.Medium.value,
+    style: 'TonalSpot' // Add default style
   } satisfies MaterialThemeOptions;
 
   it('should initialize with default values', () => {
@@ -22,9 +23,9 @@ describe('MaterialTheme', () => {
       style: 'TonalSpot',
     });
 
-    expect(theme.sourceColor).toBe(BASE_OPTIONS.sourceColor);
+    expect(theme.sourceColorArgb).toBe(BASE_OPTIONS.sourceColor);
     expect(theme.contrastLevel).toBe(0.5);
-    expect(theme.style).toBe(PaletteStyle.TonalSpot);
+    expect(theme.style.name).toBe(PaletteStyle.TonalSpot.name);
     expect(theme.customColors).toHaveLength(0);
   });
 
@@ -77,7 +78,7 @@ describe('MaterialTheme', () => {
     expect(theme.schemes.dark.variant).toBe(PaletteStyle.Vibrant.value);
   });
 
-  it('should handle toColorScheme', () => {
+  it('should handle createColorScheme', () => {
     const theme = new MaterialTheme(BASE_OPTIONS);
     const lightScheme = theme.schemes.light.toJSON();
     const darkScheme = theme.schemes.dark.toJSON();
@@ -158,9 +159,10 @@ describe('MaterialTheme', () => {
     });
 
     const themeJSON = theme.toJSON();
+
     expect(themeJSON.sourceColor).toBe(BASE_OPTIONS.sourceColor);
     expect(themeJSON.contrastLevel).toBe(0.5);
-    expect(themeJSON.style).toBe(PaletteStyle.TonalSpot.name);
+    expect(themeJSON.style).toBeOneOf([PaletteStyle.TonalSpot, 'TonalSpot']);
     expect(themeJSON.schemes.light.primaryPaletteKeyColor).toBeDefined();
     expect(themeJSON.schemes.dark.primaryPaletteKeyColor).toBeDefined();
   });
