@@ -25,11 +25,11 @@ export function createColorScheme(
   options?: FullColorSchemeConfig,
 ): ColorScheme {
   return 'schemes' in dynamicSchemeOrTheme
-    ? buildColorScheme(dynamicSchemeOrTheme, options)
-    : buildDynamicColorScheme(dynamicSchemeOrTheme, options);
+    ? tokensFromTheme(dynamicSchemeOrTheme, options)
+    : tokensFromScheme(dynamicSchemeOrTheme, options);
 }
 
-export function buildColorScheme(theme: MaterialTheme, options: FullColorSchemeConfig = {}): ColorScheme {
+export function tokensFromTheme(theme: MaterialTheme, options: FullColorSchemeConfig = {}): ColorScheme {
   const {dark = false, brightnessVariants = false, modifyColorScheme} = options;
   const baseScheme = dark ? theme.schemes.dark : theme.schemes.light;
   const colorScheme: ColorScheme = {};
@@ -38,32 +38,48 @@ export function buildColorScheme(theme: MaterialTheme, options: FullColorSchemeC
     const targetTones = Array.isArray(options.paletteTones)
       ? options.paletteTones
       : [...DEFAULT_PALETTE_TONES];
-    Object.assign(colorScheme, createTonalPaletteColors(theme, targetTones));
+    Object.assign(colorScheme, customColorsFromThemePalettes(theme, targetTones));
   }
 
   Object.assign(
     colorScheme,
-    createDynamicSchemeColors(baseScheme),
-    createCustomColorScheme(theme.customColors, options),
+    colorsFromScheme(baseScheme),
+    colorsFromCustomColors(theme.customColors, options),
   );
 
   if (brightnessVariants) {
     Object.assign(
       colorScheme,
-      createDynamicSchemeColors(theme.schemes.light, 'light'),
-      createDynamicSchemeColors(theme.schemes.dark, 'dark'),
+      colorsFromScheme(theme.schemes.light, 'light'),
+      colorsFromScheme(theme.schemes.dark, 'dark'),
     );
   }
 
   return modifyColorScheme?.(colorScheme) ?? colorScheme;
 }
 
-function buildDynamicColorScheme(scheme: DynamicScheme, options?: ColorSchemeConfig<false>): ColorScheme {
-  const dynamicSchemeColors = createDynamicSchemeColors(scheme);
+export function tokensFromScheme(scheme: DynamicScheme, options?: ColorSchemeConfig<false>): ColorScheme {
+  const dynamicSchemeColors = colorsFromScheme(scheme);
+  if (options?.paletteTones) {
+    const targetTones = Array.isArray(options.paletteTones)
+      ? options.paletteTones
+      : [...DEFAULT_PALETTE_TONES];
+    const palettes = {
+      primary: scheme.primaryPalette,
+      secondary: scheme.secondaryPalette,
+      tertiary: scheme.tertiaryPalette,
+      neutral: scheme.neutralPalette,
+      neutralVariant: scheme.neutralVariantPalette,
+    }
+    for (const [paletteName, palette] of Object.entries(palettes)) {
+      const tonalMapping = createTonalMapping(palette, targetTones);
+      Object.assign(dynamicSchemeColors, colorsFromTonalMapping(paletteName, tonalMapping));
+    }
+  }
   return options?.modifyColorScheme?.(dynamicSchemeColors) ?? dynamicSchemeColors;
 }
 
-export function createCustomColorScheme(
+export function colorsFromCustomColors(
   customColorGroups: CustomColorGroup[],
   options: FullColorSchemeConfig = {},
 ): ColorScheme {
@@ -94,7 +110,7 @@ export function createCustomColorScheme(
   return Object.assign({}, ...customColors);
 }
 
-export function createDynamicSchemeColors(dynamicScheme: DynamicScheme, suffix?: string): ColorScheme {
+export function colorsFromScheme(dynamicScheme: DynamicScheme, suffix?: string): ColorScheme {
   return MATERIAL_COLOR_ROLES.reduce((acc, key) => {
     const colorName = formatTokenName(key, {suffix});
     acc[colorName] = dynamicScheme[key];
@@ -177,21 +193,20 @@ export function processCustomColorTones(
   return processedColors;
 }
 
-function createTonalPaletteColors(theme: MaterialTheme, tones?: number[]) {
-  const tonalColors: Record<string, string> = {};
+function customColorsFromThemePalettes(theme: MaterialTheme, tones?: number[]) {
+  const tonalColors: Record<number, number> = {};
 
   // Process standard palettes
   for (const [paletteName, palette] of Object.entries(theme.palettes)) {
     const paletteColors = createTonalMapping(palette, tones);
-    Object.assign(tonalColors, getColorsFromTonalMapping(paletteName, paletteColors));
+    Object.assign(tonalColors, colorsFromTonalMapping(paletteName, paletteColors));
   }
 
   // Process custom colors using the common helper with options
   const processedCustomColors = processCustomColorTones(theme.customColors, {tones});
-
-  // Apply the mapping for each processed color
+  console.log('Processed Custom Colors:', processedCustomColors);
   for (const {name, mapping} of processedCustomColors) {
-    Object.assign(tonalColors, getColorsFromTonalMapping(name, mapping));
+    Object.assign(tonalColors, colorsFromTonalMapping(name, mapping));
   }
 
   return tonalColors;
@@ -202,7 +217,7 @@ export function createTonalMapping(palette: TonalPalette, tones?: number[]): Rec
   return Object.fromEntries(paletteTones.map((tone) => [tone, palette.tone(tone)]));
 }
 
-export function getColorsFromTonalMapping(name: string, colors: Record<number, Color>) {
+export function colorsFromTonalMapping(name: string, colors: Record<number, Color>) {
   const tonalKeys: Record<string, Color> = {};
   for (const [tone, color] of Object.entries(colors)) {
     const key = formatTokenName(name, {suffix: tone});

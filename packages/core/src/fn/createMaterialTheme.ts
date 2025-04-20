@@ -15,7 +15,6 @@ const theme = createMaterialTheme({
   ]
 })
 
-
 theme.schemes.light.toColorScheme({
   paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],
   modifyColorScheme: (scheme) => ({
@@ -27,14 +26,13 @@ theme.schemes.light.toColorScheme({
 
 
 theme.schemes.dark.toColorScheme({
-  paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+  paletteTones: true
 })
-
 
 theme.toColorScheme({
   dark: true,
   brightnessVariants: true,
-  paletteTones: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+  paletteTones: false,
   modifyColorScheme: (scheme) => ({
     ...scheme,
     custom1: 0xFF4081,
