@@ -1,11 +1,12 @@
 {
   "name": "@chromavert/material",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "scripts": {
     "dev": "bun run ./scripts/dev.ts"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.8",
+    "@types/node": "^25.9.2",
+    "zod": "^4.4.3"
   }
 }

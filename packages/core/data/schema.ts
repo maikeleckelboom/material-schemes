@@ -18,17 +18,17 @@ const coreColorsSchema = z.object({
   neutralVariant: hexColorSchema,
 });
 
-const schemeSchema = z.record(hexColorSchema);
+const schemeSchema = z.object(hexColorSchema);
 
-const paletteSchema = z.record(hexColorSchema);
+const paletteSchema = z.object(hexColorSchema);
 
 export const themeSchema = z.object({
   description: z.string(),
   seed: hexColorSchema,
   coreColors: coreColorsSchema,
   extendedColors: z.array(extendedColorSchema),
-  schemes: z.record(schemeSchema),
-  palettes: z.record(paletteSchema),
+  schemes: z.object(schemeSchema),
+  palettes: z.object(paletteSchema)
 });
 
 export type ThemeBuilderJSONExport = z.infer<typeof themeSchema>;
