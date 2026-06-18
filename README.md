@@ -128,6 +128,8 @@ const colors = createColorScheme(theme, {
 });
 ```
 
+`brightnessVariants` requires a `MaterialTheme` from `createTheme` because it needs both paired light and dark schemes. A single `DynamicColorScheme` from `createScheme` only represents one brightness mode.
+
 ## Source Colors
 
 The installed Material package only supports one source color for the published DynamicScheme constructors. `sourceColors` is accepted for forward-compatible API shape, but v0 requires exactly one color and rejects extra source colors.

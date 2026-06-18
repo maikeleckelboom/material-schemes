@@ -179,9 +179,11 @@ export function createColorScheme<WithBrightnessVariants extends boolean = false
   source: DynamicSchemeLike | MaterialThemeShape,
   options: ColorSchemeOptions<WithBrightnessVariants> = {},
 ): StructuredColorScheme<WithBrightnessVariants> {
-  const colorScheme = isThemeShape(source)
-    ? createColorSchemeFromTheme(source, options)
-    : createColorSchemeFromDynamicScheme(source, options);
+  const colorScheme = (
+    isThemeShape(source)
+      ? createColorSchemeFromTheme(source, options)
+      : createColorSchemeFromDynamicScheme(source, options)
+  ) as StructuredColorScheme<WithBrightnessVariants>;
 
   return applyColorSchemeModifier(colorScheme, options);
 }
