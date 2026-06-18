@@ -9,10 +9,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   release-check:
     name: Release check (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
@@ -20,8 +25,13 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+          - macos-latest
 
     steps:
+      - name: Enable long paths (Windows)
+        if: runner.os == 'Windows'
+        run: git config --global core.longpaths true
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -40,5 +50,13 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Run release check
-        run: pnpm release:check
+      - name: Verify release
+        run: pnpm verify:release
+
+      - name: Upload retained verification directory
+        if: failure() && env.VERIFY_RELEASE_RETAINED_DIR != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-release-failure-${{ matrix.os }}
+          path: ${{ env.VERIFY_RELEASE_RETAINED_DIR }}
+          if-no-files-found: ignore
