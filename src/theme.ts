@@ -1,4 +1,5 @@
 import { harmonize, isColor, toArgb } from './color';
+import { resolveContrastLevelValue } from './contrast';
 import { createCssVariables } from './css';
 import { createPalette, PaletteStyle } from './palette';
 import { SUPPORTED_PLATFORMS, SUPPORTED_SPEC_VERSIONS } from './roles';
@@ -37,10 +38,7 @@ export class MaterialTheme implements MaterialThemeShape {
     const themeOptions = normalizeThemeOptions(sourceOrOptions, options);
     this.sourceColors = resolveThemeSourceColors(themeOptions);
     this.source = this.sourceColors[0] as number;
-    this.contrastLevel =
-      typeof themeOptions.contrastLevel === 'number'
-        ? themeOptions.contrastLevel
-        : (themeOptions.contrastLevel?.value ?? 0);
+    this.contrastLevel = resolveContrastLevelValue(themeOptions.contrastLevel);
     this.style = PaletteStyle.from(themeOptions.variant ?? themeOptions.style);
     this.variant = this.style.value;
     this.specVersion = resolveSpecVersion(themeOptions.specVersion);

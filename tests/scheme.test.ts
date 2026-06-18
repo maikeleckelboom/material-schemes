@@ -6,6 +6,7 @@ import {
   createCssVariables,
   createScheme,
 } from '../src';
+import type { PaletteStyleInput } from '../src';
 
 describe('createScheme', () => {
   it('generates every required Material role for the default spec', () => {
@@ -62,12 +63,26 @@ describe('createScheme', () => {
   });
 
   it('reports CMF as unavailable when the installed package does not publish SchemeCmf', () => {
+    const externalVariant = 'cmf' as unknown as PaletteStyleInput;
+
     expect(CMF_SUPPORTED).toBe(false);
     expect(() =>
       createScheme({
         sourceColor: '#6750a4',
-        variant: 'cmf',
+        variant: externalVariant,
       }),
     ).toThrow(/CMF is not available/);
+  });
+
+  it('accepts numeric contrastLevel edge values and rejects out-of-range values', () => {
+    expect(createScheme('#6750a4', { contrastLevel: -1 }).contrastLevel).toBe(-1);
+    expect(createScheme('#6750a4', { contrastLevel: 1 }).contrastLevel).toBe(1);
+
+    expect(() => createScheme('#6750a4', { contrastLevel: -1.1 })).toThrow(
+      /contrastLevel must be a finite number between -1 and 1/,
+    );
+    expect(() => createScheme('#6750a4', { contrastLevel: 1.1 })).toThrow(
+      /contrastLevel must be a finite number between -1 and 1/,
+    );
   });
 });

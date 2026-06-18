@@ -46,6 +46,16 @@ export class ContrastLevel {
   }
 }
 
+export function resolveContrastLevelValue(contrastLevel: ContrastLevelInput | undefined): number {
+  if (contrastLevel instanceof ContrastLevel) return contrastLevel.value;
+  if (contrastLevel === undefined) return ContrastLevel.Default.value;
+  if (Number.isFinite(contrastLevel) && contrastLevel >= -1 && contrastLevel <= 1) {
+    return contrastLevel;
+  }
+
+  throw new Error('contrastLevel must be a finite number between -1 and 1.');
+}
+
 export class ContrastThreshold {
   public readonly name: string;
   public readonly value: number;
@@ -96,7 +106,7 @@ export function getContrastRatio(foreground: Color, background: Color): number {
   return Contrast.ratioOfTones(getLstarFromColor(foreground), getLstarFromColor(background));
 }
 
-export function getTonalContrastRatio(color1: Color, color2: Color): number {
+export function getTonalContrastDelta(color1: Color, color2: Color): number {
   const hct1 = toHct(color1);
   const hct2 = toHct(color2);
   return Math.abs(hct1.tone - hct2.tone);

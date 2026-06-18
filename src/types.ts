@@ -35,8 +35,7 @@ export type MaterialVariantName =
   | 'content'
   | 'rainbow'
   | 'fruitSalad'
-  | 'fruit-salad'
-  | 'cmf';
+  | 'fruit-salad';
 
 export type PaletteStyleInput = PaletteStyle | PaletteStyleName | MaterialVariantName | Variant;
 

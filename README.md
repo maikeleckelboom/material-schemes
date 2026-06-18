@@ -103,6 +103,8 @@ const expressive = createTheme('#6750a4', {
 
 Published `@material/material-color-utilities@0.4.0` supports the 2021 and 2025 spec versions and `phone` or `watch` platforms. It does not publish `SchemeCmf` or a CMF variant, so `material-schemes` rejects `variant: 'cmf'` instead of pretending to support it.
 
+Numeric `contrastLevel` values must be finite numbers from `-1` through `1`, matching the range expected by Material DynamicScheme constructors.
+
 ## Custom Colors
 
 Custom colors are generated as Material-style color groups and can be included in the scheme output.
@@ -149,6 +151,12 @@ Primary exports:
 - `createSchemeCssVariables`
 - `MATERIAL_COLOR_ROLES`, `MATERIAL_REQUIRED_COLOR_ROLES`, `MATERIAL_OPTIONAL_COLOR_ROLES`
 - `PaletteStyle`, `Variant`, `ContrastLevel`, `ContrastThreshold`
-- color and contrast helpers such as `toArgb`, `toHex`, `toHct`, `getContrastRatio`, and `isContrasting`
+- color and contrast helpers such as `toArgb`, `toHex`, `toHct`, `toRgbaBytes`, `getContrastRatio`, `getTonalContrastDelta`, and `isContrasting`
+
+`toRgbaBytes` returns red, green, blue, and alpha channels as `0..255` byte values. `getTonalContrastDelta` returns the absolute HCT tone difference, not a WCAG contrast ratio.
 
 The package intentionally avoids broad internal re-exports.
+
+## Development Notes
+
+`tsconfig.json` keeps `ignoreDeprecations: "6.0"` because tsup declaration generation with TypeScript 6 currently reports the deprecated `baseUrl` option during DTS output. This repo itself does not set `baseUrl`; remove the suppression after tsup or its declaration-generation dependencies stop surfacing that deprecated option. The TypeScript lib is intentionally `ES2022` only; no DOM types are required by this package today.

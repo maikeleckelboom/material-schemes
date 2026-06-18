@@ -24,6 +24,18 @@ describe('createTheme', () => {
     expect(theme.palettes.primary).toBe(theme.schemes.light.primaryPalette);
   });
 
+  it('validates numeric contrastLevel before constructing schemes', () => {
+    expect(createTheme('#6750a4', { contrastLevel: -1 }).contrastLevel).toBe(-1);
+    expect(createTheme('#6750a4', { contrastLevel: 1 }).contrastLevel).toBe(1);
+
+    expect(() => createTheme('#6750a4', { contrastLevel: -1.1 })).toThrow(
+      /contrastLevel must be a finite number between -1 and 1/,
+    );
+    expect(() => createTheme('#6750a4', { contrastLevel: 1.1 })).toThrow(
+      /contrastLevel must be a finite number between -1 and 1/,
+    );
+  });
+
   it('includes custom colors and tonal palette output when requested', () => {
     const theme = createTheme({
       sourceColor: '#6750a4',

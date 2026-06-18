@@ -4,7 +4,7 @@ import {
   type TonalPalette,
 } from '@material/material-color-utilities';
 import { formatColorToken, formatTokenName, isColor, toArgb, toHct } from './color';
-import { ContrastLevel } from './contrast';
+import { resolveContrastLevelValue } from './contrast';
 import { createCssVarMap, createCssVariables, serializeCssVarMap } from './css';
 import { createPalette, PaletteStyle } from './palette';
 import {
@@ -44,7 +44,7 @@ export class DynamicColorScheme extends DynamicScheme {
       isDark = false,
     } = resolvedOptions;
     const sourceColor = getRequiredSourceColor(resolvedOptions);
-    const contrastLevel = getContrastLevelValue(resolvedOptions.contrastLevel);
+    const contrastLevel = resolveContrastLevelValue(resolvedOptions.contrastLevel);
     const style = PaletteStyle.from(resolvedOptions.variant ?? resolvedOptions.style);
     const specVersion = getSpecVersionValue(resolvedOptions.specVersion);
     const platform = getPlatformValue(resolvedOptions.platform);
@@ -324,12 +324,6 @@ function getRequiredSourceColor(options: SchemeOptions): Color {
   const sourceColor = options.sourceColor ?? options.primary;
   if (sourceColor == null) throw new Error('createScheme requires sourceColor or primary.');
   return sourceColor;
-}
-
-function getContrastLevelValue(contrastLevel: SchemeOptionsBase['contrastLevel']): number {
-  return contrastLevel instanceof ContrastLevel
-    ? contrastLevel.value
-    : (contrastLevel ?? ContrastLevel.Default.value);
 }
 
 function getSpecVersionValue(specVersion: SchemeOptionsBase['specVersion']): SpecVersion {

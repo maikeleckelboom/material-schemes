@@ -7,7 +7,7 @@ import {
 } from '@material/material-color-utilities';
 import type { Color } from './types';
 
-export interface RgbaColor {
+export interface RgbaBytesColor {
   r: number;
   g: number;
   b: number;
@@ -26,7 +26,7 @@ export function toHex(color: Color): string {
   return hexFromArgb(toArgb(color));
 }
 
-export function toRgba(color: Color): RgbaColor {
+export function toRgbaBytes(color: Color): RgbaBytesColor {
   const argb = toArgb(color);
   return {
     a: (argb >>> 24) & 0xff,

@@ -8,8 +8,10 @@ import {
   createScheme,
   createTheme,
   getContrastRatio,
+  getTonalContrastDelta,
   toArgb,
   toHex,
+  toRgbaBytes,
 } from '../src';
 
 describe('public API', () => {
@@ -25,6 +27,8 @@ describe('public API', () => {
     expect(createPalette('#6750a4').tone(40)).toEqual(expect.any(Number));
     expect(toArgb('#6750a4')).toBe(0xff6750a4);
     expect(toHex(0xff6750a4)).toBe('#6750a4');
+    expect(toRgbaBytes(0x806750a4)).toEqual({ a: 128, r: 103, g: 80, b: 164 });
     expect(getContrastRatio('#000000', '#ffffff')).toBeGreaterThan(20);
+    expect(getTonalContrastDelta('#000000', '#ffffff')).toBeGreaterThan(99);
   });
 });

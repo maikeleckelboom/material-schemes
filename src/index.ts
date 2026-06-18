@@ -7,7 +7,7 @@ export {
   toArgb,
   toHct,
   toHex,
-  toRgba,
+  toRgbaBytes,
 } from './color';
 export {
   ContrastLevel,
@@ -16,7 +16,7 @@ export {
   getContrastColor,
   getContrastRatio,
   getLstarFromColor,
-  getTonalContrastRatio,
+  getTonalContrastDelta,
   isContrasting,
   lightenColor,
 } from './contrast';
