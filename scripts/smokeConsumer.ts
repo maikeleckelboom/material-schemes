@@ -3,8 +3,8 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, dirname, join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { basename, dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type PackageJson = {
   devDependencies?: Record<string, string>;
@@ -25,7 +25,11 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..');
 const pnpm = 'pnpm';
 const packageJson = JSON.parse(readFileSync(join(repoRoot, 'package.json'), 'utf8')) as PackageJson;
-const tempRoot = mkdtempSync(join(tmpdir(), 'material-schemes-smoke-'));
+const smokeRoot = process.env.MATERIAL_SCHEMES_SMOKE_ROOT ?? tmpdir();
+if (process.env.MATERIAL_SCHEMES_SMOKE_ROOT) {
+  mkdirSync(smokeRoot, { recursive: true });
+}
+const tempRoot = mkdtempSync(join(smokeRoot, 'material-schemes-smoke-'));
 const keepTemp = process.env.MATERIAL_SCHEMES_KEEP_SMOKE === '1';
 let failed = false;
 
@@ -78,7 +82,7 @@ function writeConsumer(consumerDir: string, tarballPath: string): void {
     private: true,
     type: 'module',
     dependencies: {
-      'material-schemes': pathToFileURL(tarballPath).href,
+      'material-schemes': toFileDependency(consumerDir, tarballPath),
     },
     devDependencies: {
       typescript: typescriptVersion,
@@ -183,6 +187,10 @@ function run(command: string, args: string[], options: RunOptions): void {
 
 function listTarballs(directory: string): string[] {
   return readdirSync(directory).filter((fileName) => fileName.endsWith('.tgz'));
+}
+
+function toFileDependency(fromDirectory: string, filePath: string): string {
+  return `file:${relative(fromDirectory, filePath).replace(/\\/g, '/')}`;
 }
 
 function writeJson(filePath: string, value: unknown): void {

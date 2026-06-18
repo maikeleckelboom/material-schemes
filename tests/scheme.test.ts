@@ -52,6 +52,14 @@ describe('createScheme', () => {
     expect(lightScheme.primaryPalette.tone(40)).toBe(darkScheme.primaryPalette.tone(40));
   });
 
+  it('rejects brightness variants for a single dynamic scheme', () => {
+    const scheme = createScheme('#6750a4');
+
+    expect(() => createColorScheme(scheme, { brightnessVariants: true } as never)).toThrow(
+      /brightnessVariants require a MaterialTheme/,
+    );
+  });
+
   it('accepts one source color and rejects unsupported multi-source input', () => {
     expect(createScheme({ sourceColors: ['#6750a4'] }).sourceColorArgb).toBe(0xff6750a4);
 
@@ -86,3 +94,10 @@ describe('createScheme', () => {
     );
   });
 });
+
+function expectDynamicSchemeBrightnessVariantsTypeError(): void {
+  const scheme = createScheme('#6750a4');
+
+  // @ts-expect-error brightnessVariants require a MaterialTheme, not one DynamicColorScheme.
+  createColorScheme(scheme, { brightnessVariants: true });
+}

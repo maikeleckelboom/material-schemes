@@ -120,9 +120,7 @@ export class DynamicColorScheme {
     defineRoleGetters(this, this.delegate);
   }
 
-  public toColorScheme<WithBrightnessVariants extends boolean = false>(
-    options?: ColorSchemeOptions<WithBrightnessVariants>,
-  ): StructuredColorScheme<WithBrightnessVariants> {
+  public toColorScheme(options?: ColorSchemeOptions<false>): StructuredColorScheme<false> {
     return createColorScheme(this, options);
   }
 
@@ -173,17 +171,19 @@ export function createColorScheme<WithBrightnessVariants extends boolean = false
   source: MaterialThemeShape,
   options?: ColorSchemeOptions<WithBrightnessVariants>,
 ): StructuredColorScheme<WithBrightnessVariants>;
-export function createColorScheme<WithBrightnessVariants extends boolean = false>(
+export function createColorScheme(
   source: DynamicSchemeLike,
-  options?: ColorSchemeOptions<WithBrightnessVariants>,
-): StructuredColorScheme<WithBrightnessVariants>;
+  options?: ColorSchemeOptions<false>,
+): StructuredColorScheme<false>;
 export function createColorScheme<WithBrightnessVariants extends boolean = false>(
   source: DynamicSchemeLike | MaterialThemeShape,
   options: ColorSchemeOptions<WithBrightnessVariants> = {},
 ): StructuredColorScheme<WithBrightnessVariants> {
-  const colorScheme = isThemeShape(source)
-    ? createColorSchemeFromTheme(source, options)
-    : createColorSchemeFromDynamicScheme(source, options);
+  const colorScheme = (
+    isThemeShape(source)
+      ? createColorSchemeFromTheme(source, options)
+      : createColorSchemeFromDynamicScheme(source, options)
+  ) as StructuredColorScheme<WithBrightnessVariants>;
 
   return applyColorSchemeModifier(colorScheme, options);
 }
@@ -214,17 +214,23 @@ function createColorSchemeFromTheme<WithBrightnessVariants extends boolean>(
   return colorScheme as StructuredColorScheme<WithBrightnessVariants>;
 }
 
-function createColorSchemeFromDynamicScheme<WithBrightnessVariants extends boolean>(
+function createColorSchemeFromDynamicScheme(
   scheme: DynamicSchemeLike,
-  options: ColorSchemeOptions<WithBrightnessVariants>,
-): StructuredColorScheme<WithBrightnessVariants> {
+  options: ColorSchemeOptions<boolean>,
+): StructuredColorScheme<false> {
+  if (options.brightnessVariants) {
+    throw new Error(
+      'brightnessVariants require a MaterialTheme from createTheme; a single DynamicColorScheme cannot provide paired light and dark role values.',
+    );
+  }
+
   const colorScheme: ColorScheme = rolesToScheme(scheme);
 
   if (options.paletteTones) {
     Object.assign(colorScheme, schemePalettesToScheme(scheme, options.paletteTones));
   }
 
-  return colorScheme as StructuredColorScheme<WithBrightnessVariants>;
+  return colorScheme;
 }
 
 function applyColorSchemeModifier<WithBrightnessVariants extends boolean>(
