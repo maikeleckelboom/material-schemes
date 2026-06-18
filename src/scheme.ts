@@ -1,12 +1,11 @@
 import {
-  DynamicScheme,
-  type DynamicColor,
-  type TonalPalette,
+  DynamicScheme as MaterialDynamicScheme,
+  type TonalPalette as MaterialTonalPalette,
 } from '@material/material-color-utilities';
-import { formatColorToken, formatTokenName, isColor, toArgb, toHct } from './color';
+import { formatColorToken, formatTokenName, isColor, toArgb, toMaterialHct } from './color';
 import { resolveContrastLevelValue } from './contrast';
 import { createCssVarMap, createCssVariables, serializeCssVarMap } from './css';
-import { createPalette, PaletteStyle } from './palette';
+import { createMaterialPalette, createPalette, PaletteStyle } from './palette';
 import {
   DEFAULT_PALETTE_TONES,
   MATERIAL_COLOR_ROLES,
@@ -19,6 +18,8 @@ import type {
   ColorScheme,
   ColorSchemeOptions,
   CssVarMap,
+  DynamicSchemeLike,
+  HctColor,
   MaterialColorRole,
   MaterialOptionalColorRole,
   MaterialThemeShape,
@@ -28,9 +29,30 @@ import type {
   SerializeCssVarMapOptions,
   SpecVersion,
   StructuredColorScheme,
+  TonalPalette,
 } from './types';
+import type { Variant } from './variant';
 
-export class DynamicColorScheme extends DynamicScheme {
+export interface DynamicColorScheme extends DynamicSchemeLike {}
+
+export class DynamicColorScheme {
+  public sourceColorHct: HctColor;
+  public readonly sourceColorArgb: number;
+  public readonly variant: Variant;
+  public readonly contrastLevel: number;
+  public readonly isDark: boolean;
+  public readonly platform: Platform;
+  public readonly specVersion: SpecVersion;
+  public readonly primaryPalette: TonalPalette;
+  public readonly secondaryPalette: TonalPalette;
+  public readonly tertiaryPalette: TonalPalette;
+  public readonly neutralPalette: TonalPalette;
+  public readonly neutralVariantPalette: TonalPalette;
+  public readonly errorPalette: TonalPalette;
+  public readonly colors: DynamicSchemeLike['colors'];
+
+  private readonly delegate: MaterialDynamicScheme;
+
   public constructor(sourceColor: Color, options?: SchemeOptionsBase);
   public constructor(options: SchemeOptions);
   public constructor(source: Color | SchemeOptions, options: SchemeOptionsBase = {}) {
@@ -49,14 +71,14 @@ export class DynamicColorScheme extends DynamicScheme {
     const specVersion = getSpecVersionValue(resolvedOptions.specVersion);
     const platform = getPlatformValue(resolvedOptions.platform);
     const dynamicScheme = style.dynamicScheme(
-      toHct(sourceColor),
+      toMaterialHct(sourceColor),
       isDark,
       contrastLevel,
       specVersion,
       platform,
     );
 
-    super({
+    this.delegate = new MaterialDynamicScheme({
       ...dynamicScheme,
       primaryPalette: DynamicColorScheme.createPaletteOverride(
         primary,
@@ -78,7 +100,24 @@ export class DynamicColorScheme extends DynamicScheme {
         neutralVariant,
         dynamicScheme.neutralVariantPalette,
       ),
-    });
+    } as unknown as ConstructorParameters<typeof MaterialDynamicScheme>[0]);
+
+    this.sourceColorHct = this.delegate.sourceColorHct;
+    this.sourceColorArgb = this.delegate.sourceColorArgb;
+    this.variant = this.delegate.variant as Variant;
+    this.contrastLevel = this.delegate.contrastLevel;
+    this.isDark = this.delegate.isDark;
+    this.platform = this.delegate.platform;
+    this.specVersion = this.delegate.specVersion;
+    this.primaryPalette = this.delegate.primaryPalette;
+    this.secondaryPalette = this.delegate.secondaryPalette;
+    this.tertiaryPalette = this.delegate.tertiaryPalette;
+    this.neutralPalette = this.delegate.neutralPalette;
+    this.neutralVariantPalette = this.delegate.neutralVariantPalette;
+    this.errorPalette = this.delegate.errorPalette;
+    this.colors = this.delegate.colors as unknown as DynamicSchemeLike['colors'];
+
+    defineRoleGetters(this, this.delegate);
   }
 
   public toColorScheme<WithBrightnessVariants extends boolean = false>(
@@ -103,11 +142,19 @@ export class DynamicColorScheme extends DynamicScheme {
     return this.toCssVariables(options);
   }
 
+  public getArgb(dynamicColor: unknown): number {
+    return this.delegate.getArgb(dynamicColor as never);
+  }
+
+  public getHct(dynamicColor: unknown): HctColor {
+    return this.delegate.getHct(dynamicColor as never);
+  }
+
   private static createPaletteOverride(
     color: Color | undefined,
     fallback: TonalPalette,
-  ): TonalPalette {
-    return color == null ? fallback : createPalette(color);
+  ): MaterialTonalPalette {
+    return color == null ? (fallback as MaterialTonalPalette) : createMaterialPalette(color);
   }
 }
 
@@ -127,11 +174,11 @@ export function createColorScheme<WithBrightnessVariants extends boolean = false
   options?: ColorSchemeOptions<WithBrightnessVariants>,
 ): StructuredColorScheme<WithBrightnessVariants>;
 export function createColorScheme<WithBrightnessVariants extends boolean = false>(
-  source: DynamicScheme,
+  source: DynamicSchemeLike,
   options?: ColorSchemeOptions<WithBrightnessVariants>,
 ): StructuredColorScheme<WithBrightnessVariants>;
 export function createColorScheme<WithBrightnessVariants extends boolean = false>(
-  source: DynamicScheme | MaterialThemeShape,
+  source: DynamicSchemeLike | MaterialThemeShape,
   options: ColorSchemeOptions<WithBrightnessVariants> = {},
 ): StructuredColorScheme<WithBrightnessVariants> {
   const colorScheme = isThemeShape(source)
@@ -168,7 +215,7 @@ function createColorSchemeFromTheme<WithBrightnessVariants extends boolean>(
 }
 
 function createColorSchemeFromDynamicScheme<WithBrightnessVariants extends boolean>(
-  scheme: DynamicScheme,
+  scheme: DynamicSchemeLike,
   options: ColorSchemeOptions<WithBrightnessVariants>,
 ): StructuredColorScheme<WithBrightnessVariants> {
   const colorScheme: ColorScheme = rolesToScheme(scheme);
@@ -187,7 +234,7 @@ function applyColorSchemeModifier<WithBrightnessVariants extends boolean>(
   return options.modifyColorScheme?.(colorScheme) ?? colorScheme;
 }
 
-function rolesToScheme(scheme: DynamicScheme, suffix?: string): ColorScheme {
+function rolesToScheme(scheme: DynamicSchemeLike, suffix?: string): ColorScheme {
   const output: Record<string, Color> = {};
 
   for (const role of MATERIAL_COLOR_ROLES) {
@@ -199,8 +246,8 @@ function rolesToScheme(scheme: DynamicScheme, suffix?: string): ColorScheme {
   return output as ColorScheme;
 }
 
-function readSchemeRole(scheme: DynamicScheme, role: MaterialColorRole): number | undefined {
-  const colors = scheme.colors as unknown as Record<string, () => DynamicColor | undefined>;
+function readSchemeRole(scheme: DynamicSchemeLike, role: MaterialColorRole): number | undefined {
+  const colors = scheme.colors as Record<string, () => unknown>;
   const colorFactory = colors[role];
   if (typeof colorFactory !== 'function') {
     if (isOptionalRole(role)) return undefined;
@@ -214,6 +261,17 @@ function readSchemeRole(scheme: DynamicScheme, role: MaterialColorRole): number 
   }
 
   return scheme.getArgb(dynamicColor);
+}
+
+function defineRoleGetters(target: DynamicColorScheme, delegate: MaterialDynamicScheme): void {
+  const roleValues = delegate as unknown as Record<string, number | undefined>;
+
+  for (const role of MATERIAL_COLOR_ROLES) {
+    Object.defineProperty(target, role, {
+      configurable: true,
+      get: () => roleValues[role],
+    });
+  }
 }
 
 function customGroupsToScheme(
@@ -264,7 +322,7 @@ function themePalettesToScheme(
 }
 
 function schemePalettesToScheme(
-  scheme: DynamicScheme,
+  scheme: DynamicSchemeLike,
   paletteTones: boolean | readonly number[],
 ): Record<string, Color> {
   const palettes = {
@@ -348,7 +406,9 @@ function createSerializeOptions(
   };
 }
 
-function isThemeShape(source: DynamicScheme | MaterialThemeShape): source is MaterialThemeShape {
+function isThemeShape(
+  source: DynamicSchemeLike | MaterialThemeShape,
+): source is MaterialThemeShape {
   return 'schemes' in source && 'palettes' in source;
 }
 

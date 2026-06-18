@@ -36,13 +36,25 @@ export class ContrastLevel {
   }
 
   public static findClosest(value: number): ContrastLevel {
-    if (value < 0) return ContrastLevel.Reduced;
+    if (Number.isNaN(value)) return ContrastLevel.Default;
+    if (value === -Infinity) return ContrastLevel.Reduced;
+    if (value === Infinity) return ContrastLevel.High;
 
-    const candidates = ContrastLevel.Values.filter((level) => level.value >= 0).sort(
-      (left, right) => right.value - left.value,
-    );
+    let closest = ContrastLevel.Default;
+    let closestDistance = Infinity;
 
-    return candidates.find((level) => value >= level.value) ?? ContrastLevel.Default;
+    for (const level of ContrastLevel.Values) {
+      const distance = Math.abs(value - level.value);
+      if (
+        distance < closestDistance ||
+        (distance === closestDistance && level.value > closest.value)
+      ) {
+        closest = level;
+        closestDistance = distance;
+      }
+    }
+
+    return closest;
   }
 }
 

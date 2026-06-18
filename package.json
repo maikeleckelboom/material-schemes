@@ -6,9 +6,14 @@
   "author": "Maikel Eckelboom",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/maikeleckelboom/material-schemes.git"
+    "url": "git+https://github.com/maikeleckelboom/material-schemes.git"
   },
+  "bugs": {
+    "url": "https://github.com/maikeleckelboom/material-schemes/issues"
+  },
+  "homepage": "https://github.com/maikeleckelboom/material-schemes#readme",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -43,6 +48,9 @@
     "test": "vitest run",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm format",
+    "smoke:consumer": "node scripts/smokeConsumer.ts",
+    "release:check": "pnpm check && pnpm pack --dry-run && pnpm smoke:consumer",
     "prepack": "pnpm build"
   },
   "dependencies": {

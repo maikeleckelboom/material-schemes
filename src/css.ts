@@ -3,15 +3,17 @@ import type { Color, CssVarMap, CssVarMapOptions, SerializeCssVarMapOptions } fr
 
 export type CreateCssVariablesOptions = CssVarMapOptions & SerializeCssVarMapOptions;
 
-export function createCssVarMap<T extends Record<string, Color>>(
+export function createCssVarMap<T extends Record<string, Color | undefined>>(
   colorScheme: T,
   options: CssVarMapOptions = {},
 ): CssVarMap {
   return Object.fromEntries(
-    Object.entries(colorScheme).map(([key, value]) => [
-      formatCssVarName(key, options),
-      typeof value === 'string' && value.startsWith('var(') ? value : toHex(value),
-    ]),
+    Object.entries(colorScheme)
+      .filter((entry): entry is [string, Color] => entry[1] !== undefined)
+      .map(([key, value]) => [
+        formatCssVarName(key, options),
+        typeof value === 'string' && value.startsWith('var(') ? value : toHex(value),
+      ]),
   ) as CssVarMap;
 }
 
@@ -29,7 +31,7 @@ export function serializeCssVarMap(
   return `${selector} {\n${declarations.map((line) => `  ${line}`).join('\n')}\n}`;
 }
 
-export function createCssVariables<T extends Record<string, Color>>(
+export function createCssVariables<T extends Record<string, Color | undefined>>(
   colorScheme: T,
   options: CreateCssVariablesOptions | string = {},
 ): string {

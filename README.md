@@ -105,6 +105,8 @@ Published `@material/material-color-utilities@0.4.0` supports the 2021 and 2025 
 
 Numeric `contrastLevel` values must be finite numbers from `-1` through `1`, matching the range expected by Material DynamicScheme constructors.
 
+`ContrastLevel.from(value)` is different from raw numeric validation. It maps a number to the closest named helper level: `Reduced`, `Default`, `Medium`, or `High`. Use it for UI presets or config normalization, not when you need to preserve an exact arbitrary numeric contrast value for `createScheme` or `createTheme`.
+
 ## Custom Colors
 
 Custom colors are generated as Material-style color groups and can be included in the scheme output.
@@ -160,3 +162,29 @@ The package intentionally avoids broad internal re-exports.
 ## Development Notes
 
 `tsconfig.json` keeps `ignoreDeprecations: "6.0"` because tsup declaration generation with TypeScript 6 currently reports the deprecated `baseUrl` option during DTS output. This repo itself does not set `baseUrl`; remove the suppression after tsup or its declaration-generation dependencies stop surfacing that deprecated option. The TypeScript lib is intentionally `ES2022` only; no DOM types are required by this package today.
+
+`tsup.config.ts` bundles `@material/material-color-utilities` into `dist` with `noExternal` because the published upstream ESM output currently contains extensionless relative imports that are not safe in real Node ESM consumers when left unbundled. The package still keeps `@material/material-color-utilities` as a dependency because the implementation is intentionally backed by that upstream package. Public declarations use local structural types such as `Variant`, `HctColor`, `TonalPalette`, and `DynamicSchemeLike` so strict consumers do not inherit upstream declaration issues. Revisit the runtime bundling workaround only after a real packed consumer smoke test passes without bundling the upstream package.
+
+Library runtime support remains Node >=18. Maintainer release scripts may require a modern Node version with stable TypeScript type stripping; use Node >=24.12 for release checks. The consumer smoke runner stays in TypeScript intentionally, avoids a TypeScript runtime dependency, and uses only erasable TypeScript syntax so Node can execute it directly.
+
+## Release Readiness Notes
+
+Do not publish from hardening checks. Use these gates before release work:
+
+```bash
+pnpm check
+pnpm pack --dry-run
+pnpm smoke:consumer
+pnpm release:check
+```
+
+Check npm name availability with npm itself, not web search:
+
+```bash
+npm view material-schemes name version --json
+npm view @chromavert/material-schemes name version --json
+```
+
+During release-readiness hardening on 2026-06-18, `npm view material-schemes name version --json` returned npm E404 / package not found, so `material-schemes` appeared available at that moment. If a name check returns npm E404 / package not found, the name is available at that moment only. Repeat this check immediately before the first npm publish because package availability can change. If `material-schemes` exists at final release time, switch to a scoped name such as `@chromavert/material-schemes` before publishing.
+
+Development and consolidation work can stay at `0.0.0`. The first public npm release should be `0.1.0`, and that version bump belongs in the final release-prep commit rather than unrelated hardening work.

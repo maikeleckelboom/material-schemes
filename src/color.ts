@@ -2,10 +2,10 @@ import {
   argbFromHex,
   Blend,
   DislikeAnalyzer,
-  Hct,
+  Hct as MaterialHct,
   hexFromArgb,
 } from '@material/material-color-utilities';
-import type { Color } from './types';
+import type { Color, HctColor } from './types';
 
 export interface RgbaBytesColor {
   r: number;
@@ -36,8 +36,8 @@ export function toRgbaBytes(color: Color): RgbaBytesColor {
   };
 }
 
-export function toHct(color: Color): Hct {
-  return Hct.fromInt(toArgb(color));
+export function toHct(color: Color): HctColor {
+  return toMaterialHct(color);
 }
 
 export function harmonize(designColor: Color, sourceColor: Color): number {
@@ -53,11 +53,15 @@ export function blendCam(from: Color, to: Color, amount: number): number {
 }
 
 export function isDisliked(color: Color): boolean {
-  return DislikeAnalyzer.isDisliked(toHct(color));
+  return DislikeAnalyzer.isDisliked(toMaterialHct(color));
 }
 
 export function fixIfDisliked(color: Color): number {
-  return DislikeAnalyzer.fixIfDisliked(toHct(color)).toInt();
+  return DislikeAnalyzer.fixIfDisliked(toMaterialHct(color)).toInt();
+}
+
+export function toMaterialHct(color: Color): MaterialHct {
+  return MaterialHct.fromInt(toArgb(color));
 }
 
 function clampUnit(value: number): number {

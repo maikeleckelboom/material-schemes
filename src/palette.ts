@@ -1,5 +1,6 @@
 import {
-  Hct,
+  DynamicScheme as MaterialDynamicScheme,
+  Hct as MaterialHct,
   SchemeContent,
   SchemeExpressive,
   SchemeFidelity,
@@ -9,32 +10,32 @@ import {
   SchemeRainbow,
   SchemeTonalSpot,
   SchemeVibrant,
-  TonalPalette,
-  Variant,
+  TonalPalette as MaterialTonalPalette,
 } from '@material/material-color-utilities';
 import { toArgb } from './color';
 import { ContrastLevel } from './contrast';
 import { CMF_SUPPORTED, DEFAULT_PALETTE_TONES, PALETTE_STYLE_NAMES } from './roles';
-import type { Color, PaletteStyleInput, PaletteStyleName, Platform, SpecVersion } from './types';
+import type {
+  Color,
+  DynamicSchemeLike,
+  HctColor,
+  PaletteStyleInput,
+  PaletteStyleName,
+  Platform,
+  SpecVersion,
+  TonalPalette,
+} from './types';
+import { Variant } from './variant';
 
-type PaletteStyleScheme =
-  | SchemeContent
-  | SchemeExpressive
-  | SchemeFidelity
-  | SchemeFruitSalad
-  | SchemeMonochrome
-  | SchemeNeutral
-  | SchemeRainbow
-  | SchemeTonalSpot
-  | SchemeVibrant;
+type PaletteStyleScheme = DynamicSchemeLike;
 
 type SchemeConstructor = new (
-  sourceColorHct: Hct,
+  sourceColorHct: MaterialHct,
   isDark: boolean,
   contrastLevel: number,
   specVersion?: SpecVersion,
   platform?: Platform,
-) => PaletteStyleScheme;
+) => MaterialDynamicScheme;
 
 export class PaletteStyle {
   public readonly name: PaletteStyleName;
@@ -52,13 +53,19 @@ export class PaletteStyle {
   }
 
   public dynamicScheme(
-    sourceColorHct: Hct,
+    sourceColorHct: HctColor,
     isDark: boolean = false,
     contrastLevel: number = ContrastLevel.Default.value,
     specVersion?: SpecVersion,
     platform?: Platform,
   ): PaletteStyleScheme {
-    return new this.schemeConstructor(sourceColorHct, isDark, contrastLevel, specVersion, platform);
+    return new this.schemeConstructor(
+      sourceColorHct as MaterialHct,
+      isDark,
+      contrastLevel,
+      specVersion,
+      platform,
+    ) as unknown as DynamicSchemeLike;
   }
 
   public static readonly Monochrome = new PaletteStyle(
@@ -126,7 +133,11 @@ export class PaletteStyle {
 }
 
 export function createPalette(color: Color): TonalPalette {
-  return TonalPalette.fromInt(toArgb(color));
+  return createMaterialPalette(color);
+}
+
+export function createMaterialPalette(color: Color): MaterialTonalPalette {
+  return MaterialTonalPalette.fromInt(toArgb(color));
 }
 
 export function getPaletteColors(

@@ -1,4 +1,3 @@
-import type { DynamicScheme, TonalPalette, Variant } from '@material/material-color-utilities';
 import type {
   MATERIAL_COLOR_ROLES,
   MATERIAL_OPTIONAL_COLOR_ROLES,
@@ -11,6 +10,7 @@ import type {
 import type { ContrastLevel } from './contrast';
 import type { PaletteStyle } from './palette';
 import type { DynamicColorScheme } from './scheme';
+import type { Variant } from './variant';
 
 export type Color = string | number;
 
@@ -45,12 +45,27 @@ export type SpecVersion = (typeof SUPPORTED_SPEC_VERSIONS)[number];
 
 export type Platform = (typeof SUPPORTED_PLATFORMS)[number];
 
+export interface HctColor {
+  hue: number;
+  chroma: number;
+  tone: number;
+  toInt(): number;
+}
+
+export interface TonalPalette {
+  readonly hue: number;
+  readonly chroma: number;
+  readonly keyColor: HctColor;
+  tone(tone: number): number;
+  getHct(tone: number): HctColor;
+}
+
 export type MaterialColorScheme = { [Role in MaterialRequiredColorRole]: Color } & {
   [Role in MaterialOptionalColorRole]?: Color;
 };
 
 export interface ColorScheme extends MaterialColorScheme {
-  [key: string]: Color;
+  [key: string]: Color | undefined;
 }
 
 export type SuffixedMaterialColorScheme<Suffix extends string> = {
@@ -97,6 +112,29 @@ export interface CustomColorGroup {
 export type MaterialCustomColorGroup = CustomColorGroup & {
   color: CustomColorGroup['color'];
 };
+
+export type DynamicSchemeRoleValues = { [Role in MaterialRequiredColorRole]: number } & {
+  [Role in MaterialOptionalColorRole]?: number;
+};
+
+export interface DynamicSchemeLike extends DynamicSchemeRoleValues {
+  sourceColorHct: HctColor;
+  readonly sourceColorArgb: number;
+  readonly variant: Variant;
+  readonly contrastLevel: number;
+  readonly isDark: boolean;
+  readonly platform: Platform;
+  readonly specVersion: SpecVersion;
+  readonly primaryPalette: TonalPalette;
+  readonly secondaryPalette: TonalPalette;
+  readonly tertiaryPalette: TonalPalette;
+  readonly neutralPalette: TonalPalette;
+  readonly neutralVariantPalette: TonalPalette;
+  readonly errorPalette: TonalPalette;
+  readonly colors: Record<string, () => unknown>;
+  getArgb(dynamicColor: unknown): number;
+  getHct(dynamicColor: unknown): HctColor;
+}
 
 export interface SchemeOptionsBase {
   sourceColors?: readonly Color[];
@@ -149,11 +187,11 @@ export interface MaterialThemeShape {
   customColors: MaterialCustomColorGroup[];
 }
 
-export type ColorSchemeSource = DynamicScheme | DynamicColorScheme | MaterialThemeShape;
+export type ColorSchemeSource = DynamicSchemeLike | DynamicColorScheme | MaterialThemeShape;
 
 export type ModifyColorSchemeFn<WithBrightnessVariants extends boolean = false> = (
   colorScheme: StructuredColorScheme<WithBrightnessVariants>,
-) => StructuredColorScheme<WithBrightnessVariants> & Record<string, Color>;
+) => StructuredColorScheme<WithBrightnessVariants> & Record<string, Color | undefined>;
 
 export interface ColorSchemeOptions<WithBrightnessVariants extends boolean = false> {
   dark?: boolean;

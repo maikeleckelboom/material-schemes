@@ -29,6 +29,7 @@ export {
 export { createPalette, getPaletteColors, PaletteStyle } from './palette';
 export { createColorScheme, createScheme, DynamicColorScheme } from './scheme';
 export { createCustomColorGroup, createTheme, MaterialTheme } from './theme';
+export { Variant } from './variant';
 export {
   CMF_SUPPORTED,
   DEFAULT_PALETTE_TONES,
@@ -40,7 +41,6 @@ export {
   SUPPORTED_PLATFORMS,
   SUPPORTED_SPEC_VERSIONS,
 } from './roles';
-export { Variant } from '@material/material-color-utilities';
 export type {
   Color,
   ColorScheme,
@@ -51,6 +51,9 @@ export type {
   CssVarMapOptions,
   CustomColor,
   CustomColorGroup,
+  DynamicSchemeLike,
+  DynamicSchemeRoleValues,
+  HctColor,
   MaterialColorRole,
   MaterialColorScheme,
   MaterialCustomColorGroup,
@@ -72,4 +75,5 @@ export type {
   SuffixedMaterialColorScheme,
   ThemeOptions,
   ThemeSource,
+  TonalPalette,
 } from './types';
