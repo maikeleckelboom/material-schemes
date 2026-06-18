@@ -1,12 +1,58 @@
 {
-  "name": "@chromavert/material",
-  "private": true,
+  "name": "material-schemes",
+  "version": "0.0.0",
+  "description": "TypeScript utilities for generating Material 3 color schemes, tonal palettes, and CSS variables.",
+  "license": "MIT",
+  "author": "Maikel Eckelboom",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/maikeleckelboom/material-schemes.git"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "material-design",
+    "material-3",
+    "color-schemes",
+    "tonal-palettes",
+    "css-variables",
+    "design-tokens"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "dev": "bun run ./scripts/dev.ts"
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0"
   },
   "devDependencies": {
-    "vitest": "^4.1.8",
-    "@types/node": "^25.9.2",
-    "zod": "^4.4.3"
+    "@types/node": "^25.9.3",
+    "prettier": "^3.8.4",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

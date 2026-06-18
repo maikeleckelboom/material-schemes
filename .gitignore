@@ -6,8 +6,11 @@ node_modules/
 .vscode/
 .idea/
 
-# Lockfiles
-*.lock
+# Non-canonical lockfiles
+bun.lock
+bun.lockb
+package-lock.json
+yarn.lock
 
 # Logs
 *.log

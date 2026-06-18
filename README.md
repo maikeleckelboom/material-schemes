@@ -1,0 +1,154 @@
+# material-schemes
+
+TypeScript utilities for generating Material 3 color schemes, tonal palettes, and CSS variables from source colors.
+
+This package is a library. It is not a UI component library, a portfolio theme system, a Tailwind plugin, or a browser image extraction workflow. Consuming apps should map Material roles such as `primary`, `surface`, and `onSurface` to their own semantic aliases when they need names like `canvas`, `text`, `border`, or `action`.
+
+## Install
+
+```bash
+pnpm add material-schemes
+```
+
+## Create A Theme
+
+`createTheme` creates paired light and dark DynamicScheme-backed schemes plus core tonal palettes.
+
+```ts
+import { ContrastLevel, PaletteStyle, createColorScheme, createTheme } from 'material-schemes';
+
+const theme = createTheme('#6750a4', {
+  variant: PaletteStyle.TonalSpot,
+  contrastLevel: ContrastLevel.Default,
+  specVersion: '2025',
+  platform: 'phone',
+});
+
+const light = createColorScheme(theme);
+const dark = createColorScheme(theme, { dark: true });
+```
+
+## Create A Single Scheme
+
+Use `createScheme` when you only need one light or dark scheme.
+
+```ts
+import { createColorScheme, createScheme } from 'material-schemes';
+
+const darkScheme = createScheme('#6750a4', {
+  isDark: true,
+  variant: 'Vibrant',
+  specVersion: '2025',
+});
+
+const colors = createColorScheme(darkScheme);
+```
+
+## CSS Variables
+
+Generate a CSS variable map or serialize it directly.
+
+```ts
+import {
+  createColorScheme,
+  createCssVarMap,
+  createCssVariables,
+  createTheme,
+  serializeCssVarMap,
+} from 'material-schemes';
+
+const theme = createTheme('#6750a4');
+const colorScheme = createColorScheme(theme);
+
+const vars = createCssVarMap(colorScheme);
+const css = serializeCssVarMap(vars, { selector: ':root' });
+
+const sameCss = createCssVariables(colorScheme, ':root');
+```
+
+## Palette Tones
+
+Tonal palette helpers expose Material tone values without inventing app-specific tokens.
+
+```ts
+import { createPalette, getPaletteColors } from 'material-schemes';
+
+const palette = createPalette('#6750a4');
+const tone40 = palette.tone(40);
+const selectedTones = getPaletteColors(palette, [0, 40, 100]);
+```
+
+`createColorScheme` can include palette tones in its output:
+
+```ts
+const schemeWithTones = createColorScheme(theme, {
+  paletteTones: [0, 40, 100],
+});
+```
+
+## Contrast And Variants
+
+The package uses the current DynamicScheme-based API from `@material/material-color-utilities`.
+
+```ts
+import { ContrastLevel, PaletteStyle, createTheme } from 'material-schemes';
+
+const expressive = createTheme('#6750a4', {
+  variant: PaletteStyle.Expressive,
+  contrastLevel: ContrastLevel.High,
+  specVersion: '2025',
+  platform: 'watch',
+});
+```
+
+Published `@material/material-color-utilities@0.4.0` supports the 2021 and 2025 spec versions and `phone` or `watch` platforms. It does not publish `SchemeCmf` or a CMF variant, so `material-schemes` rejects `variant: 'cmf'` instead of pretending to support it.
+
+## Custom Colors
+
+Custom colors are generated as Material-style color groups and can be included in the scheme output.
+
+```ts
+const theme = createTheme({
+  sourceColor: '#6750a4',
+  customColors: [
+    {
+      name: 'Success Green',
+      value: '#2e7d32',
+      blend: true,
+    },
+  ],
+});
+
+const colors = createColorScheme(theme, {
+  brightnessVariants: true,
+});
+```
+
+## Source Colors
+
+The installed Material package only supports one source color for the published DynamicScheme constructors. `sourceColors` is accepted for forward-compatible API shape, but v0 requires exactly one color and rejects extra source colors.
+
+```ts
+const theme = createTheme({
+  sourceColors: ['#6750a4'],
+});
+```
+
+## Public API
+
+Primary exports:
+
+- `createScheme`
+- `createTheme`
+- `createColorScheme`
+- `createPalette`
+- `getPaletteColors`
+- `createCssVarMap`
+- `serializeCssVarMap`
+- `createCssVariables`
+- `createSchemeCssVariables`
+- `MATERIAL_COLOR_ROLES`, `MATERIAL_REQUIRED_COLOR_ROLES`, `MATERIAL_OPTIONAL_COLOR_ROLES`
+- `PaletteStyle`, `Variant`, `ContrastLevel`, `ContrastThreshold`
+- color and contrast helpers such as `toArgb`, `toHex`, `toHct`, `getContrastRatio`, and `isContrasting`
+
+The package intentionally avoids broad internal re-exports.
