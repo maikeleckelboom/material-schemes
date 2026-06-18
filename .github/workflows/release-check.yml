@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload retained verification directory
         if: failure() && env.VERIFY_RELEASE_RETAINED_DIR != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: verify-release-failure-${{ matrix.os }}
           path: ${{ env.VERIFY_RELEASE_RETAINED_DIR }}
