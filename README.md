@@ -161,17 +161,19 @@ Primary exports:
 
 The package intentionally avoids broad internal re-exports.
 
-## Development Notes
+## Maintainer Notes
 
-`tsconfig.json` keeps `ignoreDeprecations: "6.0"` because tsup declaration generation with TypeScript 6 currently reports the deprecated `baseUrl` option during DTS output. This repo itself does not set `baseUrl`; remove the suppression after tsup or its declaration-generation dependencies stop surfacing that deprecated option. The TypeScript lib is intentionally `ES2022` only; no DOM types are required by this package today.
+Library runtime support is Node >=18. Maintainer and release checks may require a newer Node runtime with stable direct TypeScript execution, because the consumer smoke runner intentionally stays in TypeScript. Do not add `tsx`, `ts-node`, or another TypeScript runtime dependency for that script; it should remain executable by Node itself.
 
-`tsup.config.ts` bundles `@material/material-color-utilities` into `dist` with `noExternal` because the published upstream ESM output currently contains extensionless relative imports that are not safe in real Node ESM consumers when left unbundled. The package still keeps `@material/material-color-utilities` as a dependency because the implementation is intentionally backed by that upstream package. Public declarations use local structural types such as `Variant`, `HctColor`, `TonalPalette`, and `DynamicSchemeLike` so strict consumers do not inherit upstream declaration issues. Revisit the runtime bundling workaround only after a real packed consumer smoke test passes without bundling the upstream package.
+`tsup.config.ts` intentionally bundles `@material/material-color-utilities` into `dist`. The upstream package is still the implementation source, but its currently published ESM output contains extensionless relative imports that are unsafe for real Node ESM consumers when left external. Keep the bundling workaround until a packed consumer smoke test proves the package works without it.
 
-Library runtime support remains Node >=18. Maintainer release scripts may require a modern Node version with stable TypeScript type stripping; use Node >=24.12 for release checks. The consumer smoke runner stays in TypeScript intentionally, avoids a TypeScript runtime dependency, and uses only erasable TypeScript syntax so Node can execute it directly.
+Public declarations intentionally use local structural types such as `Variant`, `HctColor`, `TonalPalette`, and `DynamicSchemeLike`. That keeps strict consumers from depending on fragile upstream declaration shapes.
 
-## Release Readiness Notes
+`tsconfig.json` keeps `ignoreDeprecations: "6.0"` because tsup declaration generation currently surfaces the deprecated `baseUrl` option during DTS output. This repo does not set `baseUrl`; remove the suppression only after tsup or its declaration-generation dependencies stop surfacing that option.
 
-Do not publish from hardening checks. Use these gates before release work:
+## Verification
+
+Run release verification from a Node version that supports the maintainer scripts:
 
 ```bash
 pnpm check
@@ -180,13 +182,17 @@ pnpm smoke:consumer
 pnpm release:check
 ```
 
-Check npm name availability with npm itself, not web search:
+Before a first npm publish, check package-name availability with npm itself:
 
 ```bash
 npm view material-schemes name version --json
 npm view @chromavert/material-schemes name version --json
 ```
 
-During release-readiness hardening on 2026-06-18, `npm view material-schemes name version --json` returned npm E404 / package not found, so `material-schemes` appeared available at that moment. If a name check returns npm E404 / package not found, the name is available at that moment only. Repeat this check immediately before the first npm publish because package availability can change. If `material-schemes` exists at final release time, switch to a scoped name such as `@chromavert/material-schemes` before publishing.
+Treat an npm 404 as a moment-in-time result only. Package availability can change, so repeat the check immediately before publishing and choose the final package name based on that current result.
 
-Development and consolidation work can stay at `0.0.0`. The first public npm release should be `0.1.0`, and that version bump belongs in the final release-prep commit rather than unrelated hardening work.
+## Release Policy
+
+Keep the package at `0.0.0` during development and consolidation. Do not treat `0.1.0` as automatic; choose the first public version only when the public API, package name, README examples, generated declarations, bundled output, and consumer behavior are ready to be accepted as a public contract.
+
+Publishing is not just the next checklist step after the commands pass. It is the point where consumers can reasonably start depending on the exported API, package shape, runtime behavior, and documented usage. Make the first public release only when that contract is intentional.
