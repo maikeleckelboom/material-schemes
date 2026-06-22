@@ -21,6 +21,9 @@ dist/
 build/
 **/build/
 
+# Generated vendor sources
+vendor/material-color-utilities/
+
 # Environment Files
 .env
 .env.local

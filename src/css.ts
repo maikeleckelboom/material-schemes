@@ -1,54 +1,52 @@
-import { formatCssVarName, toHex } from './color';
-import type { Color, CssVarMap, CssVarMapOptions, SerializeCssVarMapOptions } from './types';
+import { normalizeHexColor } from './hex';
+import { MATERIAL_COLOR_ROLES, MATERIAL_REQUIRED_COLOR_ROLES } from './roles';
+import type { MaterialColorRole, MaterialScheme, ToCssOptions } from './types';
 
-export type CreateCssVariablesOptions = CssVarMapOptions & SerializeCssVarMapOptions;
+const ROLE_SET = new Set<string>(MATERIAL_COLOR_ROLES);
 
-export function createCssVarMap<T extends Record<string, Color | undefined>>(
-  colorScheme: T,
-  options: CssVarMapOptions = {},
-): CssVarMap {
-  return Object.fromEntries(
-    Object.entries(colorScheme)
-      .filter((entry): entry is [string, Color] => entry[1] !== undefined)
-      .map(([key, value]) => [
-        formatCssVarName(key, options),
-        typeof value === 'string' && value.startsWith('var(') ? value : toHex(value),
-      ]),
-  ) as CssVarMap;
+export function toCss(scheme: MaterialScheme, options: ToCssOptions): string {
+  const selector = resolveSelector(options);
+  assertExactMaterialScheme(scheme);
+
+  const declarations = MATERIAL_COLOR_ROLES.flatMap((role) => {
+    const value = scheme[role];
+    if (value === undefined) return [];
+    return `  ${toMaterialCssVariableName(role)}: ${normalizeHexColor(value, role)};`;
+  });
+
+  return `${selector} {\n${declarations.join('\n')}\n}`;
 }
 
-export function serializeCssVarMap(
-  mapping: Record<`--${string}`, string>,
-  options?: string | SerializeCssVarMapOptions,
-): string {
-  const { selector, minify = false } = normalizeSerializeOptions(options);
-  const declarations = Object.entries(mapping).map(([name, value]) => `${name}: ${value};`);
+function resolveSelector(options: ToCssOptions): string {
+  if (typeof options.selector === 'string' && options.selector.trim().length > 0) {
+    return options.selector;
+  }
 
-  if (!selector) return minify ? declarations.join(' ') : declarations.join('\n');
-
-  if (minify) return `${selector}{${declarations.join(' ')}}`;
-
-  return `${selector} {\n${declarations.map((line) => `  ${line}`).join('\n')}\n}`;
+  throw new Error('toCss requires a non-empty selector.');
 }
 
-export function createCssVariables<T extends Record<string, Color | undefined>>(
-  colorScheme: T,
-  options: CreateCssVariablesOptions | string = {},
-): string {
-  const normalizedOptions = normalizeCreateOptions(options);
-  return serializeCssVarMap(createCssVarMap(colorScheme, normalizedOptions), normalizedOptions);
+function assertExactMaterialScheme(scheme: MaterialScheme): void {
+  const keys = Object.keys(scheme);
+
+  for (const role of MATERIAL_REQUIRED_COLOR_ROLES) {
+    if (scheme[role] === undefined) {
+      throw new Error(`Material scheme is missing required role: ${role}`);
+    }
+  }
+
+  for (const key of keys) {
+    if (!ROLE_SET.has(key)) {
+      throw new Error(`Material scheme contains an unsupported role: ${key}`);
+    }
+
+    normalizeHexColor(scheme[key as MaterialColorRole], key);
+  }
 }
 
-export const createSchemeCssVariables = createCssVariables;
-
-function normalizeSerializeOptions(
-  options?: string | SerializeCssVarMapOptions,
-): SerializeCssVarMapOptions {
-  return typeof options === 'string' ? { selector: options } : (options ?? {});
+function toMaterialCssVariableName(role: MaterialColorRole): `--md-sys-color-${string}` {
+  return `--md-sys-color-${toKebabCase(role)}`;
 }
 
-function normalizeCreateOptions(
-  options: CreateCssVariablesOptions | string,
-): CreateCssVariablesOptions {
-  return typeof options === 'string' ? { selector: options } : options;
+function toKebabCase(value: string): string {
+  return value.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
 }

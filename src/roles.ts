@@ -1,4 +1,4 @@
-export const MATERIAL_PALETTE_KEY_COLORS = [
+export const MATERIAL_PALETTE_KEY_COLOR_ROLES = [
   'primaryPaletteKeyColor',
   'secondaryPaletteKeyColor',
   'tertiaryPaletteKeyColor',
@@ -8,7 +8,7 @@ export const MATERIAL_PALETTE_KEY_COLORS = [
 ] as const;
 
 export const MATERIAL_REQUIRED_COLOR_ROLES = [
-  ...MATERIAL_PALETTE_KEY_COLORS,
+  ...MATERIAL_PALETTE_KEY_COLOR_ROLES,
   'background',
   'onBackground',
   'surface',
@@ -72,24 +72,18 @@ export const MATERIAL_COLOR_ROLES = [
   ...MATERIAL_OPTIONAL_COLOR_ROLES,
 ] as const;
 
-export const DEFAULT_PALETTE_TONES = [
-  0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100,
+export const MATERIAL_VARIANTS = [
+  'monochrome',
+  'neutral',
+  'tonal-spot',
+  'vibrant',
+  'expressive',
+  'fidelity',
+  'content',
+  'rainbow',
+  'fruit-salad',
 ] as const;
 
-export const PALETTE_STYLE_NAMES = [
-  'Monochrome',
-  'Neutral',
-  'TonalSpot',
-  'Vibrant',
-  'Expressive',
-  'Fidelity',
-  'Content',
-  'Rainbow',
-  'FruitSalad',
-] as const;
-
-export const SUPPORTED_SPEC_VERSIONS = ['2021', '2025'] as const;
+export const SUPPORTED_SPEC_VERSIONS = ['2021', '2025', '2026'] as const;
 
 export const SUPPORTED_PLATFORMS = ['phone', 'watch'] as const;
-
-export const CMF_SUPPORTED = false;

@@ -92,46 +92,45 @@ function writeConsumer(consumerDir: string, tarballPath: string): void {
   writeFileSync(
     join(consumerDir, 'smoke-esm.mjs'),
     `import assert from 'node:assert/strict';
-import { createColorScheme, createCssVariables, createTheme } from 'material-schemes';
+import { createSchemes, toCss } from 'material-schemes';
 
-const theme = createTheme('#6750a4');
-const scheme = createColorScheme(theme);
-const css = createCssVariables(scheme, ':root');
+const schemes = createSchemes({ sourceColor: '#6750a4' });
+const css = toCss(schemes.light, { selector: ':root' });
 
-assert.equal(typeof theme.source, 'number');
-assert.equal(typeof scheme.primary, 'number');
-assert.ok(css.includes('--primary:'), 'CSS variables include primary role');
+assert.equal(typeof schemes.light.primary, 'string');
+assert.equal(typeof schemes.dark.onSurface, 'string');
+assert.ok(css.includes('--md-sys-color-primary:'), 'CSS variables include primary role');
 `,
   );
 
   writeFileSync(
     join(consumerDir, 'smoke-cjs.cjs'),
     `const assert = require('node:assert/strict');
-const { createColorScheme, createCssVariables, createTheme } = require('material-schemes');
+const { createSchemes, toCss } = require('material-schemes');
 
-const theme = createTheme('#6750a4');
-const scheme = createColorScheme(theme);
-const css = createCssVariables(scheme, ':root');
+const schemes = createSchemes({ sourceColor: '#6750a4' });
+const css = toCss(schemes.light, { selector: ':root' });
 
-assert.equal(typeof theme.source, 'number');
-assert.equal(typeof scheme.primary, 'number');
-assert.ok(css.includes('--primary:'), 'CSS variables include primary role');
+assert.equal(typeof schemes.light.primary, 'string');
+assert.equal(typeof schemes.dark.onSurface, 'string');
+assert.ok(css.includes('--md-sys-color-primary:'), 'CSS variables include primary role');
 `,
   );
 
   writeFileSync(
     join(consumerDir, 'smoke-types.ts'),
     `import {
-  createColorScheme,
-  createCssVariables,
-  createTheme,
-  type ColorScheme,
+  createSchemes,
+  toCss,
+  type HexColor,
+  type MaterialScheme,
 } from 'material-schemes';
 
-const theme = createTheme('#6750a4');
-const scheme: ColorScheme = createColorScheme(theme);
-const css: string = createCssVariables(scheme, { selector: ':root' });
-const primary: string | number = scheme.primary;
+const sourceColor: HexColor = '#6750a4';
+const schemes = createSchemes({ sourceColor });
+const scheme: MaterialScheme = schemes.light;
+const css: string = toCss(scheme, { selector: ':root' });
+const primary: HexColor = scheme.primary;
 
 void css;
 void primary;

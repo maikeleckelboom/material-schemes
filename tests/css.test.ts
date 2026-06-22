@@ -1,42 +1,47 @@
 import { describe, expect, it } from 'vitest';
-import { createCssVarMap, createCssVariables, serializeCssVarMap } from '../src';
+import { createSchemes, toCss } from '../src';
+import type { MaterialScheme } from '../src';
 
-describe('CSS variables', () => {
-  it('maps color roles to kebab-case CSS variables with hex values', () => {
-    const map = createCssVarMap({
-      primary: 0xffff5733,
-      onPrimary: 0xffffffff,
-    });
+describe('toCss', () => {
+  it('serializes a Material scheme with fixed Material system CSS names', () => {
+    const schemes = createSchemes({ sourceColor: '#6750a4' });
+    const css = toCss(schemes.light, { selector: ':root' });
 
-    expect(map).toEqual({
-      '--primary': '#ff5733',
-      '--on-primary': '#ffffff',
-    });
+    expect(css).toContain(':root {');
+    expect(css).toContain('  --md-sys-color-primary: ');
+    expect(css).toContain('  --md-sys-color-on-primary: ');
+    expect(css).toContain('  --md-sys-color-primary-palette-key-color: ');
+    expect(css).not.toContain('--primary:');
   });
 
-  it('serializes CSS variables with and without selectors', () => {
-    const map = {
-      '--primary': '#ff5733',
-      '--on-primary': '#ffffff',
-    } as const;
+  it('rejects empty selectors', () => {
+    const schemes = createSchemes({ sourceColor: '#6750a4' });
 
-    expect(serializeCssVarMap(map)).toBe('--primary: #ff5733;\n--on-primary: #ffffff;');
-    expect(serializeCssVarMap(map, { selector: ':root', minify: true })).toBe(
-      ':root{--primary: #ff5733; --on-primary: #ffffff;}',
+    expect(() => toCss(schemes.light, { selector: '' })).toThrow(
+      /toCss requires a non-empty selector/,
     );
   });
 
-  it('creates CSS variables directly from a color scheme', () => {
-    const css = createCssVariables(
-      {
-        primary: 0xffff5733,
-        onPrimary: 0xffffffff,
-      },
-      ':root',
+  it('rejects unsupported roles instead of serializing arbitrary records', () => {
+    const schemes = createSchemes({ sourceColor: '#6750a4' });
+    const scheme = { ...schemes.light, success: '#2e7d32' } as unknown as MaterialScheme;
+
+    expect(() => toCss(scheme, { selector: ':root' })).toThrow(/unsupported role: success/);
+  });
+
+  it('rejects missing required roles and non-canonical color values', () => {
+    const schemes = createSchemes({ sourceColor: '#6750a4' });
+    const missingPrimary = { ...schemes.light } as Record<string, string>;
+    delete missingPrimary.primary;
+
+    expect(() => toCss(missingPrimary as unknown as MaterialScheme, { selector: ':root' })).toThrow(
+      /missing required role: primary/,
     );
 
-    expect(css).toContain(':root');
-    expect(css).toContain('--primary: #ff5733;');
-    expect(css).toContain('--on-primary: #ffffff;');
+    expect(() =>
+      toCss({ ...schemes.light, primary: '#6750a4ff' } as unknown as MaterialScheme, {
+        selector: ':root',
+      }),
+    ).toThrow(/primary must be a #RRGGBB hex color/);
   });
 });

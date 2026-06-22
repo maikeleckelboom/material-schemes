@@ -1,429 +1,162 @@
 import {
-  DynamicScheme as MaterialDynamicScheme,
-  type TonalPalette as MaterialTonalPalette,
-} from '@material/material-color-utilities';
-import { formatColorToken, formatTokenName, isColor, toArgb, toMaterialHct } from './color';
-import { resolveContrastLevelValue } from './contrast';
-import { createCssVarMap, createCssVariables, serializeCssVarMap } from './css';
-import { createMaterialPalette, createPalette, PaletteStyle } from './palette';
+  DynamicScheme,
+  Hct,
+  SchemeContent,
+  SchemeExpressive,
+  SchemeFidelity,
+  SchemeFruitSalad,
+  SchemeMonochrome,
+  SchemeNeutral,
+  SchemeRainbow,
+  SchemeTonalSpot,
+  SchemeVibrant,
+} from '../vendor/material-color-utilities/dist/index.js';
+import type { DynamicColor } from '../vendor/material-color-utilities/dist/index.js';
+import { argbToHexColor, hexColorToArgb, normalizeHexColor } from './hex';
 import {
-  DEFAULT_PALETTE_TONES,
   MATERIAL_COLOR_ROLES,
   MATERIAL_OPTIONAL_COLOR_ROLES,
+  MATERIAL_VARIANTS,
   SUPPORTED_PLATFORMS,
   SUPPORTED_SPEC_VERSIONS,
 } from './roles';
 import type {
-  Color,
-  ColorScheme,
-  ColorSchemeOptions,
-  CssVarMap,
-  DynamicSchemeLike,
-  HctColor,
+  CreateSchemesOptions,
   MaterialColorRole,
   MaterialOptionalColorRole,
-  MaterialThemeShape,
+  MaterialScheme,
+  MaterialSchemes,
+  MaterialVariant,
   Platform,
-  SchemeOptions,
-  SchemeOptionsBase,
-  SerializeCssVarMapOptions,
   SpecVersion,
-  StructuredColorScheme,
-  TonalPalette,
 } from './types';
-import type { Variant } from './variant';
 
-export interface DynamicColorScheme extends DynamicSchemeLike {}
+type SchemeConstructor = new (
+  sourceColorHct: Hct,
+  isDark: boolean,
+  contrastLevel: number,
+  specVersion?: SpecVersion,
+  platform?: Platform,
+) => DynamicScheme;
 
-export class DynamicColorScheme {
-  public sourceColorHct: HctColor;
-  public readonly sourceColorArgb: number;
-  public readonly variant: Variant;
-  public readonly contrastLevel: number;
-  public readonly isDark: boolean;
-  public readonly platform: Platform;
-  public readonly specVersion: SpecVersion;
-  public readonly primaryPalette: TonalPalette;
-  public readonly secondaryPalette: TonalPalette;
-  public readonly tertiaryPalette: TonalPalette;
-  public readonly neutralPalette: TonalPalette;
-  public readonly neutralVariantPalette: TonalPalette;
-  public readonly errorPalette: TonalPalette;
-  public readonly colors: DynamicSchemeLike['colors'];
+const DEFAULT_VARIANT: MaterialVariant = 'tonal-spot';
+const DEFAULT_SPEC_VERSION: SpecVersion = '2026';
+const DEFAULT_PLATFORM: Platform = 'phone';
 
-  private readonly delegate: MaterialDynamicScheme;
+const SCHEME_CONSTRUCTORS: Record<MaterialVariant, SchemeConstructor> = {
+  monochrome: SchemeMonochrome,
+  neutral: SchemeNeutral,
+  'tonal-spot': SchemeTonalSpot,
+  vibrant: SchemeVibrant,
+  expressive: SchemeExpressive,
+  fidelity: SchemeFidelity,
+  content: SchemeContent,
+  rainbow: SchemeRainbow,
+  'fruit-salad': SchemeFruitSalad,
+};
 
-  public constructor(sourceColor: Color, options?: SchemeOptionsBase);
-  public constructor(options: SchemeOptions);
-  public constructor(source: Color | SchemeOptions, options: SchemeOptionsBase = {}) {
-    const resolvedOptions = normalizeSchemeOptions(source, options);
-    const {
-      primary,
-      secondary,
-      tertiary,
-      neutral,
-      neutralVariant,
-      isDark = false,
-    } = resolvedOptions;
-    const sourceColor = getRequiredSourceColor(resolvedOptions);
-    const contrastLevel = resolveContrastLevelValue(resolvedOptions.contrastLevel);
-    const style = PaletteStyle.from(resolvedOptions.variant ?? resolvedOptions.style);
-    const specVersion = getSpecVersionValue(resolvedOptions.specVersion);
-    const platform = getPlatformValue(resolvedOptions.platform);
-    const dynamicScheme = style.dynamicScheme(
-      toMaterialHct(sourceColor),
-      isDark,
-      contrastLevel,
-      specVersion,
-      platform,
-    );
+export function createSchemes(options: CreateSchemesOptions): MaterialSchemes {
+  const sourceColor = normalizeHexColor(options.sourceColor, 'sourceColor');
+  const sourceArgb = hexColorToArgb(sourceColor);
+  const variant = resolveVariant(options.variant);
+  const contrastLevel = resolveContrastLevel(options.contrastLevel);
+  const specVersion = resolveSpecVersion(options.specVersion);
+  const platform = resolvePlatform(options.platform);
+  const Scheme = SCHEME_CONSTRUCTORS[variant];
 
-    this.delegate = new MaterialDynamicScheme({
-      ...dynamicScheme,
-      primaryPalette: DynamicColorScheme.createPaletteOverride(
-        primary,
-        dynamicScheme.primaryPalette,
-      ),
-      secondaryPalette: DynamicColorScheme.createPaletteOverride(
-        secondary,
-        dynamicScheme.secondaryPalette,
-      ),
-      tertiaryPalette: DynamicColorScheme.createPaletteOverride(
-        tertiary,
-        dynamicScheme.tertiaryPalette,
-      ),
-      neutralPalette: DynamicColorScheme.createPaletteOverride(
-        neutral,
-        dynamicScheme.neutralPalette,
-      ),
-      neutralVariantPalette: DynamicColorScheme.createPaletteOverride(
-        neutralVariant,
-        dynamicScheme.neutralVariantPalette,
-      ),
-    } as unknown as ConstructorParameters<typeof MaterialDynamicScheme>[0]);
-
-    this.sourceColorHct = this.delegate.sourceColorHct;
-    this.sourceColorArgb = this.delegate.sourceColorArgb;
-    this.variant = this.delegate.variant as Variant;
-    this.contrastLevel = this.delegate.contrastLevel;
-    this.isDark = this.delegate.isDark;
-    this.platform = this.delegate.platform;
-    this.specVersion = this.delegate.specVersion;
-    this.primaryPalette = this.delegate.primaryPalette;
-    this.secondaryPalette = this.delegate.secondaryPalette;
-    this.tertiaryPalette = this.delegate.tertiaryPalette;
-    this.neutralPalette = this.delegate.neutralPalette;
-    this.neutralVariantPalette = this.delegate.neutralVariantPalette;
-    this.errorPalette = this.delegate.errorPalette;
-    this.colors = this.delegate.colors as unknown as DynamicSchemeLike['colors'];
-
-    defineRoleGetters(this, this.delegate);
-  }
-
-  public toColorScheme(options?: ColorSchemeOptions<false>): StructuredColorScheme<false> {
-    return createColorScheme(this, options);
-  }
-
-  public toCssVarMap(options?: ColorSchemeOptions): CssVarMap {
-    return createCssVarMap(this.toColorScheme(options));
-  }
-
-  public toCssVariables(options: ColorSchemeOptions & SerializeCssVarMapOptions = {}): string {
-    const { selector, minify, ...colorSchemeOptions } = options;
-    return createCssVariables(
-      this.toColorScheme(colorSchemeOptions),
-      createSerializeOptions(selector, minify),
-    );
-  }
-
-  public toCssVars(options: ColorSchemeOptions & SerializeCssVarMapOptions = {}): string {
-    return this.toCssVariables(options);
-  }
-
-  public getArgb(dynamicColor: unknown): number {
-    return this.delegate.getArgb(dynamicColor as never);
-  }
-
-  public getHct(dynamicColor: unknown): HctColor {
-    return this.delegate.getHct(dynamicColor as never);
-  }
-
-  private static createPaletteOverride(
-    color: Color | undefined,
-    fallback: TonalPalette,
-  ): MaterialTonalPalette {
-    return color == null ? (fallback as MaterialTonalPalette) : createMaterialPalette(color);
-  }
-}
-
-export function createScheme(sourceColor: Color, options?: SchemeOptionsBase): DynamicColorScheme;
-export function createScheme(options: SchemeOptions): DynamicColorScheme;
-export function createScheme(
-  sourceOrOptions: Color | SchemeOptions,
-  options: SchemeOptionsBase = {},
-): DynamicColorScheme {
-  return isColor(sourceOrOptions)
-    ? new DynamicColorScheme(sourceOrOptions, options)
-    : new DynamicColorScheme(sourceOrOptions);
-}
-
-export function createColorScheme<WithBrightnessVariants extends boolean = false>(
-  source: MaterialThemeShape,
-  options?: ColorSchemeOptions<WithBrightnessVariants>,
-): StructuredColorScheme<WithBrightnessVariants>;
-export function createColorScheme(
-  source: DynamicSchemeLike,
-  options?: ColorSchemeOptions<false>,
-): StructuredColorScheme<false>;
-export function createColorScheme<WithBrightnessVariants extends boolean = false>(
-  source: DynamicSchemeLike | MaterialThemeShape,
-  options: ColorSchemeOptions<WithBrightnessVariants> = {},
-): StructuredColorScheme<WithBrightnessVariants> {
-  const colorScheme = (
-    isThemeShape(source)
-      ? createColorSchemeFromTheme(source, options)
-      : createColorSchemeFromDynamicScheme(source, options)
-  ) as StructuredColorScheme<WithBrightnessVariants>;
-
-  return applyColorSchemeModifier(colorScheme, options);
-}
-
-function createColorSchemeFromTheme<WithBrightnessVariants extends boolean>(
-  theme: MaterialThemeShape,
-  options: ColorSchemeOptions<WithBrightnessVariants>,
-): StructuredColorScheme<WithBrightnessVariants> {
-  const baseScheme = options.dark ? theme.schemes.dark : theme.schemes.light;
-  const colorScheme: ColorScheme = {
-    ...rolesToScheme(baseScheme),
-    ...customGroupsToScheme(theme, options),
+  return {
+    light: createMaterialScheme(Scheme, sourceArgb, false, contrastLevel, specVersion, platform),
+    dark: createMaterialScheme(Scheme, sourceArgb, true, contrastLevel, specVersion, platform),
   };
-
-  if (options.paletteTones) {
-    Object.assign(colorScheme, themePalettesToScheme(theme, options.paletteTones));
-  }
-
-  if (options.brightnessVariants) {
-    Object.assign(
-      colorScheme,
-      rolesToScheme(theme.schemes.light, 'Light'),
-      rolesToScheme(theme.schemes.dark, 'Dark'),
-      customGroupsToScheme(theme, { ...options, brightnessVariants: true }, false),
-    );
-  }
-
-  return colorScheme as StructuredColorScheme<WithBrightnessVariants>;
 }
 
-function createColorSchemeFromDynamicScheme(
-  scheme: DynamicSchemeLike,
-  options: ColorSchemeOptions<boolean>,
-): StructuredColorScheme<false> {
-  if (options.brightnessVariants) {
-    throw new Error(
-      'brightnessVariants require a MaterialTheme from createTheme; a single DynamicColorScheme cannot provide paired light and dark role values.',
-    );
-  }
+function createMaterialScheme(
+  Scheme: SchemeConstructor,
+  sourceArgb: number,
+  isDark: boolean,
+  contrastLevel: number,
+  specVersion: SpecVersion,
+  platform: Platform,
+): MaterialScheme {
+  const dynamicScheme = new Scheme(
+    Hct.fromInt(sourceArgb),
+    isDark,
+    contrastLevel,
+    specVersion,
+    platform,
+  );
 
-  const colorScheme: ColorScheme = rolesToScheme(scheme);
-
-  if (options.paletteTones) {
-    Object.assign(colorScheme, schemePalettesToScheme(scheme, options.paletteTones));
-  }
-
-  return colorScheme;
+  return rolesToScheme(dynamicScheme);
 }
 
-function applyColorSchemeModifier<WithBrightnessVariants extends boolean>(
-  colorScheme: StructuredColorScheme<WithBrightnessVariants>,
-  options: ColorSchemeOptions<WithBrightnessVariants>,
-): StructuredColorScheme<WithBrightnessVariants> {
-  return options.modifyColorScheme?.(colorScheme) ?? colorScheme;
-}
-
-function rolesToScheme(scheme: DynamicSchemeLike, suffix?: string): ColorScheme {
-  const output: Record<string, Color> = {};
+function rolesToScheme(dynamicScheme: DynamicScheme): MaterialScheme {
+  const colors = dynamicScheme.colors as unknown as Record<string, () => DynamicColor | undefined>;
+  const output: Partial<Record<MaterialColorRole, string>> = {};
 
   for (const role of MATERIAL_COLOR_ROLES) {
-    const value = readSchemeRole(scheme, role);
-    if (value === undefined) continue;
-    output[formatTokenName(role, suffix === undefined ? {} : { suffix })] = value;
-  }
-
-  return output as ColorScheme;
-}
-
-function readSchemeRole(scheme: DynamicSchemeLike, role: MaterialColorRole): number | undefined {
-  const colors = scheme.colors as Record<string, () => unknown>;
-  const colorFactory = colors[role];
-  if (typeof colorFactory !== 'function') {
-    if (isOptionalRole(role)) return undefined;
-    throw new Error(`MaterialDynamicColors method is unavailable: ${role}`);
-  }
-
-  const dynamicColor = colorFactory.call(scheme.colors);
-  if (dynamicColor === undefined) {
-    if (isOptionalRole(role)) return undefined;
-    throw new Error(`Material dynamic color is unavailable: ${role}`);
-  }
-
-  return scheme.getArgb(dynamicColor);
-}
-
-function defineRoleGetters(target: DynamicColorScheme, delegate: MaterialDynamicScheme): void {
-  const roleValues = delegate as unknown as Record<string, number | undefined>;
-
-  for (const role of MATERIAL_COLOR_ROLES) {
-    Object.defineProperty(target, role, {
-      configurable: true,
-      get: () => roleValues[role],
-    });
-  }
-}
-
-function customGroupsToScheme(
-  theme: MaterialThemeShape,
-  options: ColorSchemeOptions<boolean>,
-  includeBase: boolean = true,
-): Record<string, Color> {
-  const colorScheme: Record<string, Color> = {};
-  const variants: { type: 'light' | 'dark'; suffix?: string }[] = [];
-
-  if (includeBase) variants.push({ type: options.dark ? 'dark' : 'light' });
-
-  if (options.brightnessVariants) {
-    variants.push({ type: 'light', suffix: 'Light' }, { type: 'dark', suffix: 'Dark' });
-  }
-
-  for (const customColor of theme.customColors) {
-    for (const variant of variants) {
-      const colorGroup = customColor[variant.type];
-      for (const [pattern, value] of Object.entries(colorGroup)) {
-        colorScheme[formatColorToken(pattern, customColor.color.name, variant.suffix)] = value;
-      }
+    const colorFactory = colors[role];
+    if (typeof colorFactory !== 'function') {
+      if (isOptionalRole(role)) continue;
+      throw new Error(`Material dynamic color is unavailable: ${role}`);
     }
+
+    const dynamicColor = colorFactory.call(dynamicScheme.colors);
+    if (dynamicColor === undefined) {
+      if (isOptionalRole(role)) continue;
+      throw new Error(`Material dynamic color is unavailable: ${role}`);
+    }
+
+    output[role] = argbToHexColor(dynamicScheme.getArgb(dynamicColor));
   }
 
-  return colorScheme;
+  return output as MaterialScheme;
 }
 
-function themePalettesToScheme(
-  theme: MaterialThemeShape,
-  paletteTones: boolean | readonly number[],
-): Record<string, Color> {
-  const output: Record<string, Color> = {};
-  const tones = optionToTones(paletteTones);
-
-  for (const [paletteName, palette] of Object.entries(theme.palettes)) {
-    Object.assign(output, paletteToScheme(paletteName, palette, tones));
-  }
-
-  for (const customColor of theme.customColors) {
-    Object.assign(
-      output,
-      paletteToScheme(customColor.color.name, createPalette(customColor.value), tones),
-    );
-  }
-
-  return output;
-}
-
-function schemePalettesToScheme(
-  scheme: DynamicSchemeLike,
-  paletteTones: boolean | readonly number[],
-): Record<string, Color> {
-  const palettes = {
-    primary: scheme.primaryPalette,
-    secondary: scheme.secondaryPalette,
-    tertiary: scheme.tertiaryPalette,
-    neutral: scheme.neutralPalette,
-    neutralVariant: scheme.neutralVariantPalette,
-    error: scheme.errorPalette,
-  };
-
-  const output: Record<string, Color> = {};
-  const tones = optionToTones(paletteTones);
-
-  for (const [paletteName, palette] of Object.entries(palettes)) {
-    Object.assign(output, paletteToScheme(paletteName, palette, tones));
-  }
-
-  return output;
-}
-
-function paletteToScheme(
-  paletteName: string,
-  palette: TonalPalette,
-  tones: readonly number[],
-): Record<string, Color> {
-  return Object.fromEntries(
-    tones.map((tone) => [formatTokenName(paletteName, { suffix: tone }), palette.tone(tone)]),
+function resolveVariant(variant: unknown): MaterialVariant {
+  if (variant === undefined) return DEFAULT_VARIANT;
+  if ((MATERIAL_VARIANTS as readonly unknown[]).includes(variant))
+    return variant as MaterialVariant;
+  throw new Error(
+    `Invalid variant "${String(variant)}". Expected ${formatExpected(MATERIAL_VARIANTS)}.`,
   );
 }
 
-function optionToTones(paletteTones: boolean | readonly number[]): readonly number[] {
-  if (Array.isArray(paletteTones)) return [...paletteTones];
-  return DEFAULT_PALETTE_TONES;
-}
-
-function normalizeSchemeOptions(
-  source: Color | SchemeOptions,
-  options: SchemeOptionsBase,
-): SchemeOptions {
-  return isColor(source) ? { ...options, sourceColor: source } : source;
-}
-
-function getRequiredSourceColor(options: SchemeOptions): Color {
-  if (options.sourceColors !== undefined) {
-    if (options.sourceColors.length === 0) {
-      throw new Error('sourceColors must contain exactly one source color in this v0 package.');
-    }
-    if (options.sourceColors.length > 1) {
-      throw new Error(
-        'Multiple source colors are not supported by @material/material-color-utilities@0.4.0; v0 rejects extra source colors instead of ignoring them.',
-      );
-    }
-    return options.sourceColors[0] as Color;
+function resolveContrastLevel(contrastLevel: unknown): number {
+  if (contrastLevel === undefined) return 0;
+  if (
+    typeof contrastLevel === 'number' &&
+    Number.isFinite(contrastLevel) &&
+    contrastLevel >= -1 &&
+    contrastLevel <= 1
+  ) {
+    return contrastLevel;
   }
 
-  const sourceColor = options.sourceColor ?? options.primary;
-  if (sourceColor == null) throw new Error('createScheme requires sourceColor or primary.');
-  return sourceColor;
+  throw new Error('contrastLevel must be a finite number between -1 and 1.');
 }
 
-function getSpecVersionValue(specVersion: SchemeOptionsBase['specVersion']): SpecVersion {
-  if (specVersion === undefined) return '2021';
-  if ((SUPPORTED_SPEC_VERSIONS as readonly string[]).includes(specVersion)) return specVersion;
-  throw new Error(`Unsupported Material specVersion: ${specVersion}`);
+function resolveSpecVersion(specVersion: unknown): SpecVersion {
+  if (specVersion === undefined) return DEFAULT_SPEC_VERSION;
+  if ((SUPPORTED_SPEC_VERSIONS as readonly unknown[]).includes(specVersion)) {
+    return specVersion as SpecVersion;
+  }
+  throw new Error(
+    `Invalid specVersion "${String(specVersion)}". Expected ${formatExpected(SUPPORTED_SPEC_VERSIONS)}.`,
+  );
 }
 
-function getPlatformValue(platform: SchemeOptionsBase['platform']): Platform {
-  if (platform === undefined) return 'phone';
-  if ((SUPPORTED_PLATFORMS as readonly string[]).includes(platform)) return platform;
-  throw new Error(`Unsupported Material platform: ${platform}`);
-}
-
-function createSerializeOptions(
-  selector: string | undefined,
-  minify: boolean | undefined,
-): SerializeCssVarMapOptions {
-  return {
-    ...(selector === undefined ? {} : { selector }),
-    ...(minify === undefined ? {} : { minify }),
-  };
-}
-
-function isThemeShape(
-  source: DynamicSchemeLike | MaterialThemeShape,
-): source is MaterialThemeShape {
-  return 'schemes' in source && 'palettes' in source;
+function resolvePlatform(platform: unknown): Platform {
+  if (platform === undefined) return DEFAULT_PLATFORM;
+  if ((SUPPORTED_PLATFORMS as readonly unknown[]).includes(platform)) return platform as Platform;
+  throw new Error(
+    `Invalid platform "${String(platform)}". Expected ${formatExpected(SUPPORTED_PLATFORMS)}.`,
+  );
 }
 
 function isOptionalRole(role: MaterialColorRole): role is MaterialOptionalColorRole {
   return (MATERIAL_OPTIONAL_COLOR_ROLES as readonly string[]).includes(role);
 }
 
-export function sourceColorToArgb(options: SchemeOptions): number {
-  return toArgb(getRequiredSourceColor(options));
+function formatExpected(values: readonly string[]): string {
+  return values.map((value) => `"${value}"`).join(', ');
 }
-
-export { serializeCssVarMap };

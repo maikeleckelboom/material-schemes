@@ -1,7 +1,7 @@
 {
   "name": "material-schemes",
   "version": "0.0.0",
-  "description": "TypeScript utilities for generating Material 3 color schemes, tonal palettes, and CSS variables.",
+  "description": "A runtime-neutral TypeScript boundary for Material light and dark role maps and CSS variables.",
   "license": "MIT",
   "author": "Maikel Eckelboom",
   "repository": {
@@ -12,6 +12,9 @@
     "url": "https://github.com/maikeleckelboom/material-schemes/issues"
   },
   "homepage": "https://github.com/maikeleckelboom/material-schemes#readme",
+  "publishConfig": {
+    "provenance": true
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -19,47 +22,55 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE.md"
   ],
   "keywords": [
     "material-design",
     "material-3",
     "color-schemes",
-    "tonal-palettes",
-    "css-variables",
-    "design-tokens"
+    "css-variables"
   ],
   "engines": {
     "node": ">=18"
   },
   "packageManager": "pnpm@11.7.0",
   "scripts": {
+    "vendor:mcu": "node scripts/vendorMaterialColorUtilities.ts",
+    "pretypecheck": "pnpm vendor:mcu --ensure",
+    "prebuild": "pnpm vendor:mcu --ensure",
     "build": "tsup",
     "typecheck": "tsc --noEmit",
+    "pretest": "pnpm vendor:mcu --ensure",
     "test": "vitest run",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "check": "pnpm typecheck && pnpm test && pnpm build && pnpm format",
+    "package:check": "node scripts/checkPackage.ts && publint && attw --pack .",
     "smoke:consumer": "node scripts/smokeConsumer.ts",
-    "release:check": "pnpm check && pnpm pack --dry-run && pnpm smoke:consumer",
+    "release:check": "pnpm check && pnpm pack --dry-run && pnpm package:check && pnpm smoke:consumer",
     "verify:release": "node scripts/verifyRelease.ts",
     "prepack": "pnpm build"
   },
-  "dependencies": {
-    "@material/material-color-utilities": "^0.4.0"
-  },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
     "@types/node": "^25.9.3",
     "prettier": "^3.8.4",
+    "publint": "^0.3.21",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
